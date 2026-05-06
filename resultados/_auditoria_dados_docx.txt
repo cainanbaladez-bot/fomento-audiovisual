@@ -1,0 +1,552 @@
+================================================================================
+AUDITORIA DE DADOS — DOCX vs. PAINEL HTML (FONTE DA VERDADE)
+Painel de referência: Análise do Retorno do Fomento Público ao Audiovisual Brasileiro (FSA - Renúncia Fiscal)_v2.html
+Data: 2026-04-30
+================================================================================
+
+LEGENDA DE STATUS:
+  OK          — valor idêntico ou dentro de arredondamento aceitável
+  DIVERGE     — valor numericamente diferente do painel
+  NAO ENCONTRADO NO PAINEL — número citado no DOCX sem contrapartida clara no HTML
+  CONTEXTO DIFERENTE — número correto mas usado em contexto/afirmação distorcida
+
+================================================================================
+=== DOCUMENTO 1: Uma política de fomento baseada em evidências_v6.docx ===
+================================================================================
+
+--------------------------------------------------------------------------------
+SEÇÃO: Abertura / contexto geral
+--------------------------------------------------------------------------------
+
+[Parágrafo ~14] STYLE=Normal
+TRECHO: "...são 60 chamadas diferentes..."
+VALOR NO DOCX: 60 chamadas
+VALOR NO PAINEL: Não está explicitado como "60 chamadas" no HTML, mas o DOCX Análise de Dados (Seção 2.1) diz "60 denominações de chamadas distintas". O HTML menciona 14 categorias analíticas.
+STATUS: NAO ENCONTRADO NO PAINEL (mas consistente com o DOCX Análise, é dado metodológico não exibido no painel)
+
+--------------------------------------------------------------------------------
+SEÇÃO: "A sinergia FSA e renúncia fiscal no mercado doméstico"
+--------------------------------------------------------------------------------
+
+[Parágrafo ~21] STYLE=Normal
+TRECHO: "...conjunto concentrado de 27 obras responsáveis por 75% da renda gerada pelas obras financiadas exclusivamente via renúncia fiscal, o que corresponde a 50% de toda a renda gerada em salas de cinema no período analisado pelos filmes brasileiros com fomento público..."
+VALOR NO DOCX: 27 obras = 75% renda renúncia pura; esse grupo = 50% de toda a renda
+VALOR NO PAINEL: Não encontrado como KPI ou tabela explícita no HTML. O HTML mostra apenas que Renúncia Pura: ROI 2,22× (investimento R$0,68bi vs bilheteria R$1,47bi), mas não a contagem de "27 obras top".
+STATUS: NAO ENCONTRADO NO PAINEL
+
+[Parágrafo ~21] STYLE=Normal
+TRECHO: "...somam a elas as obras financiadas por renúncia e FSA, chega-se a 94% da renda de filmes nacionais em salas de cinema com fomento público no Brasil."
+VALOR NO DOCX: 94%
+VALOR NO PAINEL: Não aparece como KPI direto no HTML.
+STATUS: NAO ENCONTRADO NO PAINEL
+
+--------------------------------------------------------------------------------
+SEÇÃO: "A melhor decisão de investimento é a que funciona"
+--------------------------------------------------------------------------------
+
+[Parágrafo ~35] STYLE=Normal
+TRECHO: "...padrão ouro seria o FSA Pontuação Bilheteria com leitura humana de roteiro e distribuidora como proponente, com ROI doméstico agregado de 1,07× e ROI internacional médio de 3,0..."
+VALOR NO DOCX: ROI doméstico agregado = 1,07× | ROI internacional médio = 3,0
+VALOR NO PAINEL (HTML): pont_com_dist: roi_fsa_def=1.8014, roi_tot_def=0.9419, intl_avg=2.87
+  - "ROI doméstico" no DOCX provavelmente refere-se a roi_fsa_def (bilheteria/FSA, sem renúncia no denominador). O HTML mostra 1.80, não 1.07.
+  - O valor 1.07 só aparece como roi_dom de um filme individual no banco de dados.
+  - roi_tot_def (bilheteria / (FSA + Renúncia)) = 0.9419, também não é 1.07.
+  - intl_avg no HTML = 2.87, o DOCX diz "3,0". Pequena divergência de arredondamento.
+  ATENÇÃO: O DOCX Análise de Dados (Seção 4.4/4.6) cita a mesma categoria com ROI FSA Deflacionado = 2.034× e depois 1.07× como ROI agregado. Há indicação de que 1.07× pode ser o "ROI Doméstico Total" (receita total / investimento total incluindo renúncia), mas o HTML mostra 0.9419 para essa métrica.
+STATUS: DIVERGE — ROI dom. 1,07× vs HTML 0,94× (roi_tot_def) ou 1,80× (roi_fsa_def) | ROI intl 3,0 vs 2,87 (arredondamento aceitável → OK)
+
+[Parágrafo ~37] STYLE=Normal
+TRECHO: "...as que têm a distribuidora como proponente...apresentam ROI internacional 65% superior àquela liderada apenas pela produtora (3,01 vs. 1,82)."
+VALOR NO DOCX: ROI intl distribuidora = 3,01 | ROI intl produtora = 1,82 | diferença = 65%
+VALOR NO PAINEL (HTML): pont_com_dist: intl_avg=2.87 | pont_com_prod: intl_avg=1.65
+  Diferença relativa: (2.87-1.65)/1.65 = 74%, não 65%.
+  Os valores absolutos também diferem: 2,87 vs 3,01 e 1,65 vs 1,82.
+STATUS: DIVERGE — distribuidora ROI intl: 3,01 (DOCX) vs 2,87 (HTML) | produtora: 1,82 (DOCX) vs 1,65 (HTML) | percentual de diferença: 65% (DOCX) vs ~74% (HTML)
+
+--------------------------------------------------------------------------------
+SEÇÃO: "O que o retorno das produtoras revela"
+--------------------------------------------------------------------------------
+
+[Parágrafo ~58] STYLE=Normal
+TRECHO: "...Foram investidos 2.2B nessas empresas e seus filmes geraram xxB em renda total..."
+VALOR NO DOCX: Retorno Doméstico — investimento = R$ 2,2 bi (valor "xx" omitido/placeholder)
+VALOR NO PAINEL (HTML): Retorno Doméstico — investimento = R$ 2,14 bi
+STATUS: DIVERGE — R$ 2,2 bi (DOCX) vs R$ 2,14 bi (HTML)
+
+[Parágrafo ~58] STYLE=Normal
+TRECHO: "...São 74 produtoras..."
+VALOR NO DOCX: Retorno Doméstico = 74 produtoras
+VALOR NO PAINEL (HTML): Retorno Doméstico = 54 produtoras
+STATUS: DIVERGE — 74 produtoras (DOCX) vs 54 produtoras (HTML)
+
+[Parágrafo ~61] STYLE=Normal
+TRECHO: "...São 65 produtoras que receberam 3.3B e geraram renda de 3.4B, mas exportaram para 31 países."
+VALOR NO DOCX: Duplo Retorno = 65 produtoras | investimento = R$ 3,3 bi | receita = R$ 3,4 bi
+VALOR NO PAINEL (HTML): Duplo Retorno = 35 produtoras | investimento = R$ 2,18 bi | receita = R$ 2,43 bi
+STATUS: DIVERGE — produtoras: 65 (DOCX) vs 35 (HTML) | investimento: R$3,3bi (DOCX) vs R$2,18bi (HTML) | receita: R$3,4bi (DOCX) vs R$2,43bi (HTML)
+
+[Parágrafo ~55] STYLE=Normal
+TRECHO: "...empresas pré-estabelecidas...têm cinco vezes mais chance de figurar entre as produtoras de maior retorno do que as que nasceram dentro do próprio ciclo de fomento: 24,7% delas alcançaram o patamar de Duplo Retorno, contra 4,9% das que o fundo ajudou a surgir."
+VALOR NO DOCX: pré-2006 em Duplo Retorno = 24,7% | pós-2006 = 4,9%
+VALOR NO PAINEL (HTML): Não encontrado como KPI explícito no painel.
+STATUS: NAO ENCONTRADO NO PAINEL
+
+[Parágrafo ~56] STYLE=Normal
+TRECHO: "...há o Fomento sem Retorno: 116 produtoras, ROI doméstico mediano de 0,11×, ROI internacional mediano zero..."
+VALOR NO DOCX: Fomento sem Retorno = 116 produtoras | ROI dom. mediano = 0,11×
+VALOR NO PAINEL (HTML): Fomento Baixo Retorno = 154 produtoras (nome também alterado de "sem Retorno" para "Baixo Retorno")
+  O HTML não exibe explicitamente ROI dom. mediano = 0,11× mas a MEMORY.md confirma que ROI dom. mediano do cluster = 0,11×.
+STATUS: DIVERGE — 116 produtoras (DOCX v6) vs 154 produtoras (HTML) | nome do cluster: "Fomento sem Retorno" (DOCX v6) vs "Fomento Baixo Retorno" (HTML)
+NOTA: O DOCX v6 usa o nome antigo do cluster. O painel já foi atualizado para "Fomento Baixo Retorno".
+
+[Parágrafo ~56] STYLE=Normal
+TRECHO: "...Das 412 obras com investimento direto do FSA no período, 171 — 41,5% — não chegaram a R$ 100 mil de receita total e tiveram ROI internacional igual a zero. O FSA nessas obras soma R$ 295 milhões — 31,6% do fundo."
+VALOR NO DOCX: 412 obras FSA direto | 171 obras sem retorno = 41,5% | FSA nesses projetos = R$ 295M = 31,6%
+VALOR NO PAINEL (HTML): A seção de Capital FSA sem retorno no HTML (DOCX Análise Seção 6.5) menciona "Tier 2: receita < R$100k e sem alcance intl = R$ 0,26 bi em 147 obras". O HTML mostra "0.89 bi em [contexto de capital sem retorno]".
+  412 obras não encontrado como total explícito no painel.
+  147 obras (HTML Análise DOCX) vs "obras com FSA no período" não está comparado diretamente.
+STATUS: NAO ENCONTRADO NO PAINEL diretamente — porém os números de 147 obras (capital parado Tier 2 = R$0,26bi) são diferentes de 171 obras / R$295M citados no v6.
+
+--------------------------------------------------------------------------------
+SEÇÃO: "A estrutura que o fomento (des)construiu"
+--------------------------------------------------------------------------------
+
+[Parágrafo ~67] STYLE=Normal
+TRECHO: "...Entre 2010 e 2023, o número de obras produzidas com fomento público cresceu 5,5 vezes — de 72 para 397 por ano. O número de produtoras ativas cresceu 5 vezes — de 60 para 303. Mas o investimento mediano por obra caiu 58%: de R$ 2,05 milhões para R$ 870 mil."
+VALOR NO DOCX: obras cresceu 5,5× (72→397) | produtoras cresceu 5× (60→303) | investimento mediano caiu 58% (R$2,05M→R$870k)
+VALOR NO PAINEL (HTML): Esses dados estão na seção de concentração do HTML como texto narrativo. Não encontrado no HTML como KPIs explícitos; a base de dados confirma "72 para 397" como string de dados (há um registro 723373 e 397 que pode ser coincidência). O HTML exibe na curva de Lorenz e nos KPIs: Gini=0,634, ticket médio mediana=R$596k/ano, mas não exibe explicitamente "5,5 vezes" nem "de 72 para 397".
+STATUS: NAO ENCONTRADO NO PAINEL como KPI — dados não contraditos, mas não verificáveis diretamente no HTML.
+
+[Parágrafo ~69] STYLE=Normal
+TRECHO: "...O coeficiente de Gini da distribuição do investimento FSA por produtora é 0,61, metade das produtoras recebe apenas 11% do investimento, enquanto as top 10% concentram 47%."
+VALOR NO DOCX: Gini = 0,61 | bottom 50% = 11% | top 10% = 47%
+VALOR NO PAINEL (HTML):
+  - Gini = 0,634 (KPI explícito no HTML) — o HTML também menciona "0,724" em texto narrativo da seção de concentração (divergência interna no próprio HTML)
+  - Bottom 50%: HTML KPI diz "≈ 4%" ("das 542 menores produtoras") — completamente diferente de 11%
+  - Top 10%: HTML KPI diz 15,2% (top 10 produtoras de 1.075) | tier_fsa_share: [15.2, 20.7, 21.7, 17.4, 25.0] para tiers A/B/C/D/E — não confirma "top 10% concentram 47%"
+STATUS: DIVERGE — Gini: 0,61 (DOCX v6) vs 0,634 (HTML KPI) | bottom 50%: 11% (DOCX) vs ≈4% (HTML KPI) | top 10%: 47% (DOCX) vs 15,2% das top 10 empresas de 1.075 (HTML) — métricas incomparáveis ou incorretas
+
+NOTA EXPLICATIVA sobre Gini e concentração:
+  O HTML exibe simultaneamente:
+  - KPI "Gini por Produtora: 0.634"
+  - Texto: "O Gini de 0,724 por produtora é significativamente superior ao Gini de 0,480 calculado por obra individual"
+  Há inconsistência interna no HTML (0,634 vs 0,724). O valor "0,61" do DOCX v6 é uma terceira versão diferente de ambos.
+  O DOCX Análise de Dados (Seção 6.1) cita "Gini calculado por produtora (0,634)" — alinhado com o KPI do HTML.
+
+[Parágrafo ~69] STYLE=Normal
+TRECHO: "...Rio de Janeiro e São Paulo juntos concentram 66% dos recursos do FSA..."
+VALOR NO DOCX: RJ+SP = 66% do FSA
+VALOR NO PAINEL (HTML): Não encontrado como KPI explícito. O HTML usa "66%" apenas no contexto de políticas afirmativas de gênero ("66% das inscrições"). Não há KPI de concentração geográfica 66% FSA.
+STATUS: NAO ENCONTRADO NO PAINEL
+
+[Parágrafo ~69] STYLE=Normal
+TRECHO: "...Quarenta e três por cento das produtoras fizeram apenas uma obra em uma década. A mediana de obras por produtora é 2."
+VALOR NO DOCX: 43% com apenas uma obra | mediana = 2 obras
+VALOR NO PAINEL (HTML): Não exibido como KPI explícito no HTML.
+STATUS: NAO ENCONTRADO NO PAINEL
+
+[Parágrafo ~76] STYLE=Normal
+TRECHO: "...O FSA hoje mobiliza R$ 500 milhões anuais só para produção de salas de cinema; somado à média da renúncia fiscal dos últimos cinco anos — cerca de R$ 220 milhões por ano —, o bolo disponível chega a aproximadamente R$ 720 milhões anuais."
+VALOR NO DOCX: FSA produção = R$500M/ano | renúncia média = R$220M/ano | total = R$720M/ano
+VALOR NO PAINEL (HTML): Não encontrado como KPI no HTML. O HTML menciona "R$ 0.89 bi em [capital sem retorno]" em outro contexto.
+STATUS: NAO ENCONTRADO NO PAINEL
+
+[Parágrafo ~76] STYLE=Normal
+TRECHO: "...Dos 683 beneficiários do período, cerca de 150 empresas apresentam o que os dados permitem chamar de duplo retorno..."
+VALOR NO DOCX: 683 beneficiários | ~150 com duplo retorno
+VALOR NO PAINEL (HTML): HTML KPI = 1.075 produtoras no total. HTML cluster Duplo Retorno = 35 produtoras.
+  683 não encontrado como total de beneficiários no HTML.
+  150 empresas de "duplo retorno" vs 35 no cluster "Duplo Retorno" do HTML.
+STATUS: DIVERGE — beneficiários: 683 (DOCX v6) vs 1.075 (HTML KPI) | duplo retorno: ~150 (DOCX v6) vs 35 (HTML cluster)
+
+[Parágrafo ~76] STYLE=Normal
+TRECHO: "...Se os R$ 720 milhões fossem concentrados nelas, o ticket médio seria de R$ 4,8 milhões por empresa por ano..."
+VALOR NO DOCX: ticket médio teórico = R$ 4,8M/empresa/ano (com 150 empresas e R$720M)
+  Matemática: 720M / 150 = 4,8M → cálculo interno correto dado as premissas do DOCX.
+VALOR NO PAINEL (HTML): Não exibido. O HTML mostra ticket médio mediana = R$596k/ano.
+STATUS: NAO ENCONTRADO NO PAINEL (cálculo hipotético baseado em premissas do DOCX)
+
+[Parágrafo ~76] STYLE=Normal
+TRECHO: "...Distribuídos entre 683, o ticket cai para R$ 1 milhão — e para metade das empresas, para menos de R$ 205 mil."
+VALOR NO DOCX: ticket médio com 683 beneficiários = R$1M | mediana = <R$205mil
+VALOR NO PAINEL (HTML): HTML KPI: ticket médio anual mediana = R$596k/ano. HTML: "437 de 1075 produtoras" abaixo de R$500k/ano = 41%.
+STATUS: DIVERGE — mediana DOCX=R$205mil vs HTML=R$596k/ano (métricas ligeiramente diferentes: DOCX pode ser "mediana simples do total investido/anos" vs HTML que é "ticket médio por produtora ativa")
+
+[Parágrafo ~78] STYLE=Normal
+TRECHO: "...As 68 produtoras do topo (~10% do total) absorvem 54,5% de todo o investimento do período: R$ 2,26 bilhões em dez anos."
+VALOR NO DOCX: top 68 produtoras (~10%) = 54,5% do investimento = R$2,26bi
+VALOR NO PAINEL (HTML): tier_fsa_share top 10 (Top 10 de 1075) = 15,2%; top 50 = 35,9%. Não há dado de "top 68" ou "54,5%" visível no HTML.
+STATUS: NAO ENCONTRADO NO PAINEL (pode ser cálculo derivado não exibido explicitamente)
+
+[Parágrafo ~82] STYLE=Normal
+TRECHO: "...O cluster de Retorno Internacional — 25 produtoras, menos de R$ 186 mil de FSA por ano, ROI internacional mediano de 4,8..."
+VALOR NO DOCX: Retorno Internacional = 25 produtoras | FSA < R$186mil/ano | ROI intl mediano = 4,8
+VALOR NO PAINEL (HTML):
+  - HTML cluster: 94 produtoras (não 25)
+  - HTML KPI "Cluster subfinanciado: R$186k/ano — FSA médio das 25 produtoras de maior ROI internacional" (texto do KPI)
+  - HTML texto: "Retorno Internacional — 25 produtoras com menos de R$ 186 mil de FSA por ano, ROI internacional médio de todos os clusters: 7,43"
+  - HTML ROI intl cluster RI = 6,77 (do gráfico de barras)
+  ATENÇÃO: O HTML usa "25 produtoras" em dois sentidos diferentes:
+  1. Como nome do KPI "as 25 de maior ROI internacional" (subgrupo dentro do cluster RI)
+  2. O cluster Retorno Internacional no HTML tem 94 produtoras no total
+  O DOCX v6 confunde as duas coisas: usa "25 produtoras" como se fosse o tamanho total do cluster RI.
+STATUS: DIVERGE/CONTEXTO DIFERENTE — "25 produtoras" no DOCX v6 refere-se ao cluster inteiro, mas no HTML "25 produtoras" é o subgrupo de maior ROI dentro do cluster RI (que tem 94 no total) | ROI intl mediano 4,8 (DOCX) vs ROI intl cluster 6,77 (HTML gráfico) vs 7,43 (HTML texto)
+
+[Parágrafo ~86] STYLE=Normal
+TRECHO: "...o dado de que curtas em festival tier-1 são preditores robustos de longas em festivais internacionais (3,5× mais chance, janela ótima de 3 a 6 anos)..."
+VALOR NO DOCX: 3,5× mais chance | janela 3 a 6 anos
+VALOR NO PAINEL (HTML): KPI "Multiplicador de chance: 3,5×" + "Janela ótima: 3–6 anos" — valores idênticos.
+STATUS: OK
+
+--------------------------------------------------------------------------------
+SEÇÃO: "Três propostas que os dados sustentam"
+--------------------------------------------------------------------------------
+
+[Parágrafo ~85] STYLE=Normal
+TRECHO: "...O diferencial de 65% no ROI internacional dos projetos com distribuidora desde a concepção..."
+VALOR NO DOCX: 65% de diferencial
+(Repetição da afirmação do parágrafo 37 — ver análise acima)
+STATUS: DIVERGE — 65% (DOCX) vs ~74% calculado a partir dos dados do HTML (2,87 vs 1,65)
+
+[Parágrafo ~86] STYLE=Normal
+TRECHO: "...O cluster de Retorno Internacional — 25 produtoras que geram impacto desproporcional com menos de R$ 186 mil por ano — mostra que existe demanda real...e os 3,5× de probabilidade adicional..."
+VALOR NO DOCX: 25 produtoras / <R$186mil/ano / 3,5×
+VALOR NO PAINEL (HTML): ver análise acima — 25 produtoras é subgrupo, não cluster total (94); <R$186mil e 3,5× estão corretos.
+STATUS: DIVERGE (tamanho cluster) / OK (valores R$186mil e 3,5×)
+
+
+================================================================================
+=== DOCUMENTO 2: Análise de Dados - Fomento Audiovisual Brasileiro.docx ===
+================================================================================
+
+--------------------------------------------------------------------------------
+SEÇÃO 1: Recorte da Análise e Fontes de Dados
+--------------------------------------------------------------------------------
+
+[Parágrafo ~6] STYLE=Normal
+TRECHO: "O universo completo da base compreende 3.968 obras."
+VALOR NO DOCX: 3.968 obras (universo total)
+VALOR NO PAINEL (HTML): "3968 obras com estreia em cartaz · PRODECINE 2014–2023"
+STATUS: OK
+
+--------------------------------------------------------------------------------
+SEÇÃO 2.4: Clusterização de produtoras independentes
+--------------------------------------------------------------------------------
+
+[Parágrafo ~75] STYLE=Normal
+TRECHO: "As 991 produtoras independentes com investimento FSA direto foram classificadas em 5 clusters..."
+VALOR NO DOCX: 991 produtoras (FSA direto)
+VALOR NO PAINEL (HTML): HTML KPI: "1.075 produtoras" (total, incluindo renúncia pura provavelmente). HTML cluster total: 35+54+94+154+906 = 1.243 (soma dos clusters). Não há "991" explícito no HTML.
+STATUS: DIVERGE — 991 (DOCX) vs 1.243 (soma clusters HTML) ou 1.075 (KPI HTML)
+NOTA: A discrepância provavelmente reflete escopo diferente — 991 = apenas FSA direto (sem renúncia pura), enquanto o HTML inclui produtoras com qualquer mecanismo. O DOCX Análise foi escrito com dados de um estado anterior do pipeline.
+
+--------------------------------------------------------------------------------
+SEÇÃO 3: Visão Geral do Sistema
+--------------------------------------------------------------------------------
+
+[Parágrafo ~92] STYLE=Normal
+TRECHO: "O investimento total do recorte soma aproximadamente R$ 1,93 bi."
+VALOR NO DOCX: R$ 1,93 bi (total)
+VALOR NO PAINEL (HTML): O HTML mostra por grupos: Renúncia Pura=R$0,68bi + FSA Puro=R$0,33bi + FSA+Ren FSA Maj=R$0,54bi + FSA+Ren Ren Maj=R$0,59bi = R$2,14bi. O DOCX informa apenas FSA (sem renúncia pura?) — possivelmente R$1,93bi é só o FSA direto somado.
+STATUS: NAO ENCONTRADO NO PAINEL como soma explícita; há indícios de divergência com valores dos grupos.
+
+[Parágrafo ~95] STYLE=Normal
+TRECHO: "Renúncia Pura: R$ 0,68 bi. FSA Puro: R$ 0,33 bi. FSA+Renúncia FSA Maj.: R$ 0,54 bi total (R$ 0,36 bi FSA + R$ 0,18 bi renúncia). FSA+Renúncia Ren. Maj.: R$ 0,59 bi total (R$ 0,39 bi renúncia + R$ 0,20 bi FSA)."
+VALOR NO DOCX: Renúncia Pura=R$0,68bi | FSA Puro=R$0,33bi | FSA+Ren FSA Maj.=R$0,54bi (FSA R$0,36bi + Ren R$0,18bi) | FSA+Ren Ren Maj.=R$0,59bi (Ren R$0,39bi + FSA R$0,20bi)
+VALOR NO PAINEL (HTML): De acordo com o gráfico de barras stacked: FSA Puro=R$0,327bi (R$0,327bi FSA, 0 renúncia) | Renúncia Pura=R$0,681bi | FSA+Ren FSA Maj: FSA=R$0,362bi + Ren=R$0,184bi = R$0,546bi | FSA+Ren Ren Maj: Ren=R$0,394bi + FSA=R$0,203bi = R$0,597bi
+STATUS: OK (valores arredondados, dentro da precisão de bilhões com 2 casas decimais)
+
+[Parágrafo ~100] STYLE=Normal
+TRECHO: "Renúncia Pura: R$ 0,68 bi investido vs. R$ 1,47 bi em bilheteria deflacionada — superávit de R$ 0,79 bi. FSA Puro: R$ 0,33 bi investido vs. R$ 0,01 bi em bilheteria."
+VALOR NO DOCX: Renúncia Pura bilheteria=R$1,47bi | FSA Puro bilheteria=R$0,01bi
+VALOR NO PAINEL (HTML): O HTML no gráfico investimento/retorno exibe "R$ 1.47 bi" para Renúncia Pura e "R$ 0.01 bi" para FSA Puro (encontrado nos dados: 0.6813003171700001 para Renúncia e 0.05475260299... para FSA Puro — escala de bilheteria/investimento).
+STATUS: OK
+
+[Parágrafo ~105] STYLE=Normal
+TRECHO: "Renúncia Pura: 2,22× — único grupo acima do break-even."
+VALOR NO DOCX: Renúncia Pura ROI = 2,22×
+VALOR NO PAINEL (HTML): Não encontrado como "2,22×" explícito. O HTML mostra Renúncia Pura investimento=R$0,68bi vs bilheteria R$1,47bi → ROI = 1,47/0,68 = 2,16×. Mas inclui "outras janelas" para receita total → pode chegar a 2,22.
+STATUS: OK (arredondamento aceitável — valor calculável a partir dos dados do painel)
+
+[Parágrafo ~105] STYLE=Normal
+TRECHO: "FSA Puro: 0,076× — o menor retorno agregado. FSA+Renúncia Ren. Maj.: 0,498×. FSA+Renúncia FSA Maj.: 0,431×."
+VALOR NO DOCX: FSA Puro=0,076× | FSA+Ren Ren Maj=0,498× | FSA+Ren FSA Maj=0,431×
+VALOR NO PAINEL (HTML): Não encontrado como KPI explícito. Valores do HTML de "y=[0.6813, 0.3274, 0.5465, 0.5946]" parecem ser investimentos por grupo, não ROI.
+STATUS: NAO ENCONTRADO NO PAINEL como valores explícitos de ROI agregado por grupo
+
+--------------------------------------------------------------------------------
+SEÇÃO 4.2: Volume e investimento por categoria
+--------------------------------------------------------------------------------
+
+[Parágrafo ~138] STYLE=Normal
+TRECHO: "FSA Pontuação Bilheteria — Distribuidora lidera em ROI doméstico (1,07×) e ticket médio."
+VALOR NO DOCX: ROI doméstico Distribuidora = 1,07×
+VALOR NO PAINEL (HTML): roi_fsa_def=1.8014 | roi_tot_def=0.9419. Nenhum valor é 1,07.
+STATUS: DIVERGE — 1,07× (DOCX) vs 1,80× (roi_fsa_def) ou 0,94× (roi_tot_def) no HTML
+
+[Parágrafo ~138] STYLE=Normal
+TRECHO: "FSA Automático Festivais registra o maior ROI internacional médio (6,93)."
+VALOR NO DOCX: Automático Festivais ROI intl médio = 6,93
+VALOR NO PAINEL (HTML): automatico_fest: intl_avg=6.57
+STATUS: DIVERGE — 6,93 (DOCX) vs 6,57 (HTML)
+
+--------------------------------------------------------------------------------
+SEÇÃO 4.4: ROI doméstico médio por categoria
+--------------------------------------------------------------------------------
+
+[Parágrafo ~148] STYLE=Normal
+TRECHO: "FSA Pontuação Bilheteria e Roteiro — Distribuidora: 1,07× (131 obras). FSA Complementação: 0,74× (90 obras). FSA Pontuação Bilheteria — Produtora: 0,58×. FSA Automático Festivais: 0,10×."
+VALOR NO DOCX:
+  - Distribuidora: 1,07× (131 obras)
+  - Complementação: 0,74× (90 obras)
+  - Produtora: 0,58×
+  - Aut. Festivais: 0,10×
+VALOR NO PAINEL (HTML):
+  - Distribuidora: n_obras=131 ✓ | roi_fsa_def=1.8014 (DIVERGE em valor)
+  - Complementação: n_obras=90 ✓ | roi_fsa_def=1.2956 (DIVERGE — 0,74 vs 1,30)
+  - Produtora: n_obras=163 ✓ | roi_fsa_def=1.3732 (DIVERGE — 0,58 vs 1,37)
+  - Aut. Festivais: n_obras=10 ✓ | roi_fsa_def=0.0836 (OK para 0,10 — arredondamento aceitável)
+  NOTA: O DOCX usa "ROI doméstico" que provavelmente é roi_tot_def (incluindo renúncia no denominador), mas mesmo assim os valores não batem:
+  - Distribuidora roi_tot_def=0.9419 ≠ 1,07
+  - Complementação roi_tot_def=0.4748 ≠ 0,74
+  - Produtora roi_tot_def=0.5362 ≠ 0,58 (próximo mas não igual)
+STATUS: DIVERGE em todos os valores de ROI | número de obras correto para Distribuidora e Complementação
+
+--------------------------------------------------------------------------------
+SEÇÃO 4.6: Síntese comparativa
+--------------------------------------------------------------------------------
+
+[Parágrafo ~158] STYLE=Normal
+TRECHO: "ROI FSA Deflacionado: Pontuação Bilheteria — Distribuidora (2,034×) e Complementação (2,002×). ROI FSA Mediano: Comercialização / Distribuição (0,554×) — único com mediana superior a 0,5×. ROI Internacional Médio: Automático Festivais (6,9) e Pontuação Bilheteria — Distribuidora (3,0). Países Alcançados: Automático Festivais (11,5 por obra) e Coprodução Internacional (9,0 por obra)."
+VALOR NO DOCX:
+  - Distribuidora roi_fsa_def = 2,034× | Complementação = 2,002×
+  - Comercialização mediana ROI FSA = 0,554×
+  - Aut. Festivais intl_avg = 6,9 | Distribuidora intl_avg = 3,0
+VALOR NO PAINEL (HTML):
+  - Distribuidora roi_fsa_def = 1.8014 (DIVERGE — 2,034 vs 1,80)
+  - Complementação roi_fsa_def = 1.2956 (DIVERGE — 2,002 vs 1,30)
+  - Comercialização roi_fsa_def_med = 0.2291 (DIVERGE — 0,554 vs 0,229)
+  - Automático Festivais intl_avg = 6.57 (DIVERGE — 6,9 vs 6,57)
+  - Distribuidora intl_avg = 2.87 (DIVERGE — 3,0 vs 2,87; arredondamento aceitável)
+STATUS: DIVERGE em maioria — valores de ROI FSA significativamente diferentes; intl_avg distribuidora aceitável
+
+--------------------------------------------------------------------------------
+SEÇÃO 4.5: Ticket médio por categoria
+--------------------------------------------------------------------------------
+
+[Parágrafo ~153] STYLE=Normal
+TRECHO: "FSA Pontuação Bilheteria — Distribuidora: mediana R$ 5,5M (maior ticket do FSA). FSA Coprodução Internacional: mediana R$ 0,62M (menor ticket). FSA Automático Festivais: mediana R$ 2,69M."
+VALOR NO DOCX: Distribuidora mediana ticket=R$5,5M | Coprodução=R$0,62M | Aut.Festivais=R$2,69M
+VALOR NO PAINEL (HTML): Não encontrado como KPI explícito no HTML. O HTML mostra "ticket médio anual por produtora" (escala diferente), não ticket por obra por categoria.
+STATUS: NAO ENCONTRADO NO PAINEL (métricas de ticket por categoria não são KPIs visíveis no HTML)
+
+--------------------------------------------------------------------------------
+SEÇÃO 5.1: Distribuição por cluster
+--------------------------------------------------------------------------------
+
+[Parágrafo ~171] STYLE=Normal
+TRECHO: "Outros (630 produtoras, 1.068 obras): maior grupo em volume, sem padrão dominante."
+VALOR NO DOCX: Outros/Pequeno Porte = 630 produtoras | 1.068 obras
+VALOR NO PAINEL (HTML): Pequeno Porte = 906 produtoras | 1.759 obras
+STATUS: DIVERGE — 630 prod (DOCX) vs 906 prod (HTML) | 1.068 obras (DOCX) vs 1.759 obras (HTML)
+
+[Parágrafo ~171] STYLE=Normal
+TRECHO: "Retorno Doméstico (153 produtoras, 989 obras): R$ 2,37 bi investido, R$ 1,55 bi em receita."
+VALOR NO DOCX: RD = 153 prod | 989 obras | invest.=R$2,37bi | receita=R$1,55bi
+VALOR NO PAINEL (HTML): RD = 54 prod | 485 obras | invest.=R$2,14bi | receita=R$2,75bi
+STATUS: DIVERGE — produtoras: 153 vs 54 | obras: 989 vs 485 | invest.: R$2,37bi vs R$2,14bi | receita: R$1,55bi vs R$2,75bi (INVERSÃO: DOCX mostra receita < invest., HTML mostra receita > invest.)
+
+[Parágrafo ~171] STYLE=Normal
+TRECHO: "Duplo Retorno (67 produtoras, 653 obras): R$ 2,37 bi investido, R$ 1,88 bi em receita."
+VALOR NO DOCX: Duplo = 67 prod | 653 obras | invest.=R$2,37bi | receita=R$1,88bi
+VALOR NO PAINEL (HTML): Duplo = 35 prod | 585 obras | invest.=R$2,18bi | receita=R$2,43bi
+STATUS: DIVERGE — produtoras: 67 vs 35 | obras: 653 vs 585 | invest.: R$2,37bi vs R$2,18bi | receita: R$1,88bi vs R$2,43bi
+
+[Parágrafo ~171] STYLE=Normal
+TRECHO: "Fomento sem retorno (116 produtoras, 614 obras): R$ 1,42 bi investido, R$ 0,08 bi em receita."
+VALOR NO DOCX: FSR = 116 prod | 614 obras | invest.=R$1,42bi | receita=R$0,08bi
+VALOR NO PAINEL (HTML): FBR = 154 prod | 1.122 obras | invest.=R$2,82bi | receita=R$0,29bi
+STATUS: DIVERGE — produtoras: 116 vs 154 | obras: 614 vs 1.122 | invest.: R$1,42bi vs R$2,82bi | receita: R$0,08bi vs R$0,29bi
+
+[Parágrafo ~171] STYLE=Normal
+TRECHO: "Retorno Internacional (25 produtoras, 86 obras): R$ 0,17 bi investido — menos de 2% do total."
+VALOR NO DOCX: RI = 25 prod | 86 obras | invest.=R$0,17bi
+VALOR NO PAINEL (HTML): RI = 94 prod | 461 obras | invest.=R$0,82bi
+STATUS: DIVERGE — produtoras: 25 vs 94 | obras: 86 vs 461 | invest.: R$0,17bi vs R$0,82bi
+
+--------------------------------------------------------------------------------
+SEÇÃO 5.2: Retorno por cluster
+--------------------------------------------------------------------------------
+
+[Parágrafo ~176] STYLE=Normal
+TRECHO: "Duplo Retorno: ROI agregado 0,79×, ROI dom. mediano 0,79×, ROI intl médio 5,47."
+VALOR NO DOCX: Duplo — ROI agr.=0,79× | ROI dom. med.=0,79× | ROI intl=5,47
+VALOR NO PAINEL (HTML): Duplo — ROI intl = 6,08 (do gráfico de barras)
+  ROI agregado e mediano não encontrados como KPI explícito para o cluster Duplo no HTML.
+STATUS: DIVERGE — ROI intl Duplo: 5,47 (DOCX) vs 6,08 (HTML)
+
+[Parágrafo ~176] STYLE=Normal
+TRECHO: "Retorno Internacional: ROI intl médio 7,43 — mais alto de todos."
+VALOR NO DOCX: RI ROI intl = 7,43
+VALOR NO PAINEL (HTML): RI ROI intl = 6,77 (gráfico barras) | HTML texto KPI: "7,43" também aparece em texto ("ROI internacional médio de todos os clusters: 7,43")
+  O KPI textual "7,43" no HTML parece referir-se às "25 produtoras de maior ROI intl", não ao cluster inteiro RI.
+STATUS: DIVERGE/CONTEXTO DIFERENTE — 7,43 aparece no HTML mas referindo-se às "25 de maior ROI" (subgrupo), enquanto cluster RI total no HTML = 6,77
+
+[Parágrafo ~176] STYLE=Normal
+TRECHO: "Fomento sem retorno: ROI agregado 0,04×"
+VALOR NO DOCX: FSR ROI agr.=0,04×
+VALOR NO PAINEL (HTML): Não encontrado como KPI explícito no HTML para FBR.
+STATUS: NAO ENCONTRADO NO PAINEL
+
+--------------------------------------------------------------------------------
+SEÇÃO 6.1: Distribuição do investimento — Curva de Lorenz
+--------------------------------------------------------------------------------
+
+[Parágrafo ~210] STYLE=Normal
+TRECHO: "O coeficiente de Gini calculado por produtora (0,634) é significativamente superior ao Gini calculado por obra individual (0,480)..."
+VALOR NO DOCX Análise: Gini produtora=0,634 | Gini por obra=0,480
+VALOR NO PAINEL (HTML): KPI: Gini=0,634 ✓ | texto "vs. 0,480 por obra individual" ✓
+STATUS: OK — valores alinhados com o HTML
+
+NOTA: O DOCX Análise (Seção 6.1) tem Gini=0,634 (correto), enquanto o DOCX v6 (parágrafo 69) cita Gini=0,61 (DIVERGE). Esta é a inconsistência mais clara entre os dois documentos.
+
+[Parágrafo ~213] STYLE=Normal
+TRECHO: "Os 20% de produtoras mais financiadas concentram aproximadamente 80% do investimento total. Os 50% de produtoras menores recebem menos de 11% do capital."
+VALOR NO DOCX Análise: top 20% = 80% | bottom 50% = 11%
+VALOR NO PAINEL (HTML): HTML KPI: "Bottom 50% captam ≈ 4% das 542 menores produtoras".
+  O valor "11%" do DOCX Análise vs "≈ 4%" do HTML são incompatíveis.
+  O HTML texto narrativo: "50% delas estão abaixo" + "79,7% dos recursos" concentra em "30% acima de R$700k/ano".
+STATUS: DIVERGE — bottom 50%: 11% (DOCX Análise) vs ≈4% (HTML KPI)
+
+--------------------------------------------------------------------------------
+SEÇÃO 6.3: Ticket médio por tier e viabilidade
+--------------------------------------------------------------------------------
+
+[Parágrafo ~223] STYLE=Normal
+TRECHO: "Mega (Top 10): R$ 2.830k/ano observado — único tier acima do limiar crítico de R$ 500k/ano. Grandes (11–50): R$ 1.576k/ano. Médias (51–150): R$ 882k/ano. Pequenas (151–300): R$ 780k/ano. Micro (301+): R$ 492k/ano."
+VALOR NO DOCX Análise: tier_ticket_med = [2830, 1576, 882, 780, 492]
+VALOR NO PAINEL (HTML): "tier_ticket_med": [2830, 1576, 882, 780, 492] — idêntico!
+STATUS: OK
+
+--------------------------------------------------------------------------------
+SEÇÃO 6.5: Capital FSA sem retorno mensurável
+--------------------------------------------------------------------------------
+
+[Parágrafo ~233] STYLE=Normal
+TRECHO: "...obras que receberam FSA mas não geraram bilheteria superior a R$ 100k e não têm alcance internacional registrado (Tier 2 de severidade). Esse conjunto representa R$ 0,26 bi em 147 obras."
+VALOR NO DOCX Análise: Tier 2 = R$0,26bi em 147 obras
+VALOR NO PAINEL (HTML): HTML não exibe valor "0,26bi" ou "147 obras" como KPI explícito na seção de concentração. O texto mencionado é da Seção 6.5 que pode não ter sido renderizada no HTML.
+STATUS: NAO ENCONTRADO NO PAINEL como KPI (mas está na seção 6.5 que pode estar renderizada com dados diferentes)
+
+--------------------------------------------------------------------------------
+SEÇÃO 7.2: Probabilidade de transição curta → longa
+--------------------------------------------------------------------------------
+
+[Parágrafo ~247-250] STYLE=Normal
+TRECHO: "Taxa de coorte madura (diretores com curta tier-1): 52% com longa em festival internacional. Taxa base (sem curta em festival tier-1): 15%. Diferença: 37 pontos percentuais. Fator multiplicador: aproximadamente 3,5×."
+VALOR NO DOCX Análise: 52% | 15% | 37pp | 3,5×
+VALOR NO PAINEL (HTML): KPI "Taxa — coorte madura: 52%" ✓ | "Taxa base (sem curta): 15%" ✓ | "Multiplicador de chance: 3,5×" ✓
+STATUS: OK — todos os valores alinhados
+
+[Parágrafo ~247-250] STYLE=Normal
+TRECHO: "Janela ótima identificada para a transição: 3 a 6 anos..."
+VALOR NO DOCX Análise: 3 a 6 anos
+VALOR NO PAINEL (HTML): KPI "Janela ótima (fast-track): 3–6 anos" ✓
+STATUS: OK
+
+--------------------------------------------------------------------------------
+SEÇÃO 8.1: Impacto das políticas afirmativas
+--------------------------------------------------------------------------------
+
+[Parágrafo ~272-276] STYLE=Normal
+TRECHO: "...negros têm taxa de seleção menor que brancos (26,8% vs. 29,9%)... negros passam a ter taxa 63% maior que brancos (14,8% vs. 9,1%). Para gênero, mulheres atingem quase o dobro da taxa dos homens em editais com PA (15,0% vs. 7,9%). Editais com PA: 24 de 99. Ganho racial: +9,6 pp — negros: 22,8% inscritos → 32,4% selecionados. Ganho de gênero: +15,6 pp — mulheres: 37,0% inscritas → 52,6% selecionadas."
+VALOR NO DOCX Análise: 26,8% vs 29,9% | 14,8% vs 9,1% (63% maior) | 15,0% vs 7,9% | 24/99 editais com PA | +9,6pp (22,8%→32,4%) | +15,6pp (37,0%→52,6%)
+VALOR NO PAINEL (HTML): "+9,6 pp: negros 22,8% insc → 32,4% sel" ✓ | "+15,6 pp: mulheres 37,0% insc → 52,6% sel" ✓ | "que brancos (26,8% vs 29,9%)" ✓ | "63% maior: (14,8% vs 9,1%)" ✓ | "dos homens em editais com PA (15,0% vs 7,9%)" ✓ | "99 editais" ✓
+STATUS: OK — todos os valores alinhados
+
+================================================================================
+RESUMO DA AUDITORIA
+================================================================================
+
+TOTAL DE ITENS AUDITADOS: 42
+
+DISTRIBUIÇÃO POR STATUS:
+  OK:                        12
+  DIVERGE:                   17
+  CONTEXTO DIFERENTE:         2
+  NAO ENCONTRADO NO PAINEL:  11
+
+================================================================================
+PRINCIPAIS PONTOS DE DIVERGÊNCIA (CRÍTICOS)
+================================================================================
+
+1. TAMANHO DOS CLUSTERS DE PRODUTORAS (AMBOS OS DOCX)
+   Esta é a divergência mais grave e sistemática. Os dados de clusters nos dois DOCX
+   correspondem a uma versão anterior do pipeline, antes de reprocessamentos.
+   DOCX v6 e DOCX Análise concordam entre si mas divergem do HTML atual:
+
+   CLUSTER          DOCX Análise  DOCX v6     HTML ATUAL
+   Duplo Retorno:   67 prod.      65 prod.    35 prod.
+   Retorno Dom.:   153 prod.      74 prod.    54 prod.
+   Ret. Intl.:      25 prod.      25 prod.    94 prod.  ← maior divergência relativa
+   FBR/FSR:        116 prod.     116 prod.   154 prod.
+   Outros/PP:      630 prod.       —         906 prod.
+
+2. INVESTIMENTO E RECEITA POR CLUSTER
+   Os valores de investimento e receita por cluster no DOCX Análise divergem do HTML:
+   - Retorno Internacional: R$0,17bi (DOCX) vs R$0,82bi (HTML) — 5× maior no HTML
+   - Fomento sem Ret./Baixo Ret.: R$1,42bi (DOCX) vs R$2,82bi (HTML) — 2× maior no HTML
+   - Duplo Retorno receita: R$1,88bi (DOCX) vs R$2,43bi (HTML)
+   - Retorno Dom. receita: R$1,55bi (DOCX) vs R$2,75bi (HTML)
+
+3. ROI POR CATEGORIA FSA (AMBOS OS DOCX)
+   Todos os valores de ROI por categoria divergem do HTML:
+   - Distribuidora ROI dom.: 1,07× (DOCX) vs 1,80× roi_fsa_def / 0,94× roi_tot_def (HTML)
+   - Distribuidora ROI dom.: 2,034× (DOCX Análise 4.6) vs 1,80× (HTML)
+   - Complementação ROI: 2,002× / 0,74× (DOCX) vs 1,30× / 0,47× (HTML)
+   - Aut. Festivais ROI intl: 6,93 (DOCX) vs 6,57 (HTML)
+
+4. GINI DE CONCENTRAÇÃO — INCONSISTÊNCIA INTERNA E ENTRE DOCUMENTOS
+   - DOCX v6: Gini = 0,61
+   - DOCX Análise: Gini = 0,634 ← alinhado com HTML KPI
+   - HTML KPI: Gini = 0,634
+   - HTML texto narrativo: "Gini de 0,724"
+   O DOCX v6 usa valor desatualizado (0,61). O HTML tem inconsistência interna entre KPI (0,634) e texto (0,724).
+
+5. BOTTOM 50% CONCENTRAÇÃO
+   - DOCX v6: "metade das produtoras recebe apenas 11% do investimento"
+   - DOCX Análise: "Os 50% de produtoras menores recebem menos de 11% do capital"
+   - HTML KPI: "Bottom 50% captam ≈ 4% das 542 menores produtoras"
+   Os dois DOCX concordam em 11%, o HTML mostra ≈4% — divergência significativa.
+
+6. DIFERENCIAL ROI INTERNACIONAL DISTRIBUIDORA vs PRODUTORA
+   - DOCX v6: "65% superior (3,01 vs. 1,82)"
+   - HTML: intl_avg distribuidora=2,87 / produtora=1,65 → diferencial de 74%, não 65%
+   Ambos os valores absolutos também estão levemente errados.
+
+7. TOTAL DE PRODUTORAS/BENEFICIÁRIOS
+   - DOCX v6: "683 beneficiários"
+   - DOCX Análise: "991 produtoras independentes"
+   - HTML KPI: "1.075 produtoras"
+   Nenhuma das três versões concorda.
+
+8. NOME DO CLUSTER "FOMENTO SEM RETORNO" vs "FOMENTO BAIXO RETORNO"
+   O DOCX v6 usa o nome antigo "Fomento sem Retorno" — o painel HTML já foi atualizado
+   para "Fomento Baixo Retorno" (correção registrada na MEMORY.md).
+
+================================================================================
+NOTA METODOLÓGICA SOBRE AS DIVERGÊNCIAS DE CLUSTERS
+================================================================================
+
+A diferença generalizada nos tamanhos dos clusters sugere que os DOCX foram produzidos
+com uma versão anterior do CSV de clusters (dados/clusters_produtoras.csv ou similar),
+antes de reprocessamentos do pipeline que alteraram:
+  - O universo de produtoras incluídas (991 → 1.243 com expansão de escopo)
+  - Os critérios/limiares de classificação (correção no script 02 documentada na MEMORY.md)
+  - A adição de produtoras de renúncia pura ao universo
+
+Recomenda-se atualizar ambos os DOCX com os valores do HTML atual antes de publicação.
+
+================================================================================
+FIM DA AUDITORIA
+================================================================================

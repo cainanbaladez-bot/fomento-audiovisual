@@ -1,0 +1,19 @@
+# Gerados pelo pipeline — não versionados
+resultados/tabela_consolidada_obras.xlsx
+resultados/tabela_consolidada_chamadas.xlsx
+resultados/datasets/
+resultados/painel_*.html
+
+# Painel final — gerado pelo script 07
+output_final/painel_fomento_audiovisual.html
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+.venv/
+venv/
+
+# OS
+.DS_Store
+Thumbs.db

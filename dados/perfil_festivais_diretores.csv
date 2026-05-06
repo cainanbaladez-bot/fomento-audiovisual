@@ -1,0 +1,136 @@
+DIRETOR,DIRETOR_NORM,N_PARTICIPACOES_TOTAL,N_FESTIVAIS_ESPECIAL,N_FESTIVAIS_AA,N_COMPETICAO_PRINCIPAL,N_SECAO_PARALELA,N_PREMIOS,TEM_CURTA_FESTIVAL,TEM_LONGA_FESTIVAL,MELHOR_NIVEL,PRIMEIRO_FESTIVAL_ANO,ULTIMO_FESTIVAL_ANO,FESTIVAIS_LISTA,N_FESTIVAIS_DISTINTOS,N_CANNES,N_BERLIM,N_VENEZA,N_OSCAR,N_SUNDANCE,N_ROTTERDAM,N_TIFF,N_LOCARNO,N_SAN_SEBASTIAN,N_IDFA,N_ANNECY,N_KARLOVY_VARY
+KLEBER DE MENDONCA VASCONCELLOS FILHO,kleber de mendonca vasconcellos filho,10,3,3,6,0,0,False,True,ESPECIAL,2012,2023,Cannes | Locarno | Outros Intl | Rotterdam | TIFF,5,3,0,0,0,0,1,1,1,0,0,0,0
+Cacá Diegues,caca diegues,7,7,0,7,0,7,False,True,ESPECIAL,1976,2018,Oscar,1,0,0,0,7,0,0,0,0,0,0,0,0
+Walter Salles,walter salles,6,5,1,6,0,6,False,True,ESPECIAL,1991,2024,Cannes | Oscar | San Sebastian | Veneza,4,1,0,1,3,0,0,0,0,1,0,0,0
+Karim Aïnouz,karim ainouz,5,3,0,3,0,1,False,True,ESPECIAL,2001,2019,Cannes | Oscar | Outros Intl,3,2,0,0,1,0,0,0,0,0,0,0,0
+FERNANDO FERREIRA MEIRELLES,fernando ferreira meirelles,5,3,1,4,0,0,False,True,ESPECIAL,2002,2008,Cannes | Oscar | Outros Intl | TIFF,4,2,0,0,1,0,0,1,0,0,0,0,0
+GUSTAVO PASSOS PIZZI,gustavo passos pizzi,5,1,3,4,0,0,False,True,ESPECIAL,2018,2018,Berlim | Outros Intl | San Sebastian | Sundance | TIFF,5,0,1,0,0,1,0,1,0,1,0,0,0
+SUSAN KATE LUND,susan kate lund,4,2,1,3,0,0,False,True,ESPECIAL,2002,2002,Cannes | Oscar | Outros Intl | TIFF,4,1,0,0,1,0,0,1,0,0,0,0,0
+Marcelo Gomes,marcelo gomes,4,3,0,2,0,2,False,True,ESPECIAL,2005,2009,Berlim | Cannes | Oscar | Outros Intl,4,1,1,0,1,0,0,0,0,0,0,0,0
+GABRIEL MASCARO SEABRA DE MELO,gabriel mascaro seabra de melo,4,2,1,3,0,0,False,True,ESPECIAL,2015,2019,Berlim | Outros Intl | Sundance | Veneza,4,0,1,1,0,1,0,0,0,0,0,0,0
+GABRIEL MARTINS ALVES,gabriel martins alves,4,1,2,3,0,0,False,True,ESPECIAL,2020,2020,Berlim | Outros Intl | Sundance | TIFF,4,0,1,0,0,1,0,1,0,0,0,0,0
+Nelson Pereira dos Santos,nelson pereira dos santos,4,4,0,4,0,4,False,True,ESPECIAL,1971,1984,Oscar,1,0,0,0,4,0,0,0,0,0,0,0,0
+LUIZ FERNANDO CARVALHO DE ALMEIDA,luiz fernando carvalho de almeida,3,1,0,1,0,0,False,True,ESPECIAL,2001,2020,Cannes | Outros Intl,2,1,0,0,0,0,0,0,0,0,0,0,0
+CARLOS IMPERIO HAMBURGER,carlos imperio hamburger,3,2,0,2,0,0,False,True,ESPECIAL,2006,2006,Berlim | Cannes | Outros Intl,3,1,1,0,0,0,0,0,0,0,0,0,0
+JOSE BASTOS PADILHA NETO,jose bastos padilha neto,3,1,1,2,0,0,False,True,ESPECIAL,2007,2008,Berlim | Outros Intl | Sundance,3,0,1,0,0,1,0,0,0,0,0,0,0
+Lucy Walker,lucy walker,3,1,2,1,0,2,False,True,ESPECIAL,2009,2010,Oscar | Sundance,2,0,0,0,1,2,0,0,0,0,0,0,0
+JULIA MURAT E ADARIO,julia murat e adario,3,0,2,2,0,0,False,True,AA,2017,2022,Locarno | Outros Intl | Rotterdam,3,0,0,0,0,0,1,0,1,0,0,0,0
+ANA CAROLINA PIZA ALVES DE SOUZA,ana carolina piza alves de souza,3,0,2,2,0,0,False,True,AA,2020,2020,Locarno | Outros Intl | Sundance,3,0,0,0,0,1,0,0,1,0,0,0,0
+ALEXANDRE CESARIO DE ABREU,alexandre cesario de abreu,3,1,1,2,0,0,False,True,ESPECIAL,2013,2013,Annecy | Oscar | Outros Intl,3,0,0,0,1,0,0,0,0,0,0,1,0
+ALYSSON SILVA MURITIBA,alysson silva muritiba,3,0,2,2,0,0,False,True,AA,2014,2021,Outros Intl | San Sebastian | Sundance,3,0,0,0,0,1,0,0,0,1,0,0,0
+MARCO AURELIO FERREIRA DUTRA,marco aurelio ferreira dutra,3,1,1,2,0,0,False,True,ESPECIAL,2017,2020,Berlim | Locarno | Outros Intl,3,0,1,0,0,0,0,0,1,0,0,0,0
+ANA LUIZA MACHADO DA SILVA MUYLAERT,ana luiza machado da silva muylaert,3,1,1,2,0,0,False,True,ESPECIAL,2015,2015,Berlim | Outros Intl | Sundance,3,0,1,0,0,1,0,0,0,0,0,0,0
+JULIANO DORNELLES DE FARIA NEVES,juliano dornelles de faria neves,3,1,1,2,0,0,False,True,ESPECIAL,2019,2019,Cannes | Locarno | Outros Intl,3,1,0,0,0,0,0,0,1,0,0,0,0
+Fellipe Gamarano Barbosa,fellipe gamarano barbosa,3,1,1,2,0,1,False,True,ESPECIAL,2017,2017,Cannes | Outros Intl | Rotterdam,3,1,0,0,0,0,1,0,0,0,0,0,0
+MAYA WERNECK DO RIN,maya werneck do rin,3,1,1,2,0,0,False,True,ESPECIAL,2019,2019,Berlim | Outros Intl | Rotterdam,3,0,1,0,0,0,1,0,0,0,0,0,0
+ADIRLEY QUEIROS DE ANDRADE,adirley queiros de andrade,3,1,1,2,0,0,False,True,ESPECIAL,2020,2020,Cannes | Locarno | Outros Intl,3,1,0,0,0,0,0,0,1,0,0,0,0
+JOANA CHADWICK LUIS PIMENTA,joana chadwick luis pimenta,3,1,1,2,0,0,False,True,ESPECIAL,2020,2020,Cannes | Locarno | Outros Intl,3,1,0,0,0,0,0,0,1,0,0,0,0
+Bruno Barreto,bruno barreto,3,3,0,3,0,3,False,True,ESPECIAL,1988,2008,Oscar,1,0,0,0,3,0,0,0,0,0,0,0,0
+Kleber Mendonça Filho,kleber mendonca filho,3,3,0,3,0,3,False,True,ESPECIAL,2012,2026,Cannes | Oscar,2,1,0,0,2,0,0,0,0,0,0,0,0
+HECTOR EDUARDO BABENCO,hector eduardo babenco,2,1,0,1,0,0,False,True,ESPECIAL,2003,2003,Cannes | Outros Intl,2,1,0,0,0,0,0,0,0,0,0,0,0
+ISA GRINSPUM FERRAZ,isa grinspum ferraz,2,1,0,1,0,0,False,True,ESPECIAL,2011,2011,Berlim | Outros Intl,2,0,1,0,0,0,0,0,0,0,0,0,0
+BARBARA RAQUEL PAZ,barbara raquel paz,2,1,1,2,0,0,False,True,ESPECIAL,2019,2019,TIFF | Veneza,2,0,0,1,0,0,0,1,0,0,0,0,0
+CAROLINA MARKOWICZ BASTOS,carolina markowicz bastos,2,0,2,2,0,0,False,True,AA,2022,2023,San Sebastian,1,0,0,0,0,0,0,0,0,2,0,0,0
+JOAO SALAVIZA MANSO FELDMAN DA SILVA,joao salaviza manso feldman da silva,2,2,0,2,0,0,False,True,ESPECIAL,2018,2023,Cannes,1,2,0,0,0,0,0,0,0,0,0,0,0
+RENEE NADER MESSORA,renee nader messora,2,2,0,2,0,0,False,True,ESPECIAL,2018,2023,Cannes,1,2,0,0,0,0,0,0,0,0,0,0,0
+CLAUDIA PRISCILLA ANDRADE GOIFMAN,claudia priscilla andrade goifman,2,1,0,1,0,0,False,True,ESPECIAL,2018,2018,Berlim | Outros Intl,2,0,1,0,0,0,0,0,0,0,0,0,0
+JOSE HENRIQUE GOIFMAN,jose henrique goifman,2,1,0,1,0,0,False,True,ESPECIAL,2018,2018,Berlim | Outros Intl,2,0,1,0,0,0,0,0,0,0,0,0,0
+LUIZ ROBERTO BOLOGNESI,luiz roberto bolognesi,2,0,1,1,0,0,False,True,AA,2012,2012,Annecy | Outros Intl,2,0,0,0,0,0,0,0,0,0,0,1,0
+DANIELA GONTIJO ALVES PINTO,daniela gontijo alves pinto,2,1,0,1,0,0,False,True,ESPECIAL,2016,2016,Berlim | Outros Intl,2,0,1,0,0,0,0,0,0,0,0,0,0
+JULIANA DE ARAUJO ROJAS,juliana de araujo rojas,2,0,1,1,0,0,False,True,AA,2017,2017,Locarno | Outros Intl,2,0,0,0,0,0,0,0,1,0,0,0,0
+WAGNER MANICOBA DE MOURA,wagner manicoba de moura,2,1,0,1,0,0,False,True,ESPECIAL,2019,2019,Berlim | Outros Intl,2,0,1,0,0,0,0,0,0,0,0,0,0
+MARCELO BATISTA CAETANO,marcelo batista caetano,2,1,0,1,0,0,False,True,ESPECIAL,2017,2017,Berlim | Outros Intl,2,0,1,0,0,0,0,0,0,0,0,0,0
+ANITA DE SOUZA ROCHA MAGALHAES DA SILVEIRA,anita de souza rocha magalhaes da silveira,2,0,1,1,0,0,False,True,AA,2022,2022,Locarno | Outros Intl,2,0,0,0,0,0,0,0,1,0,0,0,0
+Andrucha Waddington,andrucha waddington,2,1,1,2,0,2,False,True,ESPECIAL,2000,2000,Karlovy Vary | Oscar,2,0,0,0,1,0,0,0,0,0,0,0,1
+Fábio Barreto,fabio barreto,2,2,0,2,0,2,False,True,ESPECIAL,1995,2009,Oscar,1,0,0,0,2,0,0,0,0,0,0,0,0
+Héctor Babenco,hector babenco,2,2,0,2,0,2,False,True,ESPECIAL,1980,2003,Oscar,1,0,0,0,2,0,0,0,0,0,0,0,0
+Andrés Wood,andres wood,2,1,1,1,0,2,False,True,ESPECIAL,2011,2011,Oscar | Sundance,2,0,0,0,1,1,0,0,0,0,0,0,0
+Wim Wenders,wim wenders,2,1,1,1,0,2,False,True,ESPECIAL,2014,2014,Oscar | San Sebastian,2,0,0,0,1,0,0,0,0,1,0,0,0
+Anna Muylaert,anna muylaert,2,1,1,1,0,2,False,True,ESPECIAL,2015,2015,Oscar | Sundance,2,0,0,0,1,1,0,0,0,0,0,0,0
+Juliano Salgado,juliano salgado,2,1,1,1,0,2,False,True,ESPECIAL,2014,2014,Oscar | San Sebastian,2,0,0,0,1,0,0,0,0,1,0,0,0
+Ary Rosa,ary rosa,2,0,2,2,0,2,False,True,AA,2017,2018,Rotterdam,1,0,0,0,0,0,2,0,0,0,0,0,0
+Glenda Nicácio,glenda nicacio,2,0,2,2,0,2,False,True,AA,2017,2018,Rotterdam,1,0,0,0,0,0,2,0,0,0,0,0,0
+Glauber Rocha,glauber rocha,2,2,0,2,0,2,False,True,ESPECIAL,1964,1969,Oscar,1,0,0,0,2,0,0,0,0,0,0,0,0
+Luís Sérgio Person,luis sergio person,2,2,0,2,0,2,False,True,ESPECIAL,1965,1967,Oscar,1,0,0,0,2,0,0,0,0,0,0,0,0
+GWEN KAREN HARLEY,gwen karen harley,1,0,1,1,0,0,False,True,AA,2009,2009,Sundance,1,0,0,0,0,1,0,0,0,0,0,0,0
+JOAO HENRIQUE VIEIRA DA SILVA JARDIM,joao henrique vieira da silva jardim,1,0,1,1,0,0,False,True,AA,2009,2009,Sundance,1,0,0,0,0,1,0,0,0,0,0,0,0
+ADRIAN CAETANO,adrian caetano,1,0,1,1,0,0,False,True,AA,2016,2016,TIFF,1,0,0,0,0,0,0,1,0,0,0,0,0
+TOMAS COELHO DE SANSON PORTELLA,tomas coelho de sanson portella,1,0,1,1,0,0,False,True,AA,2016,2016,TIFF,1,0,0,0,0,0,0,1,0,0,0,0,0
+DAVID RIBEIRO SCHURMANN,david ribeiro schurmann,1,0,1,1,0,0,False,True,AA,2016,2016,San Sebastian,1,0,0,0,0,0,0,0,0,1,0,0,0
+MARCELO FERREIRA DE OLIVEIRA GOMES,marcelo ferreira de oliveira gomes,1,1,0,1,0,0,False,True,ESPECIAL,2017,2017,Berlim,1,0,1,0,0,0,0,0,0,0,0,0,0
+ANDREA LEVY BARRETO,andrea levy barreto,1,0,1,1,0,0,False,True,AA,2018,2018,Sundance,1,0,0,0,0,1,0,0,0,0,0,0,0
+DAYANE RODRIGUES BARBOSA,dayane rodrigues barbosa,1,0,1,1,0,0,False,True,AA,2018,2018,Sundance,1,0,0,0,0,1,0,0,0,0,0,0,0
+FERNANDO GROSTEIN ESCOBAR DE ANDRADE,fernando grostein escobar de andrade,1,0,1,1,0,0,False,True,AA,2018,2018,Sundance,1,0,0,0,0,1,0,0,0,0,0,0,0
+JOAO PAULO ESMANHOTO BERTOL,joao paulo esmanhoto bertol,1,0,1,1,0,0,False,True,AA,2018,2018,Sundance,1,0,0,0,0,1,0,0,0,0,0,0,0
+JUDITH BELFER RATHSAM,judith belfer rathsam,1,0,1,1,0,0,False,True,AA,2018,2018,Sundance,1,0,0,0,0,1,0,0,0,0,0,0,0
+PATRICK HANSER,patrick hanser,1,0,1,1,0,0,False,True,AA,2018,2018,Sundance,1,0,0,0,0,1,0,0,0,0,0,0,0
+PAULO RICARDO MACHLINE,paulo ricardo machline,1,0,1,1,0,0,False,True,AA,2018,2018,Sundance,1,0,0,0,0,1,0,0,0,0,0,0,0
+RAONI MOTA CIPRIANO RODRIGUES,raoni mota cipriano rodrigues,1,0,1,1,0,0,False,True,AA,2018,2018,Sundance,1,0,0,0,0,1,0,0,0,0,0,0,0
+MARILIA BIGNARDI HALLA,marilia bignardi halla,1,0,0,0,0,0,False,True,A+,2023,2023,Outros Intl,1,0,0,0,0,0,0,0,0,0,0,0,0
+ADONIAS RIOS DE MOURA TEIXEIRA,adonias rios de moura teixeira,1,0,1,1,0,0,False,True,AA,2020,2020,Annecy,1,0,0,0,0,0,0,0,0,0,0,1,0
+CESAR LUIZ CABRAL,cesar luiz cabral,1,0,1,1,0,0,False,True,AA,2021,2021,Annecy,1,0,0,0,0,0,0,0,0,0,0,1,0
+LUIS LAZARO SACRAMENTO DE ARAUJO RAMOS,luis lazaro sacramento de araujo ramos,1,0,1,1,0,0,False,True,AA,2021,2021,San Sebastian,1,0,0,0,0,0,0,0,0,1,0,0,0
+ANDRE CATOTO DIAS,andre catoto dias,1,0,1,1,0,0,False,True,AA,2018,2018,Annecy,1,0,0,0,0,0,0,0,0,0,0,1,0
+GABRIEL MATIOLI YAZBEK BITAR,gabriel matioli yazbek bitar,1,0,1,1,0,0,False,True,AA,2018,2018,Annecy,1,0,0,0,0,0,0,0,0,0,0,1,0
+GUSTAVO SOARES STEINBERG,gustavo soares steinberg,1,0,1,1,0,0,False,True,AA,2018,2018,Annecy,1,0,0,0,0,0,0,0,0,0,0,1,0
+CAETANO GOTARDO SOARES,caetano gotardo soares,1,1,0,1,0,0,False,True,ESPECIAL,2020,2020,Berlim,1,0,1,0,0,0,0,0,0,0,0,0,0
+LETICIA CASTRO SIMOES,leticia castro simoes,1,1,0,1,0,0,False,True,ESPECIAL,2019,2019,Cannes,1,1,0,0,0,0,0,0,0,0,0,0,0
+MARTÃN IGNACIO DUPLAQUET DE LA JARA,martan ignacio duplaquet de la jara,1,0,1,1,0,0,False,True,AA,2023,2023,Locarno,1,0,0,0,0,0,0,0,1,0,0,0,0
+Juan Andrés Arango,juan andres arango,1,1,0,1,0,1,False,True,ESPECIAL,2012,2012,Oscar,1,0,0,0,1,0,0,0,0,0,0,0,0
+Benjamín Ávila,benjamin avila,1,1,0,1,0,1,False,True,ESPECIAL,2011,2011,Oscar,1,0,0,0,1,0,0,0,0,0,0,0,0
+Kátia Lund,katia lund,1,1,0,1,0,1,False,True,ESPECIAL,2002,2002,Oscar,1,0,0,0,1,0,0,0,0,0,0,0,0
+Fernando Meirelles,fernando meirelles,1,1,0,1,0,1,False,True,ESPECIAL,2002,2002,Oscar,1,0,0,0,1,0,0,0,0,0,0,0,0
+José Padilha,jose padilha,1,1,0,1,0,1,False,True,ESPECIAL,2010,2010,Oscar,1,0,0,0,1,0,0,0,0,0,0,0,0
+Selton Mello,selton mello,1,1,0,1,0,1,False,True,ESPECIAL,2011,2011,Oscar,1,0,0,0,1,0,0,0,0,0,0,0,0
+Anselmo Duarte,anselmo duarte,1,1,0,1,0,1,False,True,ESPECIAL,1962,1962,Oscar,1,0,0,0,1,0,0,0,0,0,0,0,0
+Miguel Gonçalves Mendes,miguel goncalves mendes,1,1,0,1,0,1,False,True,ESPECIAL,2010,2010,Oscar,1,0,0,0,1,0,0,0,0,0,0,0,0
+Marcel Camus,marcel camus,1,1,0,1,0,1,False,True,ESPECIAL,1959,1959,Oscar,1,0,0,0,1,0,0,0,0,0,0,0,0
+Breno Silveira,breno silveira,1,1,0,1,0,1,False,True,ESPECIAL,2005,2005,Oscar,1,0,0,0,1,0,0,0,0,0,0,0,0
+Cao Hamburger,cao hamburger,1,1,0,1,0,1,False,True,ESPECIAL,2006,2006,Oscar,1,0,0,0,1,0,0,0,0,0,0,0,0
+André Barcinski,andre barcinski,1,0,1,1,0,1,False,True,AA,2001,2001,Sundance,1,0,0,0,0,1,0,0,0,0,0,0,0
+Gabriel Mascaro,gabriel mascaro,1,0,1,1,0,1,False,True,AA,2015,2015,Rotterdam,1,0,0,0,0,0,1,0,0,0,0,0,0
+Ivan Finotti,ivan finotti,1,0,1,1,0,1,False,True,AA,2001,2001,Sundance,1,0,0,0,0,1,0,0,0,0,0,0,0
+George Sluizer,george sluizer,1,1,0,1,0,1,False,True,ESPECIAL,1972,1972,Oscar,1,0,0,0,1,0,0,0,0,0,0,0,0
+Daniel Ribeiro,daniel ribeiro,1,1,0,1,0,1,False,True,ESPECIAL,2014,2014,Oscar,1,0,0,0,1,0,0,0,0,0,0,0,0
+Zygmunt Sulistrowski,zygmunt sulistrowski,1,1,0,1,0,1,False,True,ESPECIAL,1954,1954,Cannes,1,1,0,0,0,0,0,0,0,0,0,0,0
+Miguel Faria Jr.,miguel faria jr.,1,1,0,1,0,1,False,True,ESPECIAL,1970,1970,Oscar,1,0,0,0,1,0,0,0,0,0,0,0,0
+Sérgio Rezende,sergio rezende,1,1,0,1,0,1,False,True,ESPECIAL,2009,2009,Oscar,1,0,0,0,1,0,0,0,0,0,0,0,0
+Sandra Werneck,sandra werneck,1,0,1,1,0,1,False,True,AA,2001,2001,Sundance,1,0,0,0,0,1,0,0,0,0,0,0,0
+Reginaldo Faria,reginaldo faria,1,1,0,1,0,1,False,True,ESPECIAL,1971,1971,Oscar,1,0,0,0,1,0,0,0,0,0,0,0,0
+Beto Brant,beto brant,1,0,1,1,0,1,False,True,AA,2002,2002,Sundance,1,0,0,0,0,1,0,0,0,0,0,0,0
+Carlos Coimbra,carlos coimbra,1,1,0,1,0,1,False,True,ESPECIAL,1960,1960,Oscar,1,0,0,0,1,0,0,0,0,0,0,0,0
+Marina Person,marina person,1,0,1,1,0,1,False,True,AA,2015,2015,Rotterdam,1,0,0,0,0,0,1,0,0,0,0,0,0
+Caetano Gotardo,caetano gotardo,1,0,1,1,0,1,False,True,AA,2019,2019,Rotterdam,1,0,0,0,0,0,1,0,0,0,0,0,0
+Gabriel Martins,gabriel martins,1,0,1,1,0,1,False,True,AA,2019,2019,Rotterdam,1,0,0,0,0,0,1,0,0,0,0,0,0
+Marco Bellocchio,marco bellocchio,1,1,0,1,0,1,False,True,ESPECIAL,2019,2019,Oscar,1,0,0,0,1,0,0,0,0,0,0,0,0
+Daniel Schmidt,daniel schmidt,1,0,1,1,0,1,False,True,AA,2018,2018,Rotterdam,1,0,0,0,0,0,1,0,0,0,0,0,0
+Eliza Ribeiro Capai,eliza ribeiro capai,1,1,0,0,0,1,False,True,ESPECIAL,2019,2019,Berlim,1,0,1,0,0,0,0,0,0,0,0,0,0
+Marina Meliande,marina meliande,1,0,1,1,0,1,False,True,AA,2018,2018,Rotterdam,1,0,0,0,0,0,1,0,0,0,0,0,0
+Santiago Loza,santiago loza,1,1,0,1,0,1,False,True,ESPECIAL,2019,2019,Berlim,1,0,1,0,0,0,0,0,0,0,0,0,0
+Gabriel Abrantes,gabriel abrantes,1,0,1,1,0,1,False,True,AA,2018,2018,Rotterdam,1,0,0,0,0,0,1,0,0,0,0,0,0
+Maurílio Martins,maurilio martins,1,0,1,1,0,1,False,True,AA,2019,2019,Rotterdam,1,0,0,0,0,0,1,0,0,0,0,0,0
+Joel Zito Araujo,joel zito araujo,1,0,1,1,0,1,False,True,AA,2019,2019,Rotterdam,1,0,0,0,0,0,1,0,0,0,0,0,0
+David Schurmann,david schurmann,1,1,0,1,0,1,False,True,ESPECIAL,2016,2016,Oscar,1,0,0,0,1,0,0,0,0,0,0,0,0
+Marcio Reolon,marcio reolon,1,1,0,1,0,1,False,True,ESPECIAL,2018,2018,Berlim,1,0,1,0,0,0,0,0,0,0,0,0,0
+Juliana Rojas,juliana rojas,1,0,1,1,0,1,False,True,AA,2017,2017,Rotterdam,1,0,0,0,0,0,1,0,0,0,0,0,0
+Daniel Rezende,daniel rezende,1,1,0,1,0,1,False,True,ESPECIAL,2017,2017,Oscar,1,0,0,0,1,0,0,0,0,0,0,0,0
+Jonas Carpignano,jonas carpignano,1,1,0,1,0,1,False,True,ESPECIAL,2017,2017,Oscar,1,0,0,0,1,0,0,0,0,0,0,0,0
+Filipe Matzembacher,filipe matzembacher,1,1,0,1,0,1,False,True,ESPECIAL,2018,2018,Berlim,1,0,1,0,0,0,0,0,0,0,0,0,0
+Marco Dutra,marco dutra,1,0,1,1,0,1,False,True,AA,2017,2017,Rotterdam,1,0,0,0,0,0,1,0,0,0,0,0,0
+Gustavo Pizzi,gustavo pizzi,1,0,1,1,0,1,False,True,AA,2018,2018,Rotterdam,1,0,0,0,0,0,1,0,0,0,0,0,0
+Leon Hirszman,leon hirszman,1,1,0,1,0,1,False,True,ESPECIAL,1981,1981,Veneza,1,0,0,1,0,0,0,0,0,0,0,0,0
+Bárbara Paz,barbara paz,1,1,0,1,0,1,False,True,ESPECIAL,2019,2019,Oscar,1,0,0,0,1,0,0,0,0,0,0,0,0
+Luiz Bolognesi,luiz bolognesi,1,0,1,1,0,1,False,True,AA,2013,2013,Annecy,1,0,0,0,0,0,0,0,0,0,0,1,0
+Suzana Amaral,suzana amaral,1,1,0,1,0,1,False,True,ESPECIAL,1985,1985,Oscar,1,0,0,0,1,0,0,0,0,0,0,0,0
+Walter Hugo Khouri,walter hugo khouri,1,1,0,1,0,1,False,True,ESPECIAL,1968,1968,Oscar,1,0,0,0,1,0,0,0,0,0,0,0,0
+Walter Lima Júnior,walter lima junior,1,1,0,1,0,1,False,True,ESPECIAL,1978,1978,Oscar,1,0,0,0,1,0,0,0,0,0,0,0,0
+Jayme Monjardim,jayme monjardim,1,1,0,1,0,1,False,True,ESPECIAL,2004,2004,Oscar,1,0,0,0,1,0,0,0,0,0,0,0,0
+Manolo Nieto,manolo nieto,1,1,0,1,0,1,False,True,ESPECIAL,2021,2021,Oscar,1,0,0,0,1,0,0,0,0,0,0,0,0
+Sérgio Ricardo,sergio ricardo,1,1,0,1,0,1,False,True,ESPECIAL,1974,1974,Oscar,1,0,0,0,1,0,0,0,0,0,0,0,0
+Aly Muritiba,aly muritiba,1,1,0,1,0,1,False,True,ESPECIAL,2021,2021,Oscar,1,0,0,0,1,0,0,0,0,0,0,0,0
+Ariel Kuaray Ortega,ariel kuaray ortega,1,0,1,0,0,1,False,True,AA,,,IDFA,1,0,0,0,0,0,0,0,0,0,1,0,0
+Ernesto de Carvalho,ernesto de carvalho,1,0,1,0,0,1,False,True,AA,,,IDFA,1,0,0,0,0,0,0,0,0,0,1,0,0
+Nele Wohlatz,nele wohlatz,1,1,0,1,0,1,False,True,ESPECIAL,2024,2024,Berlim,1,0,1,0,0,0,0,0,0,0,0,0,0
+Marcelo Martinessi,marcelo martinessi,1,1,0,1,0,1,False,True,ESPECIAL,2018,2018,Oscar,1,0,0,0,1,0,0,0,0,0,0,0,0
+Moritz Riesewieck,moritz riesewieck,1,0,1,1,0,1,False,True,AA,2018,2018,Rotterdam,1,0,0,0,0,0,1,0,0,0,0,0,0
+Hans Block,hans block,1,0,1,1,0,1,False,True,AA,2018,2018,Rotterdam,1,0,0,0,0,0,1,0,0,0,0,0,0
