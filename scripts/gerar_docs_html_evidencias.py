@@ -1269,6 +1269,32 @@ def convert_docx(src: Path, dst: Path, kind: str, analysis_ids: dict[str, str] |
     return ids
 
 
+DOCS = ROOT / "docs"
+
+DOCS_URL_REPLACEMENTS = {
+    "Análise de Dados - Fomento Audiovisual Brasileiro.html": "analise.html",
+    "An%C3%A1lise%20de%20Dados%20-%20Fomento%20Audiovisual%20Brasileiro.html": "analise.html",
+    "Análise do Retorno do Fomento Público ao Audiovisual Brasileiro (FSA - Renúncia Fiscal)_v2.html": "painel.html",
+    "An%C3%A1lise%20do%20Retorno%20do%20Fomento%20P%C3%BAblico%20ao%20Audiovisual%20Brasileiro%20(FSA%20-%20Ren%C3%BAncia%20Fiscal)_v2.html": "painel.html",
+}
+
+DOCS_FILEMAP = {
+    POLITICA_HTML: DOCS / "politica.html",
+    ANALISE_HTML: DOCS / "analise.html",
+}
+
+
+def publish_to_docs() -> None:
+    """Copy generated HTMLs to docs/ with clean filenames and fixed links."""
+    DOCS.mkdir(exist_ok=True)
+    for src, dst in DOCS_FILEMAP.items():
+        content = src.read_text(encoding="utf-8")
+        for old_ref, new_ref in DOCS_URL_REPLACEMENTS.items():
+            content = content.replace(old_ref, new_ref)
+        dst.write_text(content, encoding="utf-8")
+        print(f"[OK] Publicado: {dst}")
+
+
 def main() -> None:
     merge_result = merge_trechos()
     if merge_result == ANALISE_DOCX:
@@ -1282,6 +1308,11 @@ def main() -> None:
 
     print(f"[OK] HTML gerado: {ANALISE_HTML}")
     print(f"[OK] HTML gerado: {POLITICA_HTML}")
+
+    publish_to_docs()
+
+    print()
+    print("Pronto! Faca commit e push no GitHub Desktop.")
 
 
 if __name__ == "__main__":
