@@ -23,6 +23,8 @@ import re, subprocess, sys, os, tempfile
 BASE = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DOCX = os.path.join(BASE, 'output_final',
                     'Uma pol\u00edtica de fomento baseada em evid\u00eancias_v6.docx')
+HTML_OUT = os.path.join(BASE, 'output_final',
+                    'Uma pol\u00edtica de fomento baseada em evid\u00eancias_v6.html')
 DOCS_OUT = os.path.join(BASE, 'docs', 'politica.html')
 
 # Template fixo (dark/light, topbar, modal, TOC)
@@ -251,8 +253,16 @@ def step5_rebuild_toc(shell_before, body):
     return shell_before
 
 
+URL_REPLACEMENTS = {
+    'An%C3%A1lise%20de%20Dados%20-%20Fomento%20Audiovisual%20Brasileiro.html': 'analise.html',
+    'An%C3%A1lise%20do%20Retorno%20do%20Fomento%20P%C3%BAblico%20ao%20Audiovisual%20Brasileiro%20(FSA%20-%20Ren%C3%BAncia%20Fiscal)_v2.html': 'painel.html',
+    'An\u00e1lise de Dados - Fomento Audiovisual Brasileiro.html': 'analise.html',
+    'An\u00e1lise do Retorno do Fomento P\u00fablico ao Audiovisual Brasileiro (FSA - Ren\u00fancia Fiscal)_v2.html': 'painel.html',
+}
+
+
 def step6_assemble_and_publish(body, shell_before):
-    """Assemble final HTML from template + body and save to docs/."""
+    """Assemble final HTML from template + body and save to output_final/ and docs/."""
     print('[6/6] Montando e publicando...')
 
     with open(SHELL_AFTER, 'r', encoding='utf-8') as f:
@@ -260,11 +270,21 @@ def step6_assemble_and_publish(body, shell_before):
 
     html = shell_before + '\n' + body + '\n' + shell_after
 
+    # Salvar em output_final (com nomes originais dos links)
+    with open(HTML_OUT, 'w', encoding='utf-8') as f:
+        f.write(html)
+    print(f'  Salvo: {HTML_OUT}')
+
+    # Salvar em docs (com links limpos para GitHub Pages)
+    docs_html = html
+    for old_ref, new_ref in URL_REPLACEMENTS.items():
+        docs_html = docs_html.replace(old_ref, new_ref)
+
     os.makedirs(os.path.dirname(DOCS_OUT), exist_ok=True)
     with open(DOCS_OUT, 'w', encoding='utf-8') as f:
-        f.write(html)
-
+        f.write(docs_html)
     print(f'  Salvo: {DOCS_OUT}')
+
     print(f'  Tamanho: {len(html):,} chars')
 
 

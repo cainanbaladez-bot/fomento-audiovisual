@@ -1278,10 +1278,9 @@ def main() -> None:
         print(f"[OK] Trechos incorporados em: {ANALISE_DOCX}")
 
     analysis_ids = convert_docx(ANALISE_DOCX, ANALISE_HTML, "analysis")
-    convert_docx(POLITICA_DOCX, POLITICA_HTML, "policy", analysis_ids)
 
     print(f"[OK] HTML gerado: {ANALISE_HTML}")
-    print(f"[OK] HTML gerado: {POLITICA_HTML}")
+    print(f"[INFO] Politica v6.html nao e gerado aqui — use atualizar_texto.py")
 
 
 if __name__ == "__main__":
