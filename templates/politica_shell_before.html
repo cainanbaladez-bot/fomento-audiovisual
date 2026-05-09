@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="pt-BR" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Uma política de fomento baseada em evidências</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Literata:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&display=swap" rel="stylesheet">
+<style>
+/* ── Color tokens ── */
+:root, [data-theme="dark"] {
+  --bg: #141416;
+  --bg-sub: #1a1a1e;
+  --paper: #1e1e22;
+  --paper-2: #252529;
+  --ink: #d8d4ce;
+  --ink-strong: #eae7e2;
+  --muted: #908a80;
+  --faint: #6a655c;
+  --rule: rgba(255,255,255,.08);
+  --accent: #6ab4c8;
+  --accent-2: #c89a6a;
+  --accent-soft: rgba(106,180,200,.1);
+  --accent-2-soft: rgba(200,154,106,.1);
+  --overlay-bg: rgba(0,0,0,.6);
+  --shadow-sm: 0 2px 12px rgba(0,0,0,.3);
+  --shadow-md: 0 8px 32px rgba(0,0,0,.4);
+  --shadow-lg: 0 20px 60px rgba(0,0,0,.5);
+  --evidence-bg: rgba(106,180,200,.08);
+  --evidence-border: rgba(106,180,200,.3);
+  --quote-bg: rgba(106,180,200,.05);
+  --th-bg: rgba(255,255,255,.03);
+  --scrollbar-bg: transparent;
+  --scrollbar-thumb: rgba(255,255,255,.12);
+}
+[data-theme="light"] {
+  --bg: #f5f3ee;
+  --bg-sub: #eeebe4;
+  --paper: #ffffff;
+  --paper-2: #f7f5f0;
+  --ink: #2a2622;
+  --ink-strong: #1a1816;
+  --muted: #736d64;
+  --faint: #a09888;
+  --rule: rgba(0,0,0,.08);
+  --accent: #1a6b82;
+  --accent-2: #9b5a2e;
+  --accent-soft: rgba(26,107,130,.08);
+  --accent-2-soft: rgba(155,90,46,.07);
+  --overlay-bg: rgba(18,16,14,.45);
+  --shadow-sm: 0 2px 8px rgba(0,0,0,.06);
+  --shadow-md: 0 8px 30px rgba(0,0,0,.10);
+  --shadow-lg: 0 20px 60px rgba(0,0,0,.14);
+  --evidence-bg: rgba(26,107,130,.06);
+  --evidence-border: rgba(26,107,130,.25);
+  --quote-bg: rgba(26,107,130,.04);
+  --th-bg: rgba(0,0,0,.025);
+  --scrollbar-bg: transparent;
+  --scrollbar-thumb: rgba(0,0,0,.12);
+}
+
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale}
+body{background:var(--bg);color:var(--ink);font:19px/1.85 'Literata',Georgia,'Times New Roman',serif;overflow-x:hidden;transition:background .35s,color .35s}
+
+/* Scrollbar */
+::-webkit-scrollbar{width:8px}
+::-webkit-scrollbar-track{background:var(--scrollbar-bg)}
+::-webkit-scrollbar-thumb{background:var(--scrollbar-thumb);border-radius:4px}
+
+/* ── Top bar ── */
+.topbar{position:sticky;top:0;z-index:100;display:flex;align-items:center;gap:10px;padding:0 20px;height:48px;background:color-mix(in srgb,var(--bg) 85%,transparent);backdrop-filter:blur(20px) saturate(1.5);border-bottom:1px solid var(--rule);font-family:'Inter',system-ui,sans-serif;transition:background .35s}
+.topbar-brand{font-weight:700;font-size:11px;color:var(--accent-2);text-transform:uppercase;letter-spacing:.14em;white-space:nowrap}
+.topbar-sep{flex:1}
+.tb-btn{display:inline-flex;align-items:center;justify-content:center;gap:5px;height:32px;padding:0 12px;border:1px solid var(--rule);border-radius:8px;background:transparent;color:var(--muted);cursor:pointer;font:600 12px/1 'Inter',system-ui,sans-serif;text-decoration:none;transition:all .2s;white-space:nowrap}
+.tb-btn:hover{border-color:var(--accent);color:var(--accent);background:var(--accent-soft)}
+.tb-btn svg{width:14px;height:14px;flex-shrink:0}
+.tb-btn span{display:inline}
+@media(max-width:700px){.tb-btn span{display:none}.topbar{gap:6px;padding:0 10px}}
+
+/* ── Reading area ── */
+.reading-area{max-width:720px;margin:0 auto;padding:56px 24px 140px}
+@media(max-width:780px){.reading-area{padding:28px 14px 100px}}
+
+/* ── Typography ── */
+a{color:var(--accent);text-underline-offset:3px}
+h1,h2,h3,h4{font-family:'Inter',system-ui,sans-serif;line-height:1.22;letter-spacing:-.02em;color:var(--ink-strong)}
+h1{font-size:clamp(30px,5vw,42px);font-weight:800;color:var(--accent);margin-bottom:6px;line-height:1.08}
+.subtitle{color:var(--muted);font:500 15px/1.55 'Inter',system-ui,sans-serif;margin-bottom:40px;max-width:500px}
+
+h2{font-size:22px;font-weight:700;margin:64px 0 20px;padding:28px 0 14px;border-top:1px solid var(--rule);position:relative;scroll-margin-top:64px}
+h2[data-panel]{cursor:pointer;transition:color .2s}
+h2[data-panel]:hover{color:var(--accent)}
+h2[data-panel]::after{content:"ver dados";display:inline-block;margin-left:10px;padding:2px 10px;border-radius:99px;border:1px solid var(--rule);color:var(--muted);font:600 10px/1.4 'Inter',system-ui,sans-serif;letter-spacing:.04em;text-transform:uppercase;vertical-align:middle;transition:all .2s}
+h2[data-panel]:hover::after{border-color:var(--accent);color:var(--accent);background:var(--accent-soft)}
+
+h3{font-size:17px;font-weight:700;color:var(--accent-2);margin:40px 0 12px;scroll-margin-top:64px}
+h4{font-size:12px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin:24px 0 8px}
+p{margin:0 0 20px}
+ul,ol{margin:0 0 20px 22px}
+li{margin:7px 0}
+strong{color:var(--ink-strong)}
+blockquote{margin:32px 0;padding:20px 24px;border-left:3px solid var(--accent);background:var(--quote-bg);border-radius:0 10px 10px 0;color:var(--muted);font-style:italic}
+table{width:100%;border-collapse:collapse;margin:24px 0;font:13px/1.55 'Inter',system-ui,sans-serif}
+th,td{padding:10px 12px;border-bottom:1px solid var(--rule);text-align:left}
+th{background:var(--th-bg);font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--accent);font-weight:700}
+img{max-width:100%;height:auto;display:block;margin:28px auto;border-radius:8px}
+figure{margin:28px 0}
+figcaption{color:var(--muted);font-size:14px;font-style:italic;text-align:center}
+
+
+/* ── TOC drawer ── */
+.toc-overlay{position:fixed;inset:0;z-index:200;background:var(--overlay-bg);opacity:0;visibility:hidden;transition:opacity .3s,visibility .3s}
+.toc-overlay.open{opacity:1;visibility:visible}
+.toc-drawer{position:fixed;top:0;left:0;z-index:201;width:min(340px,84vw);height:100vh;background:var(--paper);box-shadow:var(--shadow-lg);transform:translateX(-100%);transition:transform .3s cubic-bezier(.4,0,.2,1),background .35s;overflow-y:auto;padding:28px 22px;font-family:'Inter',system-ui,sans-serif}
+.toc-drawer.open{transform:translateX(0)}
+.toc-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.12em;color:var(--accent-2);margin-bottom:18px}
+.toc-drawer a{display:block;padding:9px 12px;border-radius:8px;color:var(--muted);text-decoration:none;font-size:14px;font-weight:500;line-height:1.4;transition:all .2s}
+.toc-drawer a:hover,.toc-drawer a.active{background:var(--accent-soft);color:var(--accent)}
+
+.toc-sep{height:1px;background:var(--rule);margin:14px 0}
+.toc-ext{display:flex!important;align-items:center;gap:8px;background:var(--accent-2-soft)!important;color:var(--accent-2)!important;font-weight:600!important;font-size:13px!important;margin-top:4px}
+.toc-ext:hover{filter:brightness(1.15)}
+.toc-ext svg{width:15px;height:15px;flex-shrink:0}
+
+/* ── Data modal ── */
+.dm-overlay{position:fixed;inset:0;z-index:300;background:var(--overlay-bg);opacity:0;visibility:hidden;transition:opacity .3s,visibility .3s}
+.dm-overlay.open{opacity:1;visibility:visible}
+.dm-modal{position:fixed;top:0;right:0;z-index:301;width:min(900px,94vw);height:100vh;background:var(--bg-sub);box-shadow:var(--shadow-lg);transform:translateX(100%);transition:transform .35s cubic-bezier(.4,0,.2,1),background .35s;display:flex;flex-direction:column}
+.dm-overlay.open~.dm-modal{transform:translateX(0)}
+.dm-head{display:flex;align-items:center;gap:12px;padding:14px 18px;border-bottom:1px solid var(--rule);background:var(--paper);font-family:'Inter',system-ui,sans-serif;flex-shrink:0;transition:background .35s}
+.dm-head .dm-title{flex:1;font-size:15px;font-weight:700;color:var(--ink-strong)}
+.dm-head .dm-sub{font-size:11px;color:var(--muted);font-weight:500}
+.dm-metrics{display:flex;gap:8px;padding:10px 18px;background:var(--paper);border-bottom:1px solid var(--rule);flex-shrink:0;overflow-x:auto;font-family:'Inter',system-ui,sans-serif;transition:background .35s}
+.dm-metric{padding:8px 12px;border:1px solid var(--rule);border-radius:8px;background:var(--accent-soft);white-space:nowrap}
+.dm-metric b{display:block;color:var(--accent);font-size:17px;font-weight:800}
+.dm-metric span{display:block;margin-top:2px;color:var(--muted);font-size:10px}
+.dm-actions{display:flex;gap:6px;padding:8px 18px;background:var(--paper);border-bottom:1px solid var(--rule);flex-shrink:0;font-family:'Inter',system-ui,sans-serif;flex-wrap:wrap;transition:background .35s}
+.dm-actions a{display:inline-flex;align-items:center;gap:4px;padding:5px 12px;border:1px solid var(--rule);border-radius:8px;background:transparent;color:var(--accent);text-decoration:none;font-size:11px;font-weight:600;transition:all .2s;white-space:nowrap}
+.dm-actions a:hover{background:var(--accent);color:#fff;border-color:var(--accent)}
+.dm-actions a svg{width:12px;height:12px}
+.dm-close{display:inline-flex;align-items:center;justify-content:center;width:32px;height:32px;border:1px solid var(--rule);border-radius:8px;background:transparent;cursor:pointer;color:var(--muted);font-size:18px;transition:all .2s;flex-shrink:0}
+.dm-close:hover{background:rgba(200,60,60,.15);color:#e55;border-color:rgba(200,60,60,.3)}
+.dm-tabs{display:flex;flex-wrap:wrap;gap:5px;padding:8px 18px;background:var(--paper);border-bottom:1px solid var(--rule);flex-shrink:0;font-family:'Inter',system-ui,sans-serif;transition:background .35s}
+.dm-tabs button{padding:4px 11px;border:1px solid var(--rule);border-radius:7px;background:transparent;color:var(--muted);cursor:pointer;font:600 10px/1.3 'Inter',system-ui,sans-serif;transition:all .2s;text-transform:uppercase;letter-spacing:.03em}
+.dm-tabs button:hover{border-color:var(--accent);color:var(--accent)}
+.dm-tabs button.on{border-color:var(--accent);background:var(--accent);color:#fff}
+.dm-frame-wrap{flex:1;overflow:hidden}
+.dm-frame{display:block;width:100%;height:100%;border:0;background:#11131f}
+
+/* ── Progress ── */
+.progress{position:fixed;top:48px;left:0;height:2px;background:var(--accent);z-index:99;width:0%;transition:width .08s linear;opacity:.7}
+
+/* ── Back to top ── */
+.btt{position:fixed;bottom:24px;right:24px;z-index:50;width:40px;height:40px;border-radius:50%;background:var(--paper);border:1px solid var(--rule);box-shadow:var(--shadow-md);cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--accent);opacity:0;transform:translateY(10px);transition:all .25s;pointer-events:none}
+.btt.on{opacity:1;transform:translateY(0);pointer-events:auto}
+.btt:hover{background:var(--accent);color:#fff}
+.btt svg{width:18px;height:18px}
+
+@media print{.topbar,.toc-overlay,.toc-drawer,.dm-overlay,.dm-modal,.progress,.btt{display:none!important}.reading-area{padding:0;max-width:none}}
+
+/* ── Epigraph ── */
+.epigraph{margin:32px 0 44px;padding:0;display:flex;flex-direction:column;gap:0}
+.epigraph blockquote{margin:0;padding:16px 24px;border-left:2px solid var(--rule);background:transparent;font-size:15px;line-height:1.65;font-style:italic;color:var(--muted);border-radius:0}
+.epigraph blockquote p{margin:0 0 6px}
+.epigraph cite{display:block;font-style:normal;font:500 13px/1.4 'Inter',system-ui,sans-serif;color:var(--faint);margin-top:2px}
+.epigraph cite a{color:var(--accent);font-weight:600}
+</style>
+</head>
+<body>
+
+<div class="progress" id="prog"></div>
+
+<header class="topbar">
+  <button class="tb-btn" id="tocBtn" aria-label="Sumário" title="Sumário"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg></button>
+  <span class="topbar-brand">Fomento Audiovisual</span>
+  <span class="topbar-sep"></span>
+  <a class="tb-btn" href="analise.html" target="_blank" rel="noopener" title="Análise Técnica"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h6v6"/><path d="M10 14L21 3"/><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/></svg> <span>Análise</span></a>
+  <a class="tb-btn" href="painel.html" target="_blank" rel="noopener" title="Painel de Dados"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="3" width="7" height="9" rx="1"/><rect x="14" y="3" width="7" height="5" rx="1"/><rect x="14" y="12" width="7" height="9" rx="1"/><rect x="3" y="16" width="7" height="5" rx="1"/></svg> <span>Painel</span></a>
+  <button class="tb-btn" id="themeBtn" aria-label="Alternar tema" title="Alternar claro/escuro"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg></button>
+</header>
+
+<div class="toc-overlay" id="tocO"></div>
+<nav class="toc-drawer" id="tocD">
+  <div class="toc-label">Sumário</div>
+  
+  
+  <a href="#o-que-determina-o-sucesso-em-salas-cinema-e-o-investimento-d">O que determina o sucesso em salas cinema é o inve...</a>
+  <a href="#chamadas-bilheteria-e-festival">Chamadas que usam desempenho de bilheteria tem mel...</a>
+  <a href="#de-forma-geral-as-distribuidoras-selecionam-melhor-do-que-as">De forma geral as distribuidoras selecionam melhor...</a>
+  <a href="#mas-os-dados-revelam-dois-perfis-completamente-distintos">Mas os dados revelam dois perfis completamente dis...</a>
+  <a href="#e-as-chamadas-de-ampla-concorrencia">E as chamadas de ampla concorrência?</a>
+  <a href="#o-que-o-retorno-das-produtoras-revela">O que o retorno das produtoras revela</a>
+  <a href="#a-estrutura-que-o-fomento-desconstruiu">A estrutura que o fomento (des)construiu</a>
+  <a href="#a-proliferacao-das-produtoras-vs-sustentabilidade">A proliferação das produtoras vs sustentabilidade</a>
+  <a href="#a-diversidade-que-temos">A Diversidade que temos</a>
+  <a href="#a-instabilidade-tem-endereco-o-cgfsa">A instabilidade tem endereço: o CGFSA</a>
+  <a href="#o-que-o-fsa-poderia-ser">O que o FSA poderia ser</a>
+  <a href="#joint-ventures-as-spes-brasileiras">Joint Ventures, as SPEs brasileiras</a>
+  <a href="#previsibilidade-e-planejamento-de-longo-prazo">Previsibilidade e planejamento de longo prazo.</a>
+  <a href="#novas-possibilidades-de-investimento">Novas possibilidades de investimento em infraestru...</a>
+  <a href="#renovacao-depende-do-desempenho">Renovação depende do desempenho da própria carteir...</a>
+  <a href="#seletivos">Seletivos</a>
+  <a href="#suat-internacional-curtas">SUAT Internacional Curtas</a>
+  <a href="#ampla-concorrencia-a-partir-do-desenvolvimento">Ampla concorrência a partir do desenvolvimento</a>
+  <a href="#uma-distribuicao-possivel">Uma distribuição possível:</a>
+
+
+  <div class="toc-sep"></div>
+  <a class="toc-ext" href="analise.html" target="_blank" rel="noopener">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h6v6"/><path d="M10 14L21 3"/><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/></svg> Análise Técnica
+  </a>
+  <a class="toc-ext" href="painel.html" target="_blank" rel="noopener">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="3" width="7" height="9" rx="1"/><rect x="14" y="3" width="7" height="5" rx="1"/><rect x="14" y="12" width="7" height="9" rx="1"/><rect x="3" y="16" width="7" height="5" rx="1"/></svg> Painel de Dados
+  </a>
+</nav>
+
+<div class="dm-overlay" id="dmO"></div>
+<aside class="dm-modal">
+  <div class="dm-head">
+    <div><div class="dm-title" id="dmT">Dados</div><div class="dm-sub" id="dmS"></div></div>
+    <button class="dm-close" id="dmX" title="Fechar">&times;</button>
+  </div>
+  <div class="dm-metrics" id="dmM"></div>
+  <div class="dm-tabs" id="dmTabs">
+    <button data-h="#visao-geral">Visão geral</button>
+    <button data-h="#retorno-domestico">Ret. doméstico</button>
+    <button data-h="#retorno-internacional">Ret. intl</button>
+    <button data-h="#categorias">Categorias</button>
+    <button data-h="#produtoras">Produtoras</button>
+    <button data-h="#concentracao">Concentração</button>
+    <button data-h="#curtas-longas">Curtas</button>
+    <button data-h="#diversidade">Diversidade</button>
+    <button data-h="#soft-power">Soft power</button>
+  </div>
+  <div class="dm-actions">
+    <a id="dmAL" href="analise.html" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h6v6"/><path d="M10 14L21 3"/><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/></svg> Abrir análise</a>
+    <a id="dmPL" href="painel.html" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="3" width="7" height="9" rx="1"/><rect x="14" y="3" width="7" height="5" rx="1"/><rect x="14" y="12" width="7" height="9" rx="1"/><rect x="3" y="16" width="7" height="5" rx="1"/></svg> Abrir painel</a>
+  </div>
+  <div class="dm-frame-wrap">
+    <iframe class="dm-frame" id="dmF" title="Painel de dados" loading="lazy"></iframe>
+  </div>
+</aside>
+
+<div class="reading-area">
+  <article>

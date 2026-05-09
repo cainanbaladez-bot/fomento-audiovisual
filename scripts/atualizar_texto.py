@@ -2,8 +2,8 @@
 """
 atualizar_texto.py
 ==================
-Converte o docx do texto de politica em HTML final com o layout atual
-(dark/light mode, modal de dados, topbar, TOC) e publica em docs/.
+Converte o docx do texto de politica em HTML e publica em docs/
+usando o template fixo (dark/light, topbar, modal de dados, TOC).
 
 Uso:
     python scripts/atualizar_texto.py
@@ -15,23 +15,24 @@ Fluxo:
   2. Corrige hierarquia de headings (tudo H2, conforme docx)
   3. Estiliza epigrafe
   4. Adiciona data-panel nos titulos com dados
-  5. Embala no template (shell) do HTML atual
-  6. Copia para docs/politica.html com links limpos
+  5. Reconstroi TOC no template
+  6. Monta HTML final com template fixo e publica em docs/
 """
-import re, subprocess, sys, os, tempfile, shutil
+import re, subprocess, sys, os, tempfile
 
 BASE = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DOCX = os.path.join(BASE, 'output_final',
                     'Uma pol\u00edtica de fomento baseada em evid\u00eancias_v6.docx')
-HTML_OUT = os.path.join(BASE, 'output_final',
-                        'Uma pol\u00edtica de fomento baseada em evid\u00eancias_v6.html')
 DOCS_OUT = os.path.join(BASE, 'docs', 'politica.html')
+
+# Template fixo (dark/light, topbar, modal, TOC)
+SHELL_BEFORE = os.path.join(BASE, 'templates', 'politica_shell_before.html')
+SHELL_AFTER  = os.path.join(BASE, 'templates', 'politica_shell_after.html')
 
 # ══════════════════════════════════════════════════════════
 # Config: heading id -> panel hash (None = no data link)
 # ══════════════════════════════════════════════════════════
 PANEL_MAP = {
-    # slug (ascii, from _slugify) -> panel hash
     'o-que-determina-o-sucesso-em-cinema-e-o-investimento-das-maj': '#retorno-domestico',
     'chamadas-bilheteria-e-festival': '#categorias',
     'de-forma-geral-as-distribuidoras-selecionam-melhor-do-que-as': '#categorias',
@@ -60,17 +61,9 @@ EPIGRAPH_QUOTES = [
         'match': 'Marte Um',
         'cite': '\u2014 Gabriel Martins',
         'cite_source': 'G1, 2026',
-        'url': None,  # URL exato nao encontrado
+        'url': None,
     },
 ]
-
-# URL replacements for docs/ version
-URL_REPLACEMENTS = {
-    'An%C3%A1lise%20de%20Dados%20-%20Fomento%20Audiovisual%20Brasileiro.html': 'analise.html',
-    'An%C3%A1lise%20do%20Retorno%20do%20Fomento%20P%C3%BAblico%20ao%20Audiovisual%20Brasileiro%20(FSA%20-%20Ren%C3%BAncia%20Fiscal)_v2.html': 'painel.html',
-    'An\u00e1lise de Dados - Fomento Audiovisual Brasileiro.html': 'analise.html',
-    'An\u00e1lise do Retorno do Fomento P\u00fablico ao Audiovisual Brasileiro (FSA - Ren\u00fancia Fiscal)_v2.html': 'painel.html',
-}
 
 
 def step1_pandoc():
@@ -95,7 +88,6 @@ def step1_pandoc():
         with open(tmp, 'r', encoding='utf-8') as f:
             raw = f.read()
 
-        # Extract just the body content
         m = re.search(r'<body[^>]*>(.*)</body>', raw, re.DOTALL)
         body = m.group(1).strip() if m else raw
         print(f'  Body extraido: {len(body):,} chars')
@@ -117,12 +109,9 @@ def step2_fix_headings(body):
     """Convert bold paragraphs and known sections to H2."""
     print('[2/6] Corrigindo hierarquia de headings...')
 
-    # Promote any h3 -> h2
     body = re.sub(r'<h3(\s)', r'<h2\1', body)
     body = re.sub(r'</h3>', '</h2>', body)
 
-    # Pandoc renders docx 14pt bold as <p><strong>...</strong></p>
-    # Convert ALL of these to H2
     def bold_to_h2(m):
         inner = m.group(1)
         clean = re.sub(r'<[^>]+>', '', inner).strip()
@@ -132,7 +121,6 @@ def step2_fix_headings(body):
     body, n = re.subn(r'<p><strong>([^<]+)</strong></p>', bold_to_h2, body)
     print(f'  Convertidos {n} paragrafos bold -> H2')
 
-    # Also convert specific non-bold paragraphs that should be headings
     extra_headings = [
         ('Chamadas que usam desempenho de bilheteria', 'chamadas-bilheteria-e-festival'),
         ('Mas os dados revelam dois perfis', 'mas-os-dados-revelam-dois-perfis-completamente-distintos'),
@@ -154,7 +142,6 @@ def step2_fix_headings(body):
         idx = body.find(search_text)
         if idx < 0:
             continue
-        # Check if already inside an h2
         before = body[max(0, idx-20):idx]
         if '<h2' in before:
             continue
@@ -179,8 +166,6 @@ def step3_epigraph(body):
     """Style the opening quotes as an epigraph block."""
     print('[3/6] Estilizando epigrafe...')
 
-    # Find the 3 quote pairs + separator (--- or em-dashes)
-    # Pattern: quote para, attribution para, repeated 3 times, then separator
     pattern = (
         r'<p>\u201c[^<]*Ningu\u00e9m quer entrar[^<]*</p>'
         r'\s*<p>\u2014\s*Rodrigo Teixeira</p>'
@@ -193,7 +178,6 @@ def step3_epigraph(body):
 
     m = re.search(pattern, body, re.DOTALL)
     if not m:
-        # Fallback: find by first and last quote
         idx1 = body.find('\u201cNingu\u00e9m quer entrar')
         idx2 = body.find('\u2014\u2014\u2014</p>', idx1 if idx1 > 0 else 0)
         if idx1 > 0 and idx2 > 0:
@@ -206,7 +190,6 @@ def step3_epigraph(body):
     else:
         old_block = m.group(0)
 
-    # Extract individual quotes from old block
     quote_paras = re.findall(r'<p>(\u201c[^<]+)</p>', old_block)
 
     bqs = []
@@ -229,7 +212,6 @@ def step4_data_panels(body):
     """Add data-panel attributes to H2 headings that link to data."""
     print('[4/6] Adicionando data-panel aos topicos...')
 
-    # First strip any existing data-panel
     body = re.sub(r'(<h2[^>]*?) data-panel="[^"]*"', r'\1', body)
 
     count = 0
@@ -244,79 +226,66 @@ def step4_data_panels(body):
     return body
 
 
-def step5_assemble(body):
-    """Wrap body in the full HTML template and rebuild TOC from actual H2s."""
-    print('[5/6] Montando HTML final...')
+def step5_rebuild_toc(shell_before, body):
+    """Rebuild TOC links in the shell from actual H2 ids in the body."""
+    print('[5/6] Reconstruindo TOC...')
 
-    with open(HTML_OUT, 'r', encoding='utf-8') as f:
-        current = f.read()
-
-    shell_before = current[:current.index('<article>') + len('<article>')]
-    shell_after = current[current.index('</article>'):]
-
-    html = shell_before + '\n' + body + '\n' + shell_after
-
-    # Rebuild TOC from actual H2 ids in the body
     h2s = re.findall(r'<h2[^>]*id="([^"]+)"[^>]*>(.*?)</h2>', body, re.DOTALL)
     toc_links = []
     for hid, inner in h2s:
         clean = re.sub(r'<[^>]+>', '', inner).strip()
-        # Shorten for TOC display
         short = clean[:50] + ('...' if len(clean) > 50 else '')
         toc_links.append(f'  <a href="#{hid}">{short}</a>')
 
     toc_html = '\n'.join(toc_links)
 
-    # Find and replace the TOC content (between toc-label and toc-sep)
-    toc_pattern = r'(<div class="toc-label">Sum[^<]*</div>\s*)(.*?)(\s*<div class="toc-sep")'
-    m = re.search(toc_pattern, html, re.DOTALL)
+    # Replace TOC content between toc-label and toc-sep
+    toc_pattern = r'(<div class="toc-label">Sum[^<]*</div>\s*)\n.*?\n(\s*<div class="toc-sep")'
+    m = re.search(toc_pattern, shell_before, re.DOTALL)
     if m:
-        html = html[:m.start(2)] + '\n' + toc_html + '\n' + html[m.end(2):]
+        shell_before = shell_before[:m.end(1)] + '\n' + toc_html + '\n' + shell_before[m.start(2):]
         print(f'  TOC reconstruido com {len(h2s)} itens')
+    else:
+        print('  AVISO: padrao TOC nao encontrado no template')
 
-    with open(HTML_OUT, 'w', encoding='utf-8') as f:
-        f.write(html)
-
-    print(f'  Salvo: {HTML_OUT}')
-    print(f'  Tamanho: {len(html):,} chars')
-    return html
+    return shell_before
 
 
-def step6_publish(html):
-    """Copy to docs/ with clean filenames and fixed links."""
-    print('[6/6] Publicando em docs/...')
+def step6_assemble_and_publish(body, shell_before):
+    """Assemble final HTML from template + body and save to docs/."""
+    print('[6/6] Montando e publicando...')
 
-    content = html
-    for old_ref, new_ref in URL_REPLACEMENTS.items():
-        content = content.replace(old_ref, new_ref)
+    with open(SHELL_AFTER, 'r', encoding='utf-8') as f:
+        shell_after = f.read()
+
+    html = shell_before + '\n' + body + '\n' + shell_after
 
     os.makedirs(os.path.dirname(DOCS_OUT), exist_ok=True)
     with open(DOCS_OUT, 'w', encoding='utf-8') as f:
-        f.write(content)
+        f.write(html)
 
     print(f'  Salvo: {DOCS_OUT}')
+    print(f'  Tamanho: {len(html):,} chars')
 
 
 def main():
     print('='*56)
-    print('  Atualizando texto: docx -> HTML -> docs/')
+    print('  Atualizando texto: docx -> docs/politica.html')
     print('='*56)
     print()
+
+    with open(SHELL_BEFORE, 'r', encoding='utf-8') as f:
+        shell_before = f.read()
 
     body = step1_pandoc()
     body = step2_fix_headings(body)
     body = step3_epigraph(body)
     body = step4_data_panels(body)
-    html = step5_assemble(body)
-    step6_publish(html)
+    shell_before = step5_rebuild_toc(shell_before, body)
+    step6_assemble_and_publish(body, shell_before)
 
     print()
-    print('Pronto! Agora faca commit e push:')
-    print('  1. Abra o GitHub Desktop')
-    print('  2. Commit: "Atualiza texto de politica"')
-    print('  3. Push origin')
-    print()
-    print('O site atualiza automaticamente em ~1 min.')
+    print('Pronto! Faca commit e push no GitHub Desktop.')
 
 
 if __name__ == '__main__':

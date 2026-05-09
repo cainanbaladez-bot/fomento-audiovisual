@@ -1,0 +1,92 @@
+</article>
+</div>
+
+<button class="btt" id="btt" title="Voltar ao topo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"/></svg></button>
+
+<script>
+const PF=decodeURIComponent('painel.html');
+const AF=decodeURIComponent('analise.html');
+const P={
+'#visao-geral':{t:'Vis\u00e3o geral do sistema',s:'Panorama: base, retorno agregado, mecanismos',ah:'#vis%C3%A3o-geral-tamanho-do-sistema-e-retorno-agregado',m:[['2.990','obras na base'],['R$ 2,38 bi','receita dom\u00e9stica']]},
+'#categorias':{t:'Categorias FSA',s:'Bilheteria, festivais, roteiro, distribuidora, produtora',ah:'#categorias-fsa-e-crit%C3%A9rio-de-sele%C3%A7%C3%A3o',m:[['0,94x','ROI distribuidora'],['3,41','ROI intl m\u00e9dio']]},
+'#retorno-domestico':{t:'Retorno dom\u00e9stico',s:'FSA, ren\u00fancia fiscal, bilheteria, financiamento',ah:'#retorno-dom%C3%A9stico-e-composi%C3%A7%C3%A3o-do-financiamento',m:[['0,79x','ROI dom\u00e9stico'],['R$ 2,38 bi','receita estimada']]},
+'#retorno-internacional':{t:'Retorno internacional',s:'Festivais, VOD, Lumi\u00e8re/CNC, circula\u00e7\u00e3o europeia',ah:'#retorno-internacional',m:[['535','festiv. participa\u00e7\u00f5es'],['31','pa\u00edses VOD']]},
+'#produtoras':{t:'Produtoras e clusters',s:'Dom\u00e9stico, internacional, duplo retorno, pequeno porte',ah:'#produtoras-e-clusters',m:[['39','duplo retorno'],['51/52','dom./intl']]},
+'#concentracao':{t:'Concentra\u00e7\u00e3o do capital',s:'Curva de Lorenz, tiers, tickets anuais',ah:'#concentra%C3%A7%C3%A3o-e-distribui%C3%A7%C3%A3o-do-capital',m:[['0,634','Gini (FSA+)'],['71%','< R$1mi/ano']]},
+'#curtas-longas':{t:'Curtas para longas',s:'Curta-festival \u2192 matura\u00e7\u00e3o \u2192 longa internacional',ah:'#curtas-para-longas-trajet%C3%B3ria-de-forma%C3%A7%C3%A3o',m:[['23,1%','curta\u2192longa intl'],['2,2x','chance relativa']]},
+'#diversidade':{t:'Diversidade e sele\u00e7\u00e3o',s:'Taxas por ra\u00e7a e g\u00eanero, pol\u00edtica afirmativa',ah:'#diversidade-inscritos-e-selecionados',m:[['32,4%','negros c/ PA'],['52,6%','mulheres c/ PA']]},
+'#soft-power':{t:'Soft power e cr\u00edtica',s:'Cr\u00edtica, cita\u00e7\u00f5es acad\u00eamicas, circula\u00e7\u00e3o simb\u00f3lica',ah:'',m:[['OpenAlex','cita\u00e7\u00f5es'],['Cr\u00edtica','nac. e intl']]}
+};
+
+/* Theme */
+const root=document.documentElement;
+const themeBtn=document.getElementById('themeBtn');
+function setTheme(t){root.dataset.theme=t;localStorage.setItem('theme',t);themeBtn.innerHTML=t==='dark'?SUN:MOON}
+const SUN='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>';
+const MOON='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg>';
+setTheme(localStorage.getItem('theme')||'dark');
+themeBtn.addEventListener('click',()=>setTheme(root.dataset.theme==='dark'?'light':'dark'));
+
+/* TOC */
+const tocO=document.getElementById('tocO');
+const tocD=document.getElementById('tocD');
+const tocBtn=document.getElementById('tocBtn');
+function openToc(){tocO.classList.add('open');tocD.classList.add('open')}
+function closeToc(){tocO.classList.remove('open');tocD.classList.remove('open')}
+tocBtn.addEventListener('click',openToc);
+tocO.addEventListener('click',closeToc);
+tocD.querySelectorAll('a[href^="#"]').forEach(a=>a.addEventListener('click',closeToc));
+document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeToc();closeModal()}});
+
+/* Modal */
+const dmO=document.getElementById('dmO');
+const dmT=document.getElementById('dmT');
+const dmS=document.getElementById('dmS');
+const dmM=document.getElementById('dmM');
+const dmF=document.getElementById('dmF');
+const dmAL=document.getElementById('dmAL');
+const dmPL=document.getElementById('dmPL');
+function openModal(h){
+  const p=P[h]||P['#visao-geral'];
+  dmT.textContent=p.t;
+  dmS.textContent=p.s;
+  dmM.innerHTML=p.m.map(([v,l])=>'<div class="dm-metric"><b>'+v+'</b><span>'+l+'</span></div>').join('');
+  dmF.src=PF+h;
+  dmAL.href=AF+decodeURIComponent(p.ah||'');
+  dmPL.href=PF+h;
+  document.querySelectorAll('#dmTabs button').forEach(b=>b.classList.toggle('on',b.dataset.h===h));
+  dmO.classList.add('open');
+  document.body.style.overflow='hidden';
+}
+function closeModal(){dmO.classList.remove('open');document.body.style.overflow='';setTimeout(()=>{dmF.src=''},350)}
+document.getElementById('dmX').addEventListener('click',closeModal);
+dmO.addEventListener('click',closeModal);
+document.querySelectorAll('#dmTabs button').forEach(b=>b.addEventListener('click',()=>openModal(b.dataset.h)));
+
+/* Evidence links */
+document.querySelectorAll('.evidence-link').forEach(a=>{
+  a.addEventListener('click',e=>{e.preventDefault();openModal(a.dataset.panelHash||'#visao-geral')});
+});
+/* H2 topic links */
+document.querySelectorAll('h2[data-panel]').forEach(h=>{
+  h.addEventListener('click',e=>{if(e.target===h||e.target.closest('h2')===h)openModal(h.dataset.panel)});
+});
+
+/* Progress + back-to-top */
+const prog=document.getElementById('prog');
+const btt=document.getElementById('btt');
+let tick=false;
+window.addEventListener('scroll',()=>{if(!tick){requestAnimationFrame(()=>{
+  const s=window.scrollY,d=document.documentElement.scrollHeight-window.innerHeight;
+  prog.style.width=(d>0?(s/d)*100:0)+'%';
+  btt.classList.toggle('on',s>500);
+  tick=false});tick=true}});
+btt.addEventListener('click',()=>window.scrollTo({top:0,behavior:'smooth'}));
+
+/* TOC active */
+const hs=Array.from(document.querySelectorAll('article h1[id],article h2[id],article h3[id]'));
+const tls=Array.from(tocD.querySelectorAll('a[href^="#"]'));
+const iob=new IntersectionObserver(es=>{es.forEach(e=>{if(e.isIntersecting){const id=e.target.id;tls.forEach(a=>{a.classList.toggle('active',decodeURIComponent(a.getAttribute('href').slice(1))===id)})}})},{rootMargin:'-60px 0px -70% 0px'});hs.forEach(h=>iob.observe(h));
+</script>
+</body>
+</html>
