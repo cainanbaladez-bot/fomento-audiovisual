@@ -1,19 +1,27 @@
-# Gerados pelo pipeline — não versionados
-resultados/tabela_consolidada_obras.xlsx
-resultados/tabela_consolidada_chamadas.xlsx
-resultados/datasets/
-resultados/painel_*.html
-
-# Painel final — gerado pelo script 07
-output_final/painel_fomento_audiovisual.html
-
-# Python
+# ── Python ────────────────────────────────────────────────────────────────────
 __pycache__/
 *.pyc
 *.pyo
 .venv/
 venv/
+*.egg-info/
 
-# OS
+# ── OS ────────────────────────────────────────────────────────────────────────
 .DS_Store
 Thumbs.db
+*.swp
+
+# ── Painéis intermediários gerados (regeneráveis via scripts 03–06) ──────────
+# EXCEÇÃO: painel_diversidade.html e painel_softpower.html são fontes estáticas
+# lidas diretamente pelo script 07 — DEVEM ser versionadas.
+resultados/painel_comparativo.html
+resultados/painel_criterio_selecao.html
+resultados/painel_produtoras.html
+resultados/painel_concentracao_produtoras.html
+resultados/painel_concentracao_standalone.html
+
+# ── Datasets intermediários (regeneráveis via scripts 01–02) ─────────────────
+resultados/datasets/
+resultados/tabela_consolidada_obras.xlsx
+resultados/tabela_consolidada_chamadas.xlsx
+resultados/festivais_consolidado.csv

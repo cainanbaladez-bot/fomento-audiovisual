@@ -87,7 +87,7 @@ KEY_MAP = {
 
 # ── Categorias com chaves JS ────────────────────────────────────────────────
 CATEGORIAS = {
-    "pont_fest_prod":   {"label": "FSA Pontuação Festivais e Roteiro",              "cor": "#00e5c8"},
+    "pont_fest_prod":   {"label": "FSA Pontuação Festivais e Roteiro",              "cor": "#6c7bf7"},
     "pont_com_prod":    {"label": "FSA Pontuação Bilheteria e Roteiro — Produtora", "cor": "#f5c842"},
     "pont_com_dist":    {"label": "FSA Pontuação Bilheteria e Roteiro — Distribuidora", "cor": "#f09020"},
     "automatico":       {"label": "FSA Automático Bilheteria",                      "cor": "#5b8cff"},
@@ -679,14 +679,18 @@ html = f"""<!DOCTYPE html>
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Cinema Brasileiro — Metodologia de Decisão de Investimento</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@300;400;500&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
 :root{{
-  --bg:#07080f;--surface:#0e1018;--surface2:#141620;--border:#1e2035;
-  --accent:#00e5c8;--accent-dim:rgba(0,229,200,.15);
-  --gold:#f5c842;--coral:#ff7c6e;--purple:#a78bfa;--muted-blue:#5fd1ff;
-  --text:#e8eaf2;--muted:#5a6080;--dim:#1e2035;
-  --font-head:'DM Serif Display',serif;--font-mono:'DM Mono',monospace;
+  --bg:#0b0d14;--surface:#14171f;--surface2:#1a1e2c;--surface3:#212638;
+  --border:#282d42;--border-light:#343a54;
+  --accent:#6c7bf7;--accent-dim:rgba(108,123,247,.12);
+  --gold:#fbbf24;--coral:#f87171;--purple:#a78bfa;--cyan:#38bdf8;
+  --green:#34d399;--muted-blue:#5fd1ff;
+  --text:#e2e8f0;--text2:#c1c9d9;--muted:#7b849a;--dim:#282d42;
+  --font-head:'DM Serif Display',serif;--font-mono:'DM Mono',monospace;--font-ui:'Inter',system-ui,sans-serif;
 }}
 *{{box-sizing:border-box;margin:0;padding:0}}
 body{{background:var(--bg);color:var(--text);font-family:var(--font-mono);font-size:13px;min-height:100vh}}
@@ -705,7 +709,7 @@ body{{background:var(--bg);color:var(--text);font-family:var(--font-mono);font-s
 @keyframes fadeIn{{from{{opacity:0;transform:translateY(4px)}}to{{opacity:1;transform:translateY(0)}}}}
 .kpi-bar{{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px;margin-bottom:24px}}
 .kpi{{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:16px 18px;position:relative;overflow:hidden}}
-.kpi::after{{content:'';position:absolute;inset:0;background:radial-gradient(circle at 80% 20%,rgba(0,229,200,.04),transparent 70%);pointer-events:none}}
+.kpi::after{{content:'';position:absolute;inset:0;background:radial-gradient(circle at 80% 20%,rgba(108,123,247,.04),transparent 70%);pointer-events:none}}
 .kpi-label{{font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;margin-bottom:8px}}
 .kpi-val{{font-family:var(--font-head);font-size:24px;font-style:italic;color:var(--accent);line-height:1}}
 .kpi-sub{{font-size:10px;color:var(--muted);margin-top:5px}}
@@ -953,7 +957,7 @@ tbody td{{padding:9px 12px;font-size:11px;vertical-align:middle}}
           Fase 1 pontua o histórico da empresa, Fase 2 avalia o roteiro.
           Editais <strong style="color:var(--text)">automáticos</strong> usam critérios objetivos de desempenho anterior.
         </p>
-        <div class="meto-row"><span style="color:#00e5c8">FSA Pontuação Festivais e Roteiro</span><span>PRODECINE 03–05 · Concurso Mód. B</span></div>
+        <div class="meto-row"><span style="color:#6c7bf7">FSA Pontuação Festivais e Roteiro</span><span>PRODECINE 03–05 · Concurso Mód. B</span></div>
         <div class="meto-row"><span style="font-size:10px;color:var(--muted)">Fase 1: pontuação por premiações/seleções em festivais internacionais (Oscar, Cannes, Berlim, Veneza…). Fase 2: leitura de roteiro. Inscrição pela produtora. Editais seletivos com histórico artístico.</span></div>
         <div class="meto-row"><span style="color:#f5c842">FSA Pontuação Bilheteria e Roteiro — Produtora</span><span>PRODECINE 01 · 06 · Produção Cinema</span></div>
         <div class="meto-row"><span style="font-size:10px;color:var(--muted)">Fase 1: desempenho comercial — bilheteria e market share das obras anteriores da produtora. Fase 2: leitura de roteiro. Editais seletivos com histórico comercial.</span></div>
@@ -1094,7 +1098,7 @@ function buildKpis(){{
   const dN=fest.intl_avg&&com_ref?((fest.intl_avg-com_ref)/Math.max(com_ref,.001)*100):null;
   const delta=dN!==null?dN.toFixed(0):'—';
   document.getElementById('kpi-bar').innerHTML=`
-    <div class="kpi"><div class="kpi-label">Festivais — Produtora</div><div class="kpi-val" style="color:#00e5c8">${{fmtInt(fest.n_obras||0)}}</div><div class="kpi-sub">ROI intl médio ${{(fest.intl_avg||0).toFixed(1)}}</div></div>
+    <div class="kpi"><div class="kpi-label">Festivais — Produtora</div><div class="kpi-val" style="color:#6c7bf7">${{fmtInt(fest.n_obras||0)}}</div><div class="kpi-sub">ROI intl médio ${{(fest.intl_avg||0).toFixed(1)}}</div></div>
     <div class="kpi"><div class="kpi-label">Comercial — Produtora</div><div class="kpi-val" style="color:#f5c842">${{fmtInt(com.n_obras||0)}}</div><div class="kpi-sub">ROI intl médio ${{(com.intl_avg||0).toFixed(1)}}</div></div>
     <div class="kpi"><div class="kpi-label">Comercial — Distribuidora</div><div class="kpi-val" style="color:#e8b030">${{fmtInt(comd.n_obras||0)}}</div><div class="kpi-sub">ROI intl médio ${{(comd.intl_avg||0).toFixed(1)}}</div></div>
     <div class="kpi"><div class="kpi-label">Δ ROI Intl Festivais vs Comercial</div><div class="kpi-val" style="color:${{dN!==null?(dN>0?'var(--accent)':'var(--coral)'):'var(--muted)'}}">${{delta!=='—'?(Number(delta)>0?'+':'')+delta+'%':delta}}</div><div class="kpi-sub">Festivais-Prod. vs max(Com-Prod.,Com-Dist.)</div></div>`;
@@ -1146,7 +1150,7 @@ function drawQuadrant(){{
   // quadrant backgrounds
   const quads=[
     {{x:PAD.l, y:PAD.t, w:qx-PAD.l, h:qy-PAD.t, color:'rgba(160,64,232,.07)', label:'Voca\u00e7\u00e3o|Internacional'}},
-    {{x:qx,    y:PAD.t, w:PAD.l+PW-qx, h:qy-PAD.t, color:'rgba(0,229,200,.07)',  label:'Duplo|Impacto'}},
+    {{x:qx,    y:PAD.t, w:PAD.l+PW-qx, h:qy-PAD.t, color:'rgba(108,123,247,.07)',  label:'Duplo|Impacto'}},
     {{x:PAD.l, y:qy,    w:qx-PAD.l, h:PAD.t+PH-qy, color:'rgba(90,96,128,.05)', label:'Baixo Retorno|Detectado'}},
     {{x:qx,    y:qy,    w:PAD.l+PW-qx, h:PAD.t+PH-qy, color:'rgba(245,200,66,.07)', label:'Voca\u00e7\u00e3o|Comercial'}},
   ];

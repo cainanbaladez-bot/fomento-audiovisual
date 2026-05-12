@@ -1,0 +1,1252 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Auditoria de Claims — Fomento Audiovisual Brasileiro</title>
+<style>
+:root {
+  --bg: #0b0d14;
+  --surface: #14171f;
+  --surface2: #1a1e2c;
+  --surface3: #212638;
+  --border: #282d42;
+  --border-light: #343a54;
+  --accent: #6c7bf7;
+  --accent-dim: rgba(108,123,247,.12);
+  --cyan: #38bdf8;
+  --cyan-dim: rgba(56,189,248,.1);
+  --green: #34d399;
+  --green-dim: rgba(52,211,153,.1);
+  --yellow: #fbbf24;
+  --yellow-dim: rgba(251,191,36,.1);
+  --red: #f87171;
+  --red-dim: rgba(248,113,113,.1);
+  --purple: #a78bfa;
+  --purple-dim: rgba(167,139,250,.1);
+  --text: #e2e8f0;
+  --text2: #c1c9d9;
+  --muted: #7b849a;
+  --code-bg: #0d1018;
+}
+
+*,*::before,*::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif;
+  font-size: 15px;
+  line-height: 1.7;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ── HEADER ── */
+.header {
+  position: relative;
+  padding: 56px 32px 44px;
+  text-align: center;
+  border-bottom: 1px solid var(--border);
+  overflow: hidden;
+}
+.header::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 600px 300px at 30% 0%, rgba(108,123,247,.08) 0%, transparent 70%),
+    radial-gradient(ellipse 500px 250px at 70% 100%, rgba(56,189,248,.06) 0%, transparent 70%);
+  pointer-events: none;
+}
+.header-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--accent-dim);
+  color: var(--accent);
+  border: 1px solid rgba(108,123,247,.25);
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  padding: 5px 16px;
+  margin-bottom: 20px;
+}
+.header-tag::before {
+  content: '';
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: var(--accent);
+  animation: pulse-dot 2s ease-in-out infinite;
+}
+@keyframes pulse-dot {
+  0%,100% { opacity: .4; }
+  50% { opacity: 1; }
+}
+.header h1 {
+  font-size: 30px;
+  font-weight: 800;
+  color: #fff;
+  margin-bottom: 10px;
+  letter-spacing: -.02em;
+}
+.header p {
+  color: var(--muted);
+  font-size: 14px;
+  max-width: 560px;
+  margin: 0 auto;
+  line-height: 1.6;
+}
+
+/* ── STATS BAR ── */
+.stats-bar {
+  display: flex;
+  justify-content: center;
+  gap: 32px;
+  padding: 18px 24px;
+  border-bottom: 1px solid var(--border);
+  background: var(--surface);
+}
+.stat-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: var(--muted);
+}
+.stat-num {
+  font-size: 22px;
+  font-weight: 800;
+  letter-spacing: -.02em;
+}
+.stat-num.green { color: var(--green); }
+.stat-num.yellow { color: var(--yellow); }
+.stat-num.red { color: var(--red); }
+
+/* ── LAYOUT ── */
+.layout {
+  display: flex;
+  max-width: 1120px;
+  margin: 0 auto;
+  padding: 0 24px;
+}
+
+/* ── SIDE NAV ── */
+.side-nav {
+  position: sticky;
+  top: 24px;
+  width: 220px;
+  flex-shrink: 0;
+  padding: 32px 0;
+  align-self: flex-start;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.side-nav-title {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .12em;
+  color: var(--muted);
+  padding: 0 12px 10px;
+}
+.nav-link {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 12px;
+  border-radius: 8px;
+  text-decoration: none;
+  color: var(--text2);
+  font-size: 13px;
+  font-weight: 500;
+  transition: all .15s;
+  border: 1px solid transparent;
+}
+.nav-link:hover {
+  background: var(--surface2);
+  color: #fff;
+  text-decoration: none;
+}
+.nav-link.active {
+  background: var(--accent-dim);
+  border-color: rgba(108,123,247,.2);
+  color: #fff;
+}
+.nav-dot {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  border: 2px solid var(--muted);
+}
+.nav-dot.ok { border-color: var(--green); background: var(--green-dim); }
+.nav-dot.warn { border-color: var(--yellow); background: var(--yellow-dim); }
+
+/* ── MAIN CONTENT ── */
+.main {
+  flex: 1;
+  min-width: 0;
+  padding: 40px 0 80px 40px;
+}
+
+/* ── SUMMARY CARDS ── */
+.summary-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  margin-bottom: 48px;
+}
+.summary-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 16px 18px;
+  cursor: pointer;
+  transition: all .2s;
+  text-decoration: none;
+  color: inherit;
+  display: block;
+}
+.summary-card:hover {
+  border-color: var(--accent);
+  background: var(--surface2);
+  transform: translateY(-1px);
+  text-decoration: none;
+}
+.sc-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+.sc-num {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--muted);
+  background: var(--surface3);
+  border-radius: 4px;
+  padding: 2px 7px;
+}
+.sc-badge {
+  font-size: 10px;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 10px;
+  text-transform: uppercase;
+  letter-spacing: .05em;
+}
+.sc-badge.ok { background: var(--green-dim); color: var(--green); border: 1px solid rgba(52,211,153,.25); }
+.sc-badge.warn { background: var(--yellow-dim); color: var(--yellow); border: 1px solid rgba(251,191,36,.25); }
+.sc-title {
+  font-size: 13.5px;
+  font-weight: 700;
+  color: #fff;
+  margin-bottom: 8px;
+  line-height: 1.35;
+}
+.sc-bar-row {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  font-size: 10px;
+  color: var(--muted);
+  margin-bottom: 4px;
+}
+.sc-bar {
+  flex: 1;
+  height: 4px;
+  background: var(--surface3);
+  border-radius: 4px;
+  overflow: hidden;
+}
+.sc-bar-fill {
+  height: 100%;
+  border-radius: 4px;
+  transition: width .6s ease;
+}
+.sc-bar-fill.green { background: var(--green); }
+.sc-bar-fill.yellow { background: var(--yellow); }
+.sc-bar-fill.cyan { background: var(--cyan); }
+.sc-fragility {
+  font-size: 11.5px;
+  color: var(--muted);
+  margin-top: 8px;
+  line-height: 1.45;
+  border-top: 1px solid var(--border);
+  padding-top: 8px;
+}
+
+/* ── CLAIM CARDS ── */
+.claim {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  margin-bottom: 36px;
+  overflow: hidden;
+  scroll-margin-top: 24px;
+}
+.claim-head {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+  padding: 24px 28px 20px;
+  border-bottom: 1px solid var(--border);
+  background: linear-gradient(135deg, var(--surface2) 0%, var(--surface) 100%);
+}
+.claim-num {
+  flex-shrink: 0;
+  width: 36px; height: 36px;
+  border-radius: 10px;
+  background: var(--accent-dim);
+  border: 1px solid rgba(108,123,247,.3);
+  color: var(--accent);
+  font-weight: 800;
+  font-size: 15px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.claim-head-text { flex: 1; }
+.claim-title {
+  font-size: 17px;
+  font-weight: 800;
+  color: #fff;
+  margin-bottom: 6px;
+  letter-spacing: -.01em;
+}
+.claim-quote {
+  font-size: 13px;
+  color: var(--cyan);
+  font-style: italic;
+  line-height: 1.5;
+}
+.claim-head-badges {
+  display: flex;
+  gap: 6px;
+  flex-shrink: 0;
+  padding-top: 2px;
+}
+.h-badge {
+  font-size: 10px;
+  font-weight: 700;
+  padding: 4px 10px;
+  border-radius: 8px;
+  text-transform: uppercase;
+  letter-spacing: .04em;
+  white-space: nowrap;
+}
+.h-badge.ok { background: var(--green-dim); color: var(--green); border: 1px solid rgba(52,211,153,.2); }
+.h-badge.warn { background: var(--yellow-dim); color: var(--yellow); border: 1px solid rgba(251,191,36,.2); }
+.h-badge.err { background: var(--red-dim); color: var(--red); border: 1px solid rgba(248,113,113,.2); }
+
+.claim-body { padding: 28px; }
+
+/* Confidence meter */
+.conf-row {
+  display: flex;
+  gap: 20px;
+  margin-bottom: 24px;
+  padding: 16px 20px;
+  background: var(--code-bg);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+}
+.conf-item { flex: 1; }
+.conf-label {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .1em;
+  color: var(--muted);
+  margin-bottom: 8px;
+}
+.conf-bar {
+  height: 6px;
+  background: var(--surface3);
+  border-radius: 6px;
+  overflow: hidden;
+  margin-bottom: 4px;
+}
+.conf-fill {
+  height: 100%;
+  border-radius: 6px;
+  transition: width .8s cubic-bezier(.22,1,.36,1);
+}
+.conf-fill.green { background: linear-gradient(90deg, #22c55e, #34d399); }
+.conf-fill.yellow { background: linear-gradient(90deg, #f59e0b, #fbbf24); }
+.conf-fill.red { background: linear-gradient(90deg, #ef4444, #f87171); }
+.conf-val {
+  font-size: 11px;
+  font-weight: 600;
+}
+.conf-val.green { color: var(--green); }
+.conf-val.yellow { color: var(--yellow); }
+.conf-val.red { color: var(--red); }
+
+/* Section labels */
+.sec-label {
+  font-size: 11px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: .1em;
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.sec-label::before {
+  content: '';
+  width: 3px; height: 14px;
+  border-radius: 2px;
+}
+.sec-label.audit { color: var(--purple); }
+.sec-label.audit::before { background: var(--purple); }
+.sec-label.lit { color: var(--cyan); }
+.sec-label.lit::before { background: var(--cyan); }
+.sec-label.verdict { color: var(--green); }
+.sec-label.verdict::before { background: var(--green); }
+
+.sec-block {
+  margin-bottom: 24px;
+  padding: 18px 20px;
+  background: var(--code-bg);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  font-size: 14px;
+  line-height: 1.75;
+}
+.sec-block p + p { margin-top: 10px; }
+
+code {
+  font-family: 'Cascadia Code', 'Fira Code', 'JetBrains Mono', Consolas, monospace;
+  font-size: 12px;
+  background: var(--accent-dim);
+  border: 1px solid rgba(108,123,247,.18);
+  border-radius: 5px;
+  padding: 2px 7px;
+  color: #c4b5fd;
+}
+pre {
+  font-family: 'Cascadia Code', 'Fira Code', 'JetBrains Mono', Consolas, monospace;
+  font-size: 12px;
+  background: #080a12;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 16px 18px;
+  overflow-x: auto;
+  color: #a5b4fc;
+  line-height: 1.65;
+  margin: 12px 0;
+}
+pre .cm { color: var(--muted); }
+pre .kw { color: #f472b6; }
+pre .va { color: #7dd3fc; }
+pre .st { color: #86efac; }
+pre .nu { color: #fbbf24; }
+
+/* Alerts */
+.alert {
+  display: flex;
+  gap: 10px;
+  padding: 14px 16px;
+  border-radius: 8px;
+  font-size: 13.5px;
+  margin-top: 14px;
+  line-height: 1.6;
+}
+.alert-warn { background: var(--yellow-dim); border: 1px solid rgba(251,191,36,.18); color: #fde68a; }
+.alert-ok   { background: var(--green-dim);  border: 1px solid rgba(52,211,153,.18);  color: #a7f3d0; }
+.alert-info { background: var(--cyan-dim);   border: 1px solid rgba(56,189,248,.18);  color: #bae6fd; }
+.alert-icon { flex-shrink: 0; font-size: 14px; margin-top: 2px; }
+
+/* Lit items */
+.lit-item {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  margin-bottom: 12px;
+  font-size: 13.5px;
+  line-height: 1.6;
+}
+.lit-dot {
+  flex-shrink: 0;
+  width: 7px; height: 7px;
+  border-radius: 50%;
+  background: var(--muted);
+  margin-top: 7px;
+}
+.lit-dot.green { background: var(--green); }
+.lit-dot.yellow { background: var(--yellow); }
+
+/* Verdict */
+.verdict-box {
+  display: flex;
+  gap: 14px;
+  align-items: flex-start;
+  padding: 18px 20px;
+  border-radius: 10px;
+  font-size: 14px;
+  line-height: 1.7;
+  margin-top: 4px;
+}
+.verdict-box.ok {
+  background: var(--green-dim);
+  border: 1px solid rgba(52,211,153,.2);
+}
+.verdict-box.warn {
+  background: var(--yellow-dim);
+  border: 1px solid rgba(251,191,36,.2);
+}
+.verdict-icon {
+  flex-shrink: 0;
+  width: 28px; height: 28px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  font-weight: 800;
+}
+.verdict-icon.ok {
+  background: rgba(52,211,153,.2);
+  color: var(--green);
+}
+.verdict-icon.warn {
+  background: rgba(251,191,36,.2);
+  color: var(--yellow);
+}
+
+/* Links */
+a { color: var(--cyan); text-decoration: none; }
+a:hover { text-decoration: underline; color: #7dd3fc; }
+
+/* Separator */
+.sep {
+  border: none;
+  border-top: 1px solid var(--border);
+  margin: 32px 0;
+}
+
+/* ── REFERENCES ── */
+.refs-section {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 28px;
+  margin-top: 48px;
+}
+.refs-section h2 {
+  font-size: 13px;
+  font-weight: 800;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: .1em;
+  margin-bottom: 20px;
+}
+.refs-list {
+  list-style: none;
+  padding: 0;
+}
+.refs-list li {
+  padding: 10px 0;
+  border-bottom: 1px solid rgba(40,45,66,.7);
+  font-size: 13px;
+  line-height: 1.55;
+  display: flex;
+  gap: 10px;
+  align-items: baseline;
+}
+.refs-list li:last-child { border-bottom: none; }
+.refs-list li::before {
+  content: '';
+  width: 4px; height: 4px;
+  border-radius: 50%;
+  background: var(--accent);
+  flex-shrink: 0;
+  margin-top: 6px;
+}
+
+/* ── FOOTER ── */
+.footer {
+  text-align: center;
+  color: var(--muted);
+  font-size: 12px;
+  padding: 24px;
+  border-top: 1px solid var(--border);
+  margin-top: 24px;
+}
+
+/* ── RESPONSIVE ── */
+@media (max-width: 900px) {
+  .side-nav { display: none; }
+  .main { padding-left: 0; }
+  .summary-grid { grid-template-columns: 1fr 1fr; }
+  .conf-row { flex-direction: column; gap: 14px; }
+  .claim-head { flex-direction: column; }
+  .claim-head-badges { align-self: flex-start; }
+  .stats-bar { gap: 20px; flex-wrap: wrap; }
+}
+@media (max-width: 560px) {
+  .summary-grid { grid-template-columns: 1fr; }
+  .header { padding: 36px 20px 28px; }
+  .header h1 { font-size: 22px; }
+  .claim-body { padding: 20px; }
+  .stats-bar { gap: 16px; }
+}
+
+/* ── PRINT ── */
+@media print {
+  body { background: #fff; color: #111; font-size: 11pt; }
+  .side-nav, .stats-bar { display: none; }
+  .main { padding: 0; }
+  .layout { display: block; max-width: 100%; }
+  .header { background: none; border-bottom: 2px solid #333; padding: 20px 0; }
+  .header h1 { color: #111; }
+  .header-tag { color: #555; border-color: #999; background: #eee; }
+  .claim { break-inside: avoid; border-color: #ccc; background: #fff; }
+  .claim-head { background: #f5f5f5; }
+  .claim-title, .sc-title { color: #111; }
+  .sec-block, .conf-row { background: #f9f9f9; border-color: #ddd; }
+  .verdict-box { border-color: #ccc; }
+  .verdict-box.ok { background: #e8f5e9; }
+  .verdict-box.warn { background: #fff8e1; }
+  a { color: #1565c0; }
+  code { background: #f0f0f0; border-color: #ccc; color: #333; }
+  pre { background: #f5f5f5; color: #333; border-color: #ddd; }
+  .summary-grid { grid-template-columns: repeat(3, 1fr); }
+  .refs-section { background: #fff; border-color: #ccc; }
+}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-tag">Auditoria + Revisao Bibliografica</div>
+  <h1>Fomento Audiovisual Brasileiro</h1>
+  <p>Verificacao interna dos claims principais contra o codigo-fonte e revisao cruzada com a literatura academica internacional</p>
+</div>
+
+<div class="stats-bar">
+  <div class="stat-item">
+    <span class="stat-num" style="color:var(--text)">6</span>
+    <span>claims auditados</span>
+  </div>
+  <div class="stat-item">
+    <span class="stat-num green">3</span>
+    <span>corretos</span>
+  </div>
+  <div class="stat-item">
+    <span class="stat-num yellow">3</span>
+    <span>com ressalvas</span>
+  </div>
+  <div class="stat-item">
+    <span class="stat-num" style="color:var(--cyan)">13</span>
+    <span>referencias</span>
+  </div>
+</div>
+
+<div class="layout">
+
+<!-- SIDE NAV -->
+<nav class="side-nav" id="side-nav">
+  <div class="side-nav-title">Claims</div>
+  <a href="#claim-1" class="nav-link" data-claim="1"><span class="nav-dot ok"></span>ROI Domestico 0,79x</a>
+  <a href="#claim-2" class="nav-link" data-claim="2"><span class="nav-dot warn"></span>Distribuidoras selecionam</a>
+  <a href="#claim-3" class="nav-link" data-claim="3"><span class="nav-dot ok"></span>Criterio bilheteria/festival</a>
+  <a href="#claim-4" class="nav-link" data-claim="4"><span class="nav-dot warn"></span>Gini 0,634</a>
+  <a href="#claim-5" class="nav-link" data-claim="5"><span class="nav-dot warn"></span>Politica Afirmativa</a>
+  <a href="#claim-6" class="nav-link" data-claim="6"><span class="nav-dot ok"></span>Curta → Longa intl</a>
+  <div style="margin-top:12px"></div>
+  <a href="#refs" class="nav-link"><span class="nav-dot" style="border-color:var(--accent)"></span>Referencias</a>
+</nav>
+
+<!-- MAIN -->
+<div class="main">
+
+<!-- SUMMARY GRID -->
+<div class="summary-grid">
+  <a href="#claim-1" class="summary-card">
+    <div class="sc-top">
+      <span class="sc-num">#1</span>
+      <span class="sc-badge ok">Correto</span>
+    </div>
+    <div class="sc-title">ROI Domestico 0,79x</div>
+    <div class="sc-bar-row">
+      <span>Auditoria</span>
+      <div class="sc-bar"><div class="sc-bar-fill green" style="width:90%"></div></div>
+    </div>
+    <div class="sc-bar-row">
+      <span>Literatura</span>
+      <div class="sc-bar"><div class="sc-bar-fill yellow" style="width:40%"></div></div>
+    </div>
+    <div class="sc-fragility">Numerador inclui janelas alem de bilheteria</div>
+  </a>
+  <a href="#claim-2" class="summary-card">
+    <div class="sc-top">
+      <span class="sc-num">#2</span>
+      <span class="sc-badge warn">Ressalva</span>
+    </div>
+    <div class="sc-title">Distribuidoras selecionam melhor</div>
+    <div class="sc-bar-row">
+      <span>Auditoria</span>
+      <div class="sc-bar"><div class="sc-bar-fill yellow" style="width:60%"></div></div>
+    </div>
+    <div class="sc-bar-row">
+      <span>Literatura</span>
+      <div class="sc-bar"><div class="sc-bar-fill yellow" style="width:35%"></div></div>
+    </div>
+    <div class="sc-fragility">Metrica exibida e intl_avg, nao ROI domestico</div>
+  </a>
+  <a href="#claim-3" class="summary-card">
+    <div class="sc-top">
+      <span class="sc-num">#3</span>
+      <span class="sc-badge ok">Correto</span>
+    </div>
+    <div class="sc-title">Criterio bilheteria / festival</div>
+    <div class="sc-bar-row">
+      <span>Auditoria</span>
+      <div class="sc-bar"><div class="sc-bar-fill green" style="width:85%"></div></div>
+    </div>
+    <div class="sc-bar-row">
+      <span>Literatura</span>
+      <div class="sc-bar"><div class="sc-bar-fill green" style="width:90%"></div></div>
+    </div>
+    <div class="sc-fragility">Causalidade vs auto-selecao nao testada</div>
+  </a>
+  <a href="#claim-4" class="summary-card">
+    <div class="sc-top">
+      <span class="sc-num">#4</span>
+      <span class="sc-badge warn">Ressalva</span>
+    </div>
+    <div class="sc-title">Gini 0,634</div>
+    <div class="sc-bar-row">
+      <span>Auditoria</span>
+      <div class="sc-bar"><div class="sc-bar-fill yellow" style="width:70%"></div></div>
+    </div>
+    <div class="sc-bar-row">
+      <span>Literatura</span>
+      <div class="sc-bar"><div class="sc-bar-fill yellow" style="width:45%"></div></div>
+    </div>
+    <div class="sc-fragility">Divergencia 0,61 vs 0,634 entre versoes</div>
+  </a>
+  <a href="#claim-5" class="summary-card">
+    <div class="sc-top">
+      <span class="sc-num">#5</span>
+      <span class="sc-badge warn">Ressalva</span>
+    </div>
+    <div class="sc-title">Politica Afirmativa funciona</div>
+    <div class="sc-bar-row">
+      <span>Auditoria</span>
+      <div class="sc-bar"><div class="sc-bar-fill yellow" style="width:35%"></div></div>
+    </div>
+    <div class="sc-bar-row">
+      <span>Literatura</span>
+      <div class="sc-bar"><div class="sc-bar-fill green" style="width:85%"></div></div>
+    </div>
+    <div class="sc-fragility">Valores hardcoded nos scripts, nao computados</div>
+  </a>
+  <a href="#claim-6" class="summary-card">
+    <div class="sc-top">
+      <span class="sc-num">#6</span>
+      <span class="sc-badge ok">Correto</span>
+    </div>
+    <div class="sc-title">Curta em festival → longa intl (2,2x)</div>
+    <div class="sc-bar-row">
+      <span>Auditoria</span>
+      <div class="sc-bar"><div class="sc-bar-fill yellow" style="width:65%"></div></div>
+    </div>
+    <div class="sc-bar-row">
+      <span>Literatura</span>
+      <div class="sc-bar"><div class="sc-bar-fill green" style="width:80%"></div></div>
+    </div>
+    <div class="sc-fragility">Match de nomes precisa documentacao</div>
+  </a>
+</div>
+
+<!-- ═══════════════════════ CLAIM 1 ═══════════════════════ -->
+<div class="claim" id="claim-1">
+  <div class="claim-head">
+    <div class="claim-num">1</div>
+    <div class="claim-head-text">
+      <div class="claim-title">ROI Domestico Agregado 0,79x</div>
+      <div class="claim-quote">"O sistema recupera 79 centavos por real investido via receita de obra"</div>
+    </div>
+    <div class="claim-head-badges">
+      <span class="h-badge ok">Auditoria OK</span>
+      <span class="h-badge warn">Lit. parcial</span>
+    </div>
+  </div>
+  <div class="claim-body">
+
+    <div class="conf-row">
+      <div class="conf-item">
+        <div class="conf-label">Solidez do calculo</div>
+        <div class="conf-bar"><div class="conf-fill green" style="width:90%"></div></div>
+        <div class="conf-val green">90% — formula verificada</div>
+      </div>
+      <div class="conf-item">
+        <div class="conf-label">Suporte na literatura</div>
+        <div class="conf-bar"><div class="conf-fill yellow" style="width:40%"></div></div>
+        <div class="conf-val yellow">40% — sem benchmark comparavel</div>
+      </div>
+    </div>
+
+    <p class="sec-label audit">Auditoria Interna</p>
+    <div class="sec-block">
+      <p>Formula verificada em <code>02_gerar_datasets.py:622-624</code>:</p>
+      <pre><span class="va">rec_d</span>     = <span class="va">bil_d</span> + <span class="va">jan_d</span>       <span class="cm"># Bilheteria + Outras Janelas deflacionadas (R$2024)</span>
+<span class="va">inv_tot_d</span> = FSA_deflac + Renuncia_deflac
+<span class="va">roi_tot_d</span> = <span class="va">rec_d</span> / <span class="va">inv_tot_d</span>   <span class="cm"># ROI Dom. Total deflac</span></pre>
+      <p>A formula e matematicamente correta e consistente com as definicoes do README. O deflacionamento por IPCA base 2024 esta aplicado nos dois lados da divisao, o que e correto para comparabilidade temporal.</p>
+      <div class="alert alert-warn">
+        <span class="alert-icon">!</span>
+        <span><strong>Fragilidade critica — "Outras Janelas" sao constantes fixas, nao receita observada.</strong> O numerador inclui <code>jan_d</code> (Outras Janelas), que e calculada pela funcao <code>estimar_janelas()</code> em <code>01_gerar_tabela_consolidada.py:666-678</code> usando <strong>valores fixos por tier</strong>: TV Paga R$ 60-280K, VOD R$ 60K, TV Aberta R$ 80K, DVD R$ 5K. A funcao detecta <em>presenca</em> da janela via CRT (Cadastro de Receitas) e atribui o valor fixo correspondente — nao usa receita real. Isso torna o 0,79x parcialmente sintetico: a bilheteria e observada, mas as demais janelas sao estimativas grosseiras com variancia zero dentro de cada tier. O impacto depende da proporcao de <code>jan_d</code> no total de <code>rec_d</code>, que deve ser quantificada.</span>
+      </div>
+    </div>
+
+    <p class="sec-label lit">Literatura Academica</p>
+    <div class="sec-block">
+      <div class="lit-item">
+        <div class="lit-dot yellow"></div>
+        <div><strong>Comparacao internacional — cuidado com contexto:</strong> estudos de subsidio nos EUA (Good Jobs First; CBPP, 2012) relatam que Florida recupera 7 centavos por dolar, Massachusetts 14 centavos, Georgia 10 centavos. Esses numeros sao dramaticamente menores, mas medem <em>retorno fiscal ao estado</em> (receita tributaria gerada / subsidio dado) — metrica completamente diferente do 0,79x brasileiro, que mede receita da obra / investimento publico. Nao sao comparaveis diretamente.</div>
+      </div>
+      <div class="lit-item">
+        <div class="lit-dot yellow"></div>
+        <div><strong>Estudo alemao:</strong> <a href="https://link.springer.com/article/10.1007/s10824-023-09486-7" target="_blank">Decker &amp; Wouters (2023, Journal of Cultural Economics)</a> mostram que financiamento publico aumenta bilheteria domestica e global, mas nao reportam uma ratio receita/investimento comparavel ao 0,79x.</div>
+      </div>
+      <div class="lit-item">
+        <div class="lit-dot yellow"></div>
+        <div><strong>Messerlin &amp; Parc (2020):</strong> <a href="https://www.tandfonline.com/doi/abs/10.1080/13511610.2020.1811650" target="_blank">The myth of subsidies in the film industry</a> argumentam que subsidios europeus foram capturados por beneficiarios concentrados e nao geraram retorno proporcional — nao usam a mesma metrica, mas o argumento de concentracao e relevante para o claim 4.</div>
+      </div>
+      <div class="alert alert-info">
+        <span class="alert-icon">i</span>
+        <span><strong>Contribuicao original:</strong> o 0,79x e uma metrica sem benchmark publicado na literatura de economia do cinema. Isso e um ponto forte (contribuicao nova) e uma fraqueza (sem validacao externa). Sugestao: criar um quadro comparativo explicando o que outros paises medem e por que a metrica brasileira e diferente.</span>
+      </div>
+    </div>
+
+    <p class="sec-label verdict">Veredicto</p>
+    <div class="verdict-box ok">
+      <div class="verdict-icon ok">&#10003;</div>
+      <span>Calculo correto. Claim defensavel se acompanhado de nota metodologica sobre composicao do numerador e diferenca em relacao a metricas de retorno fiscal usadas na literatura internacional.</span>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════ CLAIM 2 ═══════════════════════ -->
+<div class="claim" id="claim-2">
+  <div class="claim-head">
+    <div class="claim-num">2</div>
+    <div class="claim-head-text">
+      <div class="claim-title">Distribuidoras Selecionam Melhor que Produtoras</div>
+      <div class="claim-quote">"Chamadas FSA com distribuidora como proponente tem ROI domestico superior"</div>
+    </div>
+    <div class="claim-head-badges">
+      <span class="h-badge ok">Dados OK</span>
+      <span class="h-badge warn">Endogeneidade</span>
+    </div>
+  </div>
+  <div class="claim-body">
+
+    <div class="conf-row">
+      <div class="conf-item">
+        <div class="conf-label">Solidez do calculo</div>
+        <div class="conf-bar"><div class="conf-fill yellow" style="width:60%"></div></div>
+        <div class="conf-val yellow">60% — metrica exibida difere do claim</div>
+      </div>
+      <div class="conf-item">
+        <div class="conf-label">Suporte na literatura</div>
+        <div class="conf-bar"><div class="conf-fill yellow" style="width:35%"></div></div>
+        <div class="conf-val yellow">35% — sem paralelo empirico</div>
+      </div>
+    </div>
+
+    <p class="sec-label audit">Auditoria Interna</p>
+    <div class="sec-block">
+      <p>Calculado em <code>03_gerar_painel_criterio_selecao.py</code>. O script agrega <code>roi_tot_def</code> por <code>cat_key</code> (linhas 403-425) e o valor fica disponivel no JS como propriedade de cada categoria. Porem, o KPI principal exibido no painel <strong>nao e <code>roi_tot_def</code></strong> — e sim <code>intl_avg</code> (score internacional 0-100), conforme linhas 1090-1099 do HTML gerado. A comparacao e entre as categorias especificas <code>"FSA Pontuacao Bilheteria e Roteiro — Produtora"</code> vs <code>"— Distribuidora"</code>, nao entre distribuidoras e produtoras genericamente.</p>
+      <div class="alert alert-warn">
+        <span class="alert-icon">!</span>
+        <span><strong>Imprecisao no claim:</strong> o painel compara <code>intl_avg</code> (score internacional), nao ROI domestico. A frase "distribuidora seleciona melhor" implica ROI domestico superior, mas o que o painel mostra e performance internacional. O <code>roi_tot_def</code> esta disponivel nos dados mas nao e a metrica destacada na interface. Reformular o claim para refletir o que realmente esta sendo mostrado.</span>
+      </div>
+      <div class="alert alert-warn">
+        <span class="alert-icon">!</span>
+        <span><strong>Risco de endogeneidade:</strong> distribuidoras nos editais FSA Comercializacao/Distribuicao recebem projetos com ancora de distribuicao ja garantida antes do investimento. Isso naturalmente eleva qualquer metrica de performance. O claim pode refletir que <em>projetos com distribuicao garantida performam melhor</em>, nao necessariamente que a distribuidora como agente tem maior capacidade seletiva.</span>
+      </div>
+    </div>
+
+    <p class="sec-label lit">Literatura Academica</p>
+    <div class="sec-block">
+      <div class="lit-item">
+        <div class="lit-dot yellow"></div>
+        <div><strong>Nenhum paper encontrado</strong> que compare diretamente distribuidora vs produtora como proponente de fundo publico de cinema e seus respectivos ROIs. Este e um claim original sem paralelo empirico direto.</div>
+      </div>
+      <div class="lit-item">
+        <div class="lit-dot"></div>
+        <div><strong>Suporte teorico (economia da informacao):</strong> distribuidoras possuem informacao assimetrica superior sobre viabilidade comercial de projetos. Analogo a venture capitalists vs empreendedores como selecionadores: o agente com exposicao ao mercado de saida tem maior capacidade preditiva de sucesso comercial.</div>
+      </div>
+      <div class="lit-item">
+        <div class="lit-dot"></div>
+        <div><strong>Messerlin &amp; Parc (2020):</strong> argumentam que subsidios funcionam melhor quando atrelados a agentes com incentivo financeiro no sucesso comercial do projeto — alinhado com o claim, pois distribuidoras tem maior skin in the game que produtoras independentes.</div>
+      </div>
+      <div class="lit-item">
+        <div class="lit-dot"></div>
+        <div><strong>Wasko (2003, <em>How Hollywood Works</em>):</strong> distribuidoras funcionam como gatekeepers com maior poder preditivo de demanda de audiencia do que produtoras — suporte qualitativo ao mecanismo.</div>
+      </div>
+    </div>
+
+    <p class="sec-label verdict">Veredicto</p>
+    <div class="verdict-box warn">
+      <div class="verdict-icon warn">!</div>
+      <span>Claim com dois problemas: (1) a metrica destacada no painel e <code>intl_avg</code> (score internacional), nao ROI domestico — o claim precisa ser reformulado para refletir o que realmente esta sendo mostrado; (2) risco de endogeneidade nao resolvido. Sugestao: apresentar como hipotese com dois mecanismos possiveis (capacidade de selecao vs estrutura de projeto pre-distribuido), explicitar qual metrica sustenta o claim, e indicar que os dados nao permitem discriminar os dois mecanismos.</span>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════ CLAIM 3 ═══════════════════════ -->
+<div class="claim" id="claim-3">
+  <div class="claim-head">
+    <div class="claim-num">3</div>
+    <div class="claim-head-text">
+      <div class="claim-title">Criterio de Selecao Determina Tipo de Retorno</div>
+      <div class="claim-quote">"Criterio de bilheteria → melhor retorno domestico; criterio de festival → melhor retorno internacional"</div>
+    </div>
+    <div class="claim-head-badges">
+      <span class="h-badge ok">Auditoria OK</span>
+      <span class="h-badge ok">Lit. forte</span>
+    </div>
+  </div>
+  <div class="claim-body">
+
+    <div class="conf-row">
+      <div class="conf-item">
+        <div class="conf-label">Solidez do calculo</div>
+        <div class="conf-bar"><div class="conf-fill green" style="width:85%"></div></div>
+        <div class="conf-val green">85% — mecanismo coerente</div>
+      </div>
+      <div class="conf-item">
+        <div class="conf-label">Suporte na literatura</div>
+        <div class="conf-bar"><div class="conf-fill green" style="width:90%"></div></div>
+        <div class="conf-val green">90% — bem documentado</div>
+      </div>
+    </div>
+
+    <p class="sec-label audit">Auditoria Interna</p>
+    <div class="sec-block">
+      <p>O script <code>03_gerar_painel_criterio_selecao.py</code> agrega metricas por par <code>(chamada, cat_key)</code> nas linhas 313-362, calculando tanto <code>roi_tot_def</code> (ROI domestico deflacionado) quanto <code>intlAverage</code> (score internacional). Esses dados ficam disponiveis na aba 3 do painel via array <code>CHM</code>. O mecanismo e coerente: chamadas com criterio de bilheteria aplicam pesos comerciais; criterio festival sinaliza qualidade artistica.</p>
+      <div class="alert alert-info">
+        <span class="alert-icon">i</span>
+        <span><strong>Nota de precisao:</strong> o painel nao exibe uma narrativa textual comparando "chamada bilheteria ROI = X vs chamada festival ROI = Y". Os dados estao disponiveis nos graficos e scatter plots, mas a comparacao direta e inferida pelo usuario, nao afirmada explicitamente pelo painel. O claim precisa indicar de onde vem a conclusao (qual visualizacao, qual metrica).</span>
+      </div>
+      <div class="alert alert-warn">
+        <span class="alert-icon">!</span>
+        <span><strong>Causalidade vs auto-selecao:</strong> o criterio da chamada pode ser simultaneo ao tipo de projeto que se candidata. Produtores comerciais buscam chamadas com criterio de bilheteria; cineastas autorais buscam chamadas com criterio festival. O claim pode ser verdadeiro tanto por efeito do criterio como por auto-selecao dos candidatos. Analise de sensibilidade (e.g., projetos borderline) fortaleceria o argumento causal.</span>
+      </div>
+    </div>
+
+    <p class="sec-label lit">Literatura Academica</p>
+    <div class="sec-block">
+      <div class="lit-item">
+        <div class="lit-dot green"></div>
+        <div><strong>Suporte direto:</strong> <a href="https://link.springer.com/chapter/10.1007/978-3-319-71716-6_7" target="_blank">Parc &amp; Messerlin (2017, Springer)</a> — analisa como criterios de selecao por genero interagem com performance, encontrando que dramas selecionados por qualidade artistica tem pior performance domestica mas maior prestigio internacional. Mecanismo identico ao claim.</div>
+      </div>
+      <div class="lit-item">
+        <div class="lit-dot green"></div>
+        <div><strong>De Vany &amp; Walls (1999, <em>Journal of Economic Dynamics</em>):</strong> documentam que premios em festivais e performance de bilheteria sao dimensoes relativamente independentes de sucesso cinematografico — suporte empirico classico para a separacao dos dois circuitos de valor.</div>
+      </div>
+      <div class="lit-item">
+        <div class="lit-dot green"></div>
+        <div><strong>Lobato (2012, <em>Shadow Economies of Cinema</em>):</strong> argumenta que festivais internacionais e circuito comercial sao sistemas de valorizacao separados, com pouquissima sobreposicao estrutural.</div>
+      </div>
+      <div class="lit-item">
+        <div class="lit-dot green"></div>
+        <div><strong>PLOS ONE (2024):</strong> <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC10917328/" target="_blank">Quantifying the global film festival circuit</a> confirma que festivais A-list tem alta diversidade linguistica e geografica, com perfil de filmes distinto dos que dominam bilheteria local — validacao empirica em larga escala (616 festivais, 31.989 filmes).</div>
+      </div>
+    </div>
+
+    <p class="sec-label verdict">Veredicto</p>
+    <div class="verdict-box ok">
+      <div class="verdict-icon ok">&#10003;</div>
+      <span>Claim mais bem suportado pela literatura do conjunto. Provavelmente o argumento mais defensavel academicamente. A separacao entre mercado domestico e circuito de festivais como sistemas de valor distintos e consenso na literatura de economia do cinema. Adicionar nota sobre causalidade vs auto-selecao fortaleceria o argumento.</span>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════ CLAIM 4 ═══════════════════════ -->
+<div class="claim" id="claim-4">
+  <div class="claim-head">
+    <div class="claim-num">4</div>
+    <div class="claim-head-text">
+      <div class="claim-title">Gini 0,634 na Concentracao FSA por Produtora</div>
+      <div class="claim-quote">"O investimento FSA e altamente concentrado: Gini de 0,634 entre produtoras independentes"</div>
+    </div>
+    <div class="claim-head-badges">
+      <span class="h-badge warn">Divergencia</span>
+      <span class="h-badge warn">Lit. parcial</span>
+    </div>
+  </div>
+  <div class="claim-body">
+
+    <div class="conf-row">
+      <div class="conf-item">
+        <div class="conf-label">Solidez do calculo</div>
+        <div class="conf-bar"><div class="conf-fill yellow" style="width:70%"></div></div>
+        <div class="conf-val yellow">70% — divergencia entre versoes</div>
+      </div>
+      <div class="conf-item">
+        <div class="conf-label">Suporte na literatura</div>
+        <div class="conf-bar"><div class="conf-fill yellow" style="width:45%"></div></div>
+        <div class="conf-val yellow">45% — sem benchmark direto</div>
+      </div>
+    </div>
+
+    <p class="sec-label audit">Auditoria Interna</p>
+    <div class="sec-block">
+      <p>Formula verificada em <code>05_gerar_painel_concentracao.py:71-73</code>:</p>
+      <pre><span class="va">ps_s</span>     = <span class="va">ps</span>.sort_values(<span class="st">"fsa_nom"</span>).reset_index(drop=<span class="kw">True</span>)
+<span class="va">lcum</span>     = <span class="va">ps_s</span>[<span class="st">"fsa_nom"</span>].cumsum()
+<span class="va">gini_val</span> = round((<span class="va">n_prod</span>+<span class="nu">1</span> - <span class="nu">2</span>*(<span class="va">lcum</span>.sum()/<span class="va">total_fsa</span>)) / <span class="va">n_prod</span>, <span class="nu">3</span>)</pre>
+      <p>Formula de Brown (aproximacao discreta do Gini) — matematicamente correta para dados discretos ordenados. O script exclui Globo, Canal Brasil, Telecine e Fox (nao-independentes) antes do calculo — escolha metodologica defensavel e explicitada no codigo.</p>
+      <div class="alert alert-warn">
+        <span class="alert-icon">!</span>
+        <span><strong>Divergencia entre versoes:</strong> DOCX v6 cita Gini 0,61; HTML gerado exibe 0,634. O codigo calcula sobre investimento FSA nominal (nao deflacionado), o que e correto para concentracao de acesso ao fundo. O valor 0,634 e o correto conforme codigo-fonte. O DOCX precisa ser atualizado.</span>
+      </div>
+    </div>
+
+    <p class="sec-label lit">Literatura Academica</p>
+    <div class="sec-block">
+      <div class="lit-item">
+        <div class="lit-dot yellow"></div>
+        <div><strong>Nao ha estudo com Gini especifico</strong> para distribuicao de fundo publico de cinema em nenhum pais. Este e outro claim metodologicamente original.</div>
+      </div>
+      <div class="lit-item">
+        <div class="lit-dot"></div>
+        <div><strong>Benchmark cultural mais proximo:</strong> <a href="https://onlinelibrary.wiley.com/doi/10.1111/saje.12365" target="_blank">Snowball (2024, South African Journal of Economics)</a> calcula Gini de gasto cultural = <strong>0,747</strong> na Africa do Sul — acima do Brasil (0,634), sugerindo que o FSA tem concentracao relativamente moderada para uma industria criativa em pais emergente.</div>
+      </div>
+      <div class="lit-item">
+        <div class="lit-dot"></div>
+        <div><strong>Observatorio Audiovisual Europeu:</strong> relatorios mostram que quase dois tercos dos filmes europeus (2016-2020) tiveram orcamento abaixo de EUR 3M, enquanto um numero pequeno concentra a maioria dos recursos — analogo qualitativo, sem Gini calculado.</div>
+      </div>
+      <div class="lit-item">
+        <div class="lit-dot"></div>
+        <div><strong>Caves (2000, <em>Creative Industries</em>):</strong> documenta concentracao de receitas e investimentos em industrias criativas como padrao estrutural (lei de Pareto / long tail), validando o mecanismo por tras do Gini elevado.</div>
+      </div>
+    </div>
+
+    <p class="sec-label verdict">Veredicto</p>
+    <div class="verdict-box warn">
+      <div class="verdict-icon warn">!</div>
+      <span>Metodologicamente correto. Sem benchmark direto internacional para cinema, mas dentro do range plausivel para industrias criativas (0,634 vs 0,747 na cultura sul-africana). Resolver urgentemente a divergencia 0,61 vs 0,634 entre versoes do documento antes de qualquer circulacao.</span>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════ CLAIM 5 ═══════════════════════ -->
+<div class="claim" id="claim-5">
+  <div class="claim-head">
+    <div class="claim-num">5</div>
+    <div class="claim-head-text">
+      <div class="claim-title">Politica Afirmativa Funciona</div>
+      <div class="claim-quote">"32,4% de pessoas negras e 52,6% de mulheres selecionadas em chamadas com Politica Afirmativa"</div>
+    </div>
+    <div class="claim-head-badges">
+      <span class="h-badge warn">Hardcoded</span>
+      <span class="h-badge ok">Lit. forte</span>
+    </div>
+  </div>
+  <div class="claim-body">
+
+    <div class="conf-row">
+      <div class="conf-item">
+        <div class="conf-label">Solidez do calculo</div>
+        <div class="conf-bar"><div class="conf-fill red" style="width:35%"></div></div>
+        <div class="conf-val red">35% — valores hardcoded, nao reproduziveis</div>
+      </div>
+      <div class="conf-item">
+        <div class="conf-label">Suporte na literatura</div>
+        <div class="conf-bar"><div class="conf-fill green" style="width:85%"></div></div>
+        <div class="conf-val green">85% — bem documentado</div>
+      </div>
+    </div>
+
+    <p class="sec-label audit">Auditoria Interna</p>
+    <div class="sec-block">
+      <p><strong style="color:var(--red)">ALERTA — valores hardcoded, nao calculados.</strong> Os percentuais 32,4% e 52,6% <strong>nao sao computados a partir dos dados</strong>. Eles aparecem como constantes literais em dois scripts:</p>
+      <pre><span class="cm"># 08_enriquecer_doc_analise.py:629</span>
+raca = pd.DataFrame({<span class="st">"etapa"</span>: [<span class="st">"Inscritos sem PA"</span>, <span class="st">"Inscritos com PA"</span>, <span class="st">"Selecionados com PA"</span>],
+                     <span class="st">"pct"</span>: [<span class="nu">15.2</span>, <span class="nu">22.8</span>, <span class="nu">32.4</span>]})
+
+<span class="cm"># 08_enriquecer_doc_analise.py:632</span>
+genero = pd.DataFrame({<span class="st">"etapa"</span>: [<span class="st">"Inscritas com PA"</span>, <span class="st">"Selecionadas com PA"</span>],
+                       <span class="st">"pct"</span>: [<span class="nu">37.0</span>, <span class="nu">52.6</span>]})</pre>
+      <p>Os mesmos valores aparecem hardcoded no script 07 (linhas 2192, 2202, 2220, 2231) para os graficos Plotly do painel Diversidade. Nao existe nenhuma funcao que compute esses percentuais a partir da tabela consolidada, de <code>GENERO_DIRETOR</code>, ou de qualquer outra coluna de diversidade. A origem provavel e uma tabulacao manual dos dados das ATAs do FSA 2024, mas isso nao esta documentado no codigo.</p>
+      <div class="alert alert-warn">
+        <span class="alert-icon">!</span>
+        <span><strong>Risco de auditoria:</strong> como os valores nao sao reproduziveis pelo pipeline, nao ha como verificar sua corretude sem acesso a fonte original. Se a base de dados mudar (ex: novos editais adicionados), os percentuais nao se atualizarao automaticamente. Recomenda-se: (a) documentar a fonte exata dos numeros, (b) idealmente computar a partir dos microdados.</span>
+      </div>
+      <div class="alert alert-warn">
+        <span class="alert-icon">!</span>
+        <span><strong>Contrafactual ausente:</strong> o claim "PA funciona" pressupoe comparacao entre chamadas COM e SEM PA. O painel inclui "Inscritos sem PA = 15,2%" como referencia para raca, mas nao apresenta a taxa de mulheres SEM PA. Sem isso, o leitor nao pode avaliar o tamanho do efeito para genero. Se a taxa sem PA e ~22% (linha de base global, UCLA 2022), entao 52,6% e um efeito enorme — mas isso precisa aparecer explicitamente.</span>
+      </div>
+    </div>
+
+    <p class="sec-label lit">Literatura Academica</p>
+    <div class="sec-block">
+      <div class="lit-item">
+        <div class="lit-dot green"></div>
+        <div><strong>Revisao de 194 estudos (UNU, 2021):</strong> <a href="https://unu.edu/article/affirmative-action-policies-increase-diversity-are-successful-controversial-around-world" target="_blank">63% encontraram resultados positivos</a> de politicas de acao afirmativa para minorias — paralelo direto ao claim de eficacia da PA.</div>
+      </div>
+      <div class="lit-item">
+        <div class="lit-dot green"></div>
+        <div><strong>Linha de base sem PA:</strong> sem politica afirmativa, mulheres sao <strong>apenas 22% dos diretores</strong> globalmente (UCLA Hollywood Diversity Report, 2022) e esse numero ficou estagnado entre 2004-2015 (estudo britanico). O resultado de 52,6% nas chamadas com PA esta dramaticamente acima desta linha de base — fortemente sugestivo de eficacia.</div>
+      </div>
+      <div class="lit-item">
+        <div class="lit-dot yellow"></div>
+        <div><strong>Critica relevante:</strong> <a href="https://theconversation.com/beyond-one-and-done-achieving-gender-equity-in-the-film-industry-depends-on-more-than-entry-programs-232553" target="_blank">The Conversation (2026)</a> documenta que politicas de entrada (<em>one and done</em>) tendem a ser "dribladas" pela industria. A Australia documentou isso com o <em>Gender Matters</em>. O texto nao aborda se as cineastas selecionadas pelas PA retornam ao sistema em chamadas futuras — essa seria a pergunta de sustentabilidade.</div>
+      </div>
+      <div class="lit-item">
+        <div class="lit-dot"></div>
+        <div><strong>Redes de festivais (PLOS ONE, 2024):</strong> representacao feminina cresceu de 24-29% (2012) para 34-38% (2021) no circuito global de festivais — politicas sistemicas tem efeito, mas a progressao e lenta sem mecanismos de entrada como PA.</div>
+      </div>
+      <div class="lit-item">
+        <div class="lit-dot"></div>
+        <div><strong>Suecia (politica comparada):</strong> unico pais com meta 50/50 em fundo publico de cinema — referencia mais proxima ao modelo brasileiro, com resultados progressivos documentados pelo Swedish Film Institute.</div>
+      </div>
+    </div>
+
+    <p class="sec-label verdict">Veredicto</p>
+    <div class="verdict-box warn">
+      <div class="verdict-icon warn">!</div>
+      <span>Numeros plausiveis e coerentes com PA eficaz, bem suportados pela literatura. Porem, a auditoria interna revela que os valores sao <strong>hardcoded</strong> nos scripts 07 e 08, sem calculo reproduzivel a partir dos dados. Isso impede verificacao independente e significa que o pipeline nao atualiza esses numeros se a base mudar. Prioridades: (1) documentar fonte exata dos percentuais, (2) idealmente computar a partir dos microdados, (3) explicitar contrafactual (taxa sem PA), (4) analisar sustentabilidade (cineastas retornam ao sistema?).</span>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════ CLAIM 6 ═══════════════════════ -->
+<div class="claim" id="claim-6">
+  <div class="claim-head">
+    <div class="claim-num">6</div>
+    <div class="claim-head-text">
+      <div class="claim-title">Curta em Festival Internacional como Preditor de Carreira</div>
+      <div class="claim-quote">"23,1% dos diretores com curta em festival internacional produziram longa com circulacao internacional — 2,2x a taxa geral"</div>
+    </div>
+    <div class="claim-head-badges">
+      <span class="h-badge warn">Match critico</span>
+      <span class="h-badge ok">Teoria forte</span>
+    </div>
+  </div>
+  <div class="claim-body">
+
+    <div class="conf-row">
+      <div class="conf-item">
+        <div class="conf-label">Solidez do calculo</div>
+        <div class="conf-bar"><div class="conf-fill yellow" style="width:65%"></div></div>
+        <div class="conf-val yellow">65% — match de nomes e fragil</div>
+      </div>
+      <div class="conf-item">
+        <div class="conf-label">Suporte na literatura</div>
+        <div class="conf-bar"><div class="conf-fill green" style="width:80%"></div></div>
+        <div class="conf-val green">80% — mecanismo fundamentado</div>
+      </div>
+    </div>
+
+    <p class="sec-label audit">Auditoria Interna</p>
+    <div class="sec-block">
+      <p>Calculado em <code>07_gerar_painel_final.py</code>, funcao <code>curtas_longas</code> (linhas 1153-1579). Os 23,1% sao <code>taxa_transicao</code> (linha 1521): <code>n_transicao / n_diretores * 100</code>. O multiplicador 2,2x e <code>ganho_mult</code> (linha 1579): <code>taxa_transicao / taxa_base_fest</code>. Ambos sao <strong>dinamicamente computados</strong> a partir dos dados.</p>
+      <p style="margin-top:10px"><strong>Fontes de dados do cruzamento:</strong></p>
+      <p>Curtas: <code>curtas_brasileiros_festivais_internacionais.xlsx</code>. Longas: <code>participacoes_festivais_diretores.csv</code> + <code>base_festivais_obras_ata.csv</code> cruzada com diretores ANCINE, mais entradas manuais (linhas 1367-1387).</p>
+      <div class="alert alert-info">
+        <span class="alert-icon">i</span>
+        <span><strong>Definicao encontrada no codigo — "circulacao internacional" = presenca em festival.</strong> Linha 1468: <code>by_dir['tem_longa_festival'] = by_dir['n_longas_fest'] > 0</code>. Ou seja, basta o longa aparecer na base de festivais internacionais. <strong>Nao ha threshold de ROI, bilheteria Lumiere, ou tier de festival.</strong> Isso e mais amplo do que a expressao "circulacao internacional" sugere — um longa exibido uma vez em um festival pequeno se qualifica. Considerar se isso infla a taxa de 23,1%.</span>
+      </div>
+      <div class="alert alert-warn">
+        <span class="alert-icon">!</span>
+        <span><strong>Match de nomes — mais sofisticado que aparenta, mas com riscos.</strong> O script usa normalizacao NFD (remove diacriticos, lowercase) via <code>_norm_dir()</code> + grupos de alias manuais (linhas 1173-1181) + expansao dinamica de nomes artisticos via <code>_is_artist_name_expansion()</code> (linhas 1242-1262). Isso mitiga variantes graficas, mas homonimos e nomes comuns continuam sendo risco. Recomenda-se reportar: (a) total de diretores matchados vs nao-matchados, (b) taxa de match manual vs automatico.</span>
+      </div>
+    </div>
+
+    <p class="sec-label lit">Literatura Academica</p>
+    <div class="sec-block">
+      <div class="lit-item">
+        <div class="lit-dot green"></div>
+        <div><strong>PLOS ONE (2024) — base teorica direta:</strong> <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC10917328/" target="_blank">Quantifying the global film festival circuit</a> mostra que festivais sao "nos de capital social e status" na carreira de cineastas — quem entra no circuito adquire reputacao transferivel para projetos futuros. 616 festivais, 31.989 filmes analisados.</div>
+      </div>
+      <div class="lit-item">
+        <div class="lit-dot green"></div>
+        <div><strong>Bourdieu / Baumann (2007, <em>Hollywood Highbrow</em>):</strong> participacao em festivais e conversao de capital cultural em capital simbolico que abre portas a co-producoes e distribuicao internacional — suporte teorico classico.</div>
+      </div>
+      <div class="lit-item">
+        <div class="lit-dot green"></div>
+        <div><strong>Verhoeven et al. (2009, <em>Media, Culture &amp; Society</em>):</strong> festivais como "organizacoes carismaticas" que conferem prestigio — acesso a festivais com curtas funciona como credencial que reduz o custo de selecao do cineasta em projetos futuros de maior escala.</div>
+      </div>
+      <div class="lit-item">
+        <div class="lit-dot yellow"></div>
+        <div><strong>Sem paralelo quantitativo direto:</strong> nenhum estudo encontrado que quantifique especificamente a taxa de "curta em festival → longa com distribuicao internacional" em nenhum pais. Este e o claim mais original do conjunto — contribuicao empirica genuinamente nova.</div>
+      </div>
+    </div>
+
+    <p class="sec-label verdict">Veredicto</p>
+    <div class="verdict-box ok">
+      <div class="verdict-icon ok">&#10003;</div>
+      <span>Mecanismo bem fundamentado teoricamente. A quantificacao 23,1% / 2,2x e contribuicao empirica original. Para solidificar: (1) documentar metodologia do match de nomes, (2) definir explicitamente "circulacao internacional" do longa, (3) verificar se periodo de analise da curta e consistente com o do longa.</span>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════ REFERENCIAS ═══════════════════════ -->
+<div class="refs-section" id="refs">
+  <h2>Referencias Bibliograficas</h2>
+  <ul class="refs-list">
+    <li><a href="https://link.springer.com/article/10.1007/s10824-023-09486-7" target="_blank">Decker &amp; Wouters (2023) — The global impact of public and private funding on cultural and economic movie success. <em>Journal of Cultural Economics</em></a></li>
+    <li><a href="https://link.springer.com/chapter/10.1007/978-3-319-71716-6_7" target="_blank">Parc &amp; Messerlin (2017) — State Subsidies to Film and Their Effects at the Box Office. Springer</a></li>
+    <li><a href="https://www.tandfonline.com/doi/abs/10.1080/13511610.2020.1811650" target="_blank">Messerlin &amp; Parc (2020) — The myth of subsidies in the film industry. <em>Innovation: European Journal of Social Science Research</em></a></li>
+    <li><a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC10917328/" target="_blank">Loist &amp; De Valck et al. (2024) — Quantifying the global film festival circuit. <em>PLOS ONE</em></a></li>
+    <li><a href="https://www.cbpp.org/research/state-film-subsidies-not-much-bang-for-too-many-bucks" target="_blank">Leachman &amp; McGahey (2012) — State film subsidies: Not much bang for too many bucks. CBPP</a></li>
+    <li><a href="https://goodjobsfirst.org/film-subsidies/" target="_blank">Good Jobs First — Film Subsidies: state-level fiscal return data</a></li>
+    <li><a href="https://unu.edu/article/affirmative-action-policies-increase-diversity-are-successful-controversial-around-world" target="_blank">United Nations University (2021) — Affirmative Action Policies to Increase Diversity</a></li>
+    <li><a href="https://theconversation.com/beyond-one-and-done-achieving-gender-equity-in-the-film-industry-depends-on-more-than-entry-programs-232553" target="_blank">The Conversation (2026) — Beyond 'one and done': Gender equity in the film industry</a></li>
+    <li><a href="https://appliednetsci.springeropen.com/articles/10.1007/s41109-022-00457-z" target="_blank">Lincoln et al. (2022) — The film festival sector and gender inequality. <em>Applied Network Science</em></a></li>
+    <li><a href="https://quod.lib.umich.edu/m/mij/15031809.0006.108/--re-distributing-gender-in-the-global-film-industry-beyond" target="_blank">Wreyford et al. (2019) — Re-distributing gender in the global film industry. <em>Media Industries Journal</em></a></li>
+    <li><a href="https://onlinelibrary.wiley.com/doi/10.1111/saje.12365" target="_blank">Snowball (2024) — Cultural consumption and the expenditure Gini coefficient. <em>South African Journal of Economics</em></a></li>
+    <li><a href="https://rm.coe.int/public-funding-report-2004-en-optim-pdf/16808e46d9" target="_blank">European Audiovisual Observatory — Public funding for film and audiovisual works in Europe</a></li>
+    <li><a href="https://rm.coe.int/impact-analysis-of-fiscal-incentive-schemes-supporting-film-and-audiov/16808e4506" target="_blank">Council of Europe — Impact analysis of fiscal incentive schemes for film and audiovisual</a></li>
+  </ul>
+</div>
+
+</div><!-- /main -->
+</div><!-- /layout -->
+
+<div class="footer">
+  Gerado em maio de 2026 · Fomento Audiovisual Brasileiro — Analise Empirica de Retorno do Investimento Publico
+</div>
+
+<script>
+// Highlight active nav link on scroll
+(function() {
+  const links = document.querySelectorAll('.nav-link[data-claim]');
+  const claims = [];
+  links.forEach(l => {
+    const id = l.getAttribute('href').slice(1);
+    const el = document.getElementById(id);
+    if (el) claims.push({ link: l, el: el });
+  });
+
+  function update() {
+    let active = claims[0];
+    const scrollY = window.scrollY + 80;
+    for (const c of claims) {
+      if (c.el.offsetTop <= scrollY) active = c;
+    }
+    links.forEach(l => l.classList.remove('active'));
+    if (active) active.link.classList.add('active');
+  }
+
+  window.addEventListener('scroll', update, { passive: true });
+  update();
+})();
+</script>
+
+</body>
+</html>

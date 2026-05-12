@@ -88,7 +88,7 @@ for i in range(len(bins_k)-1):
     lb = f"R${bins_k[i]}k" if bins_k[i] < 1000 else f"R${bins_k[i]//1000}M"
     hist_labels.append(lb)
     hist_counts.append(cnt)
-    hist_colors.append("#e05a2b" if hi<=500001 else ("#e0c94f" if hi<=1000001 else "#4ae0a0"))
+    hist_colors.append("#f87171" if hi<=500001 else ("#fbbf24" if hi<=1000001 else "#34d399"))
 
 # Cumulative threshold curve (x=threshold in R$k, y=% produtoras below)
 thr_k   = list(range(100, 5100, 100))
@@ -102,7 +102,7 @@ tier_defs = [("A","Mega — Top 10",0,10), ("B","Grandes — 11 a 50",10,50),
 tier_rows = []
 # Adequate ticket suggestion (commentary-based)
 adq = {"A":(8000,0), "B":(2000,5000), "C":(1200,2500), "D":(700,1500), "E":(400,900)}
-tier_colors = {"A":"#e05a2b","B":"#f5c842","C":"#4fa3e0","D":"#4ae0a0","E":"#9b8eaf"}
+tier_colors = {"A":"#f87171","B":"#f5c842","C":"#5b8cff","D":"#34d399","E":"#a78bfa"}
 for tid, tnm, i0, i1 in tier_defs:
     t = ps.iloc[i0:i1]
     fss = t["fsa_nom"].sum()
@@ -165,66 +165,71 @@ html = f"""<!DOCTYPE html>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Concentração FSA — Ticket Médio e Sustentabilidade</title>
-<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Mono:wght@300;400&display=swap" rel="stylesheet">
-<script src="https://cdn.plot.ly/plotly-2.27.0.min.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@300;400;500&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="https://cdn.plot.ly/plotly-2.35.2.min.js"></script>
 <style>
 *{{box-sizing:border-box;margin:0;padding:0}}
 :root{{
-  --bg:#07080f;--s1:#0e1018;--s2:#141620;--s3:#1e2035;--s4:#262940;
-  --txt:#e8eaf2;--muted:#5a6080;--dim:#1e2035;
-  --acc:#e05a2b;--acc2:#f5c842;--acc3:#4ae0a0;--acc4:#4fa3e0;
+  --bg:#0b0d14;--surface:#14171f;--surface2:#1a1e2c;--surface3:#212638;
+  --border:#282d42;--border-light:#343a54;
+  --accent:#6c7bf7;--accent-dim:rgba(108,123,247,.12);
+  --gold:#fbbf24;--coral:#f87171;--purple:#a78bfa;--cyan:#38bdf8;
+  --green:#34d399;--muted-blue:#5fd1ff;
+  --text:#e2e8f0;--text2:#c1c9d9;--muted:#7b849a;--dim:#282d42;
+  --font-head:'Inter',system-ui,sans-serif;--font-mono:'Inter',system-ui,sans-serif;--font-ui:'Inter',system-ui,sans-serif;
 }}
 html,body{{height:100%;overflow:hidden}}
-body{{background:var(--bg);color:var(--txt);font-family:'DM Mono',monospace;font-size:12px;display:flex;flex-direction:column}}
+body{{background:var(--bg);color:var(--text);font-family:var(--font-mono);font-size:12px;display:flex;flex-direction:column}}
 .hdr{{padding:10px 18px 0;flex-shrink:0;display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}}
-.hdr-t{{font-family:'Syne',sans-serif;font-size:16px;font-weight:800;letter-spacing:-.01em}}
+.hdr-t{{font-family:var(--font-head);font-size:16px;font-weight:800;letter-spacing:-.01em}}
 .hdr-s{{color:var(--muted);font-size:10px}}
-.tab-bar{{display:flex;gap:0;padding:8px 18px 0;flex-shrink:0;border-bottom:1px solid var(--s3)}}
-.tab-btn{{padding:6px 16px;font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.1em;text-transform:uppercase;
+.tab-bar{{display:flex;gap:0;padding:8px 18px 0;flex-shrink:0;border-bottom:1px solid var(--border)}}
+.tab-btn{{padding:6px 16px;font-family:var(--font-mono);font-size:10px;letter-spacing:.1em;text-transform:uppercase;
   background:none;color:var(--muted);border:none;border-bottom:2px solid transparent;cursor:pointer;
   transition:color .15s,border-color .15s;margin-bottom:-1px;white-space:nowrap}}
-.tab-btn:hover{{color:var(--txt)}}
-.tab-btn.active{{color:var(--acc);border-bottom-color:var(--acc)}}
+.tab-btn:hover{{color:var(--text)}}
+.tab-btn.active{{color:var(--coral);border-bottom-color:var(--coral)}}
 .tab-panel{{display:none;flex:1;flex-direction:column;min-height:0;overflow:hidden}}
 .tab-panel.active{{display:flex}}
 .scroll{{flex:1;overflow-y:auto;padding:14px 18px 18px}}
 .scroll::-webkit-scrollbar{{width:4px}}
-.scroll::-webkit-scrollbar-thumb{{background:var(--s3);border-radius:2px}}
+.scroll::-webkit-scrollbar-thumb{{background:var(--border);border-radius:2px}}
 .kpi-bar{{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:8px;margin-bottom:16px}}
-.kpi{{background:var(--s1);border:1px solid var(--s3);border-radius:3px;padding:10px 14px}}
-.kpi.warn{{border-left:3px solid var(--acc)}}
-.kpi.ok{{border-left:3px solid var(--acc3)}}
-.kpi.mid{{border-left:3px solid var(--acc2)}}
+.kpi{{background:var(--surface);border:1px solid var(--border);border-radius:3px;padding:10px 14px}}
+.kpi.warn{{border-left:3px solid var(--coral)}}
+.kpi.ok{{border-left:3px solid var(--green)}}
+.kpi.mid{{border-left:3px solid var(--gold)}}
 .kpi-l{{font-size:8px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:5px}}
-.kpi-v{{font-family:'Syne',sans-serif;font-size:22px;font-weight:700;color:var(--txt)}}
+.kpi-v{{font-family:var(--font-head);font-size:22px;font-weight:700;color:var(--text)}}
 .kpi-u{{font-size:9px;color:var(--muted);margin-left:3px}}
 .kpi-sub{{font-size:8px;color:var(--muted);margin-top:3px}}
-.sec{{font-family:'Syne',sans-serif;font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;
-  color:var(--muted);margin-bottom:10px;padding-bottom:5px;border-bottom:1px solid var(--s3)}}
+.sec{{font-family:var(--font-head);font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;
+  color:var(--muted);margin-bottom:10px;padding-bottom:5px;border-bottom:1px solid var(--border)}}
 .grid2{{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px}}
 .grid3{{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:16px}}
-.card{{background:var(--s1);border:1px solid var(--s3);border-radius:3px;padding:12px}}
+.card{{background:var(--surface);border:1px solid var(--border);border-radius:3px;padding:12px}}
 .card-t{{font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:8px}}
 .alert{{background:rgba(224,90,43,.1);border:1px solid rgba(224,90,43,.3);border-radius:3px;
-  padding:10px 14px;margin-bottom:14px;font-size:10px;color:var(--txt);line-height:1.7}}
-.alert b{{color:var(--acc)}}
+  padding:10px 14px;margin-bottom:14px;font-size:10px;color:var(--text);line-height:1.7}}
+.alert b{{color:var(--coral)}}
 .info{{background:rgba(79,163,224,.08);border:1px solid rgba(79,163,224,.25);border-radius:3px;
-  padding:10px 14px;margin-bottom:14px;font-size:10px;color:var(--txt);line-height:1.7}}
-.info b{{color:var(--acc4)}}
+  padding:10px 14px;margin-bottom:14px;font-size:10px;color:var(--text);line-height:1.7}}
+.info b{{color:var(--muted-blue)}}
 table{{width:100%;border-collapse:collapse}}
-thead th{{background:var(--s2);padding:6px 10px;text-align:left;font-size:9px;letter-spacing:.08em;
-  text-transform:uppercase;color:var(--muted);border-bottom:1px solid var(--s3);white-space:nowrap}}
+thead th{{background:var(--surface2);padding:6px 10px;text-align:left;font-size:9px;letter-spacing:.08em;
+  text-transform:uppercase;color:var(--muted);border-bottom:1px solid var(--border);white-space:nowrap}}
 thead th.r{{text-align:right}}
 tbody tr{{border-bottom:1px solid rgba(255,255,255,.03);transition:background .06s}}
-tbody tr:hover{{background:var(--s2)}}
-td{{padding:6px 10px;font-size:10px;color:var(--txt);white-space:nowrap}}
+tbody tr:hover{{background:var(--surface2)}}
+td{{padding:6px 10px;font-size:10px;color:var(--text);white-space:nowrap}}
 td.r{{text-align:right;font-variant-numeric:tabular-nums}}
 td.dim{{color:var(--muted)}}
 .dot{{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:5px;vertical-align:middle;flex-shrink:0}}
 .tier-badge{{display:inline-block;padding:2px 8px;border-radius:2px;font-size:8px;letter-spacing:.1em;color:#fff;font-weight:700}}
 .adq-bar{{display:flex;align-items:center;gap:6px;margin-top:4px}}
 .adq-seg{{height:6px;border-radius:1px;display:inline-block}}
-.footnote{{padding:6px 18px 8px;font-size:8px;color:var(--muted);border-top:1px solid var(--s3);flex-shrink:0}}
+.footnote{{padding:6px 18px 8px;font-size:8px;color:var(--muted);border-top:1px solid var(--border);flex-shrink:0}}
 </style>
 </head>
 <body>
@@ -421,7 +426,7 @@ const BG = '#07080f', S1='#0e1018', S2='#141620', S3='#1e2035';
 const TXT='#e8eaf2', MUT='#5a6080';
 const LAY = (extra={{}}) => ({{
   paper_bgcolor:BG, plot_bgcolor:S1,
-  font:{{family:'DM Mono,monospace',size:10,color:MUT}},
+  font:{{family:'Inter,system-ui,sans-serif',size:10,color:MUT}},
   margin:{{t:6,b:40,l:50,r:16}},
   xaxis:{{gridcolor:S3,zerolinecolor:S3,tickfont:{{size:9}}}},
   yaxis:{{gridcolor:S3,zerolinecolor:S3,tickfont:{{size:9}}}},
@@ -438,12 +443,12 @@ Plotly.newPlot('hist_ticket', [{{
 }}], {{
   ...LAY(),
   shapes:[
-    {{type:'line',x0:'R$500k',x1:'R$500k',y0:0,y1:230,line:{{color:'#e05a2b',dash:'dash',width:1}}}},
-    {{type:'line',x0:'R$1000k',x1:'R$1000k',y0:0,y1:230,line:{{color:'#e0c94f',dash:'dash',width:1}}}},
+    {{type:'line',x0:'R$500k',x1:'R$500k',y0:0,y1:230,line:{{color:'#f87171',dash:'dash',width:1}}}},
+    {{type:'line',x0:'R$1000k',x1:'R$1000k',y0:0,y1:230,line:{{color:'#fbbf24',dash:'dash',width:1}}}},
   ],
   annotations:[
-    {{x:'R$500k',y:220,text:'Limiar crítico<br>R$500k',showarrow:false,font:{{size:8,color:'#e05a2b'}},bgcolor:S1,borderpad:3}},
-    {{x:'R$1000k',y:220,text:'Zona de<br>atenção R$1M',showarrow:false,font:{{size:8,color:'#e0c94f'}},bgcolor:S1,borderpad:3}},
+    {{x:'R$500k',y:220,text:'Limiar crítico<br>R$500k',showarrow:false,font:{{size:8,color:'#f87171'}},bgcolor:S1,borderpad:3}},
+    {{x:'R$1000k',y:220,text:'Zona de<br>atenção R$1M',showarrow:false,font:{{size:8,color:'#fbbf24'}},bgcolor:S1,borderpad:3}},
   ],
   yaxis:{{...LAY().yaxis,title:'N° produtoras'}},
   xaxis:{{...LAY().xaxis,title:'Ticket médio anual (FSA nominal)',tickangle:-30}},
@@ -451,17 +456,17 @@ Plotly.newPlot('hist_ticket', [{{
 
 Plotly.newPlot('thr_curve', [
   {{x:D.thr_k, y:D.thr_pct, type:'scatter', mode:'lines', name:'% produtoras abaixo',
-    line:{{color:'#e05a2b',width:2}},
+    line:{{color:'#f87171',width:2}},
     fill:'tozeroy', fillcolor:'rgba(224,90,43,0.08)',
     hovertemplate:'R$%{{x}}k: %{{y}}% das produtoras<extra></extra>'}},
   {{x:D.thr_k, y:D.thr_fsa, type:'scatter', mode:'lines', name:'% FSA nesse grupo',
-    line:{{color:'#4fa3e0',width:2,dash:'dot'}},
+    line:{{color:'#5b8cff',width:2,dash:'dot'}},
     hovertemplate:'R$%{{x}}k: grupo detém %{{y}}% do FSA<extra></extra>'}},
 ], {{
   ...LAY(),
   shapes:[
-    {{type:'line',x0:500,x1:500,y0:0,y1:105,line:{{color:'#e05a2b',dash:'dash',width:1}}}},
-    {{type:'line',x0:1000,x1:1000,y0:0,y1:105,line:{{color:'#e0c94f',dash:'dash',width:1}}}},
+    {{type:'line',x0:500,x1:500,y0:0,y1:105,line:{{color:'#f87171',dash:'dash',width:1}}}},
+    {{type:'line',x0:1000,x1:1000,y0:0,y1:105,line:{{color:'#fbbf24',dash:'dash',width:1}}}},
   ],
   yaxis:{{...LAY().yaxis,title:'% acumulada',range:[0,105]}},
   xaxis:{{...LAY().xaxis,title:'Limiar de ticket (R$k/ano)'}},
@@ -474,17 +479,17 @@ function buildTierTable(){{
   const tbody = document.getElementById('tier_tbody');
   tc.forEach(r=>{{
     const adq = r.adq_max > 0 ? `R${{r.adq_min}}k – R${{r.adq_max}}k` : `R${{r.adq_min}}k+`;
-    const warn500 = r.pct_below_500k > 30 ? 'color:#e05a2b' : (r.pct_below_500k>10?'color:#e0c94f':'color:#4ae0a0');
-    const warn1m  = r.pct_below_1m > 50 ? 'color:#e05a2b' : (r.pct_below_1m>25?'color:#e0c94f':'color:#4ae0a0');
+    const warn500 = r.pct_below_500k > 30 ? 'color:#f87171' : (r.pct_below_500k>10?'color:#fbbf24':'color:#34d399');
+    const warn1m  = r.pct_below_1m > 50 ? 'color:#f87171' : (r.pct_below_1m>25?'color:#fbbf24':'color:#34d399');
     tbody.innerHTML += `<tr>
       <td><span class="dot" style="background:${{r.color}}"></span>
           <span class="tier-badge" style="background:${{r.color}}">${{r.id}}</span>
           <span style="margin-left:6px;color:${{TXT}}">${{r.name}}</span></td>
       <td class="r dim">${{r.n}}</td>
       <td class="r">${{r.fsa_share}}%</td>
-      <td class="r" style="color:${{r.ticket_med<500?'#e05a2b':r.ticket_med<1000?'#e0c94f':'#4ae0a0'}};font-weight:700">
+      <td class="r" style="color:${{r.ticket_med<500?'#f87171':r.ticket_med<1000?'#fbbf24':'#34d399'}};font-weight:700">
         R$${{r.ticket_med}}k</td>
-      <td class="r" style="color:#4fa3e0">${{adq}}</td>
+      <td class="r" style="color:#5b8cff">${{adq}}</td>
       <td class="r dim">${{r.anos_med}}a</td>
       <td class="r dim">${{r.obras_med.toFixed(1)}}</td>
       <td class="r" style="${{warn500}}">${{r.pct_below_500k}}%</td>
@@ -501,7 +506,7 @@ Plotly.newPlot('tier_comp', [
     textposition:'outside',textfont:{{size:9}},
     hovertemplate:'%{{x}}<br>Observado: R$%{{y}}k/ano<extra></extra>'}},
   {{x:tc.map(r=>r.name), y:tc.map(r=>r.adq_min), type:'scatter',mode:'markers',
-    name:'Adequado mínimo', marker:{{symbol:'line-ew',size:14,color:'#4fa3e0',line:{{width:2,color:'#4fa3e0'}}}},
+    name:'Adequado mínimo', marker:{{symbol:'line-ew',size:14,color:'#5b8cff',line:{{width:2,color:'#5b8cff'}}}},
     hovertemplate:'%{{x}}<br>Mín. adequado: R$%{{y}}k/ano<extra></extra>'}},
 ], {{
   ...LAY(),
@@ -534,13 +539,13 @@ Plotly.newPlot('tier_bar_sust', [
     text:ticketMed.map(v=>'R$'+v+'k'), textposition:'outside', textfont:{{size:9}}}},
   {{x:tierNames, y:adqMins, type:'scatter', mode:'lines+markers',
     name:'Ticket Adequado Mín.',
-    line:{{color:'#4fa3e0',dash:'dash',width:2}},
-    marker:{{color:'#4fa3e0',size:7}},
+    line:{{color:'#5b8cff',dash:'dash',width:2}},
+    marker:{{color:'#5b8cff',size:7}},
     text:adqMins.map(v=>'R$'+v+'k'),
     hovertemplate:'Adequado mín.: R$%{{y}}k/ano<extra></extra>'}},
   {{x:tierNames, y:[500,500,500,500,500], type:'scatter', mode:'lines',
     name:'Limiar crítico R$500k',
-    line:{{color:'#e05a2b',dash:'dot',width:1}}}},
+    line:{{color:'#f87171',dash:'dot',width:1}}}},
 ], {{
   ...LAY(),
   yaxis:{{...LAY().yaxis,title:'R$k / ano'}},
@@ -553,12 +558,12 @@ Plotly.newPlot('lorenz_prod', [
     line:{{dash:'dash',color:MUT,width:1}}}},
   {{x:D.lorenz_x,y:D.lorenz_y,mode:'lines',name:'FSA por produtora',
     fill:'tozeroy',fillcolor:'rgba(224,90,43,0.10)',
-    line:{{color:'#e05a2b',width:2}},
+    line:{{color:'#f87171',width:2}},
     hovertemplate:'%{{x:.1%}} das produtoras → %{{y:.1%}} do FSA<extra></extra>'}},
 ], {{
   ...LAY(),
   annotations:[{{x:0.6,y:0.2,text:'Gini = {D["gini"]}',showarrow:false,
-    font:{{size:12,color:'#e05a2b'}},bgcolor:S1,borderpad:4}}],
+    font:{{size:12,color:'#f87171'}},bgcolor:S1,borderpad:4}}],
   xaxis:{{...LAY().xaxis,title:'Fração acumulada de produtoras',tickformat:'.0%'}},
   yaxis:{{...LAY().yaxis,title:'Fração acumulada do FSA',tickformat:'.0%'}},
   showlegend:false,
@@ -566,7 +571,7 @@ Plotly.newPlot('lorenz_prod', [
 
 // Scatter por tier
 const tierOrder = ['A','B','C','D','E'];
-const tierCmap = {{'A':'#e05a2b','B':'#f5c842','C':'#4fa3e0','D':'#4ae0a0','E':'#9b8eaf'}};
+const tierCmap = {{'A':'#f87171','B':'#f5c842','C':'#5b8cff','D':'#34d399','E':'#a78bfa'}};
 const tierLabels = {{'A':'Mega (Top 10)','B':'Grandes (11–50)','C':'Médias (51–150)','D':'Pequenas (151–300)','E':'Micro (301+)'}};
 const scatterTraces = tierOrder.map(tid => {{
   const pts = D.scatter.filter(p=>p.tier===tid);
@@ -584,7 +589,7 @@ Plotly.newPlot('scatter_tick', scatterTraces, {{
   xaxis:{{...LAY().xaxis,title:'Ticket médio anual (R$k/ano)',type:'log'}},
   yaxis:{{...LAY().yaxis,title:'N° de obras com FSA',type:'log'}},
   legend:{{bgcolor:S1,bordercolor:S3,borderwidth:1,font:{{size:9}}}},
-  shapes:[{{type:'line',x0:500,x1:500,y0:0.5,y1:200,line:{{color:'#e05a2b',dash:'dash',width:1}}}}],
+  shapes:[{{type:'line',x0:500,x1:500,y0:0.5,y1:200,line:{{color:'#f87171',dash:'dash',width:1}}}}],
 }}, PLOT_CFG);
 
 // Tab switcher

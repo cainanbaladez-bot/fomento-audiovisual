@@ -15,6 +15,7 @@ Estrutura do sidebar:
 
 import re
 import os
+import sys
 import json
 import html
 import unicodedata
@@ -22,6 +23,10 @@ import numpy as np
 import pandas as pd
 import plotly.graph_objects as go
 import plotly.io as pio
+
+# Centralised CSS definitions
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from shared_styles import mega_css, PLOTLY_LAYOUT, PLOTLY_AXIS
 
 BASE = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
@@ -36,6 +41,7 @@ del _df_count
 
 SRC_CMP   = os.path.join(BASE, 'resultados', 'painel_comparativo.html')
 SRC_CONC  = os.path.join(BASE, 'resultados', 'painel_concentracao_produtoras.html')
+SRC_CONC_V2 = os.path.join(BASE, 'resultados', 'painel_concentracao_standalone.html')
 SRC_CS    = os.path.join(BASE, 'resultados', 'painel_criterio_selecao.html')
 SRC_PR    = os.path.join(BASE, 'resultados', 'painel_produtoras.html')
 SRC_DIV   = os.path.join(BASE, 'resultados', 'painel_diversidade.html')
@@ -304,7 +310,7 @@ def _build_festival_vod_lumiere_scatter_html():
             ]),
             mode='markers',
             name='Lumière',
-            marker=dict(size=9, color='#00e5c8', opacity=0.78, line=dict(color='#e8eaf2', width=0.4)),
+            marker=dict(size=9, color='#6c7bf7', opacity=0.78, line=dict(color='#e8eaf2', width=0.4)),
             hovertemplate=hover,
         ), row=1, col=2)
         xs = np.linspace(right['Pontuação Festivais'].min(), right['Pontuação Festivais'].max(), 40)
@@ -317,7 +323,7 @@ def _build_festival_vod_lumiere_scatter_html():
         margin=dict(l=60, r=35, t=70, b=55),
         paper_bgcolor='rgba(0,0,0,0)',
         plot_bgcolor='rgba(14,16,24,0.6)',
-        font=dict(color='#e8eaf2', family='DM Mono, monospace', size=11),
+        font=dict(color='#e8eaf2', family='Inter, system-ui, sans-serif', size=11),
         showlegend=False,
     )
     fig.update_xaxes(title_text='Pontuação em festivais internacionais', gridcolor='rgba(255,255,255,0.08)', zeroline=False)
@@ -338,6 +344,7 @@ def _build_festival_vod_lumiere_scatter_html():
 
 cmp_raw  = read(SRC_CMP)
 conc_raw = read(SRC_CONC)
+_conc_standalone_raw = read(SRC_CONC_V2) if os.path.exists(SRC_CONC_V2) else None
 cs_raw   = read(SRC_CS)
 pr_raw   = read(SRC_PR)
 _div_section = read(SRC_DIV)
@@ -496,9 +503,9 @@ intl_map_fallback_script = """
     var html = '<div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:8px">';
     html += '<div><div style="font-size:12px;font-weight:800;color:#222">' + _esc(row.name) + ' (' + _esc(row.iso2) + ')</div>';
     html += '<div style="font-size:9px;color:#666;margin-top:2px">Fontes: festivais na base ATA BRDE/FSA 2024; VOD na base Lumière VOD.</div></div>';
-    html += '<div style="font-size:10px;color:#555;white-space:nowrap"><b style="color:#E8702A">' + fest.length + '</b> obras em festival · <b style="color:#5B6BB5">' + vod.length + '</b> títulos VOD</div></div>';
+    html += '<div style="font-size:10px;color:#555;white-space:nowrap"><b style="color:#ff8040">' + fest.length + '</b> obras em festival · <b style="color:#5B6BB5">' + vod.length + '</b> títulos VOD</div></div>';
     html += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;align-items:start">';
-    html += '<div><div style="font-size:9px;font-weight:700;color:#E8702A;margin-bottom:5px;text-transform:uppercase;letter-spacing:.06em">Festivais</div>';
+    html += '<div><div style="font-size:9px;font-weight:700;color:#ff8040;margin-bottom:5px;text-transform:uppercase;letter-spacing:.06em">Festivais</div>';
     html += fest.length ? fest.map(function(f){ return '<div style="padding:4px 0;border-bottom:1px solid #e3e5eb;line-height:1.25">' + _esc(f) + '</div>'; }).join('') : '<div style="color:#888">Sem obra identificada em festival neste país.</div>';
     html += '</div><div><div style="font-size:9px;font-weight:700;color:#5B6BB5;margin-bottom:5px;text-transform:uppercase;letter-spacing:.06em">VOD Europa</div>';
     html += vod.length ? vod.map(function(f){ return '<div style="padding:4px 0;border-bottom:1px solid #e3e5eb;line-height:1.25">' + _esc(f) + '</div>'; }).join('') : '<div style="color:#888">Sem título identificado em VOD neste país.</div>';
@@ -515,8 +522,8 @@ intl_map_fallback_script = """
       ? 'festivais'
       : ((document.getElementById('chk-vod') && document.getElementById('chk-vod').checked && !(document.getElementById('chk-fest') && document.getElementById('chk-fest').checked)) ? 'vod' : 'presenca');
     var scale = mode === 'festivais'
-      ? [[0, '#2a1b12'], [0.35, '#E8702A'], [1, '#f5c842']]
-      : [[0, '#151a2b'], [0.45, '#5B6BB5'], [1, '#00e5c8']];
+      ? [[0, '#2a1b12'], [0.35, '#ff8040'], [1, '#f5c842']]
+      : [[0, '#151a2b'], [0.45, '#5B6BB5'], [1, '#6c7bf7']];
     var data = [{
       type: 'choropleth',
       locationmode: 'ISO-3',
@@ -541,7 +548,7 @@ intl_map_fallback_script = """
       margin: {l: 0, r: 0, t: 6, b: 0},
       paper_bgcolor: 'rgba(0,0,0,0)',
       plot_bgcolor: 'rgba(0,0,0,0)',
-      font: {color: '#e8eaf2', family: 'DM Mono, monospace', size: 10},
+      font: {color: '#e8eaf2', family: 'Inter, system-ui, sans-serif', size: 10},
       geo: {
         projection: {type: 'natural earth'},
         bgcolor: 'rgba(0,0,0,0)',
@@ -583,34 +590,41 @@ intl_map_fallback_script = """
 print(f"Comparativo: {len(tab_divs)} tab divs extracted")
 
 # ─────────────────────────────────────────────────────────────────────────────
-# STEP 2 — CONCENTRACAO
+# STEP 2 — CONCENTRACAO (use standalone file from published version if available)
 # ─────────────────────────────────────────────────────────────────────────────
-conc_ids = ['t1', 't2', 't3', 'hist_ticket', 'thr_curve', 'tier_comp', 'tier_pie',
-            'tier_tbody', 'tier_bar_sust', 'lorenz_prod', 'scatter_tick']
-
-conc_body = get_body(conc_raw)
-
-conc_css = extract_css(conc_raw)
-
-conc_scripts_all = re.findall(r'<script[^>]*>([\s\S]*?)</script>', conc_raw)
-conc_data_script = conc_scripts_all[0] if len(conc_scripts_all) > 0 else ''
-conc_logic_script = conc_scripts_all[1] if len(conc_scripts_all) > 1 else ''
-
-conc_panel_t1 = extract_tab_panel(conc_body, 't1')
-conc_panel_t2 = extract_tab_panel(conc_body, 't2')
-conc_panel_t3 = extract_tab_panel(conc_body, 't3')
-
-conc_panel_t1 = prefix_ids(conc_panel_t1, conc_ids, 'conc-').replace('class="tab-panel"', 'class="conc-panel"')
-conc_panel_t2 = prefix_ids(conc_panel_t2, conc_ids, 'conc-').replace('class="tab-panel"', 'class="conc-panel"')
-conc_panel_t3 = prefix_ids(conc_panel_t3, conc_ids, 'conc-').replace('class="tab-panel"', 'class="conc-panel"')
-
-conc_data_script = prefix_ids(conc_data_script, conc_ids, 'conc-')
-conc_logic_script = prefix_ids(conc_logic_script, conc_ids, 'conc-')
-
-conc_logic_script = conc_logic_script.replace('function showTab(', 'function concShowTab_internal(')
-conc_logic_script = re.sub(r'\bshowTab\(', 'concShowTab_internal(', conc_logic_script)
-
-print("Concentracao: panels extracted")
+if _conc_standalone_raw:
+    # Standalone file: HTML + <!-- CONC DATA --> <script>data</script> <!-- CONC CHARTS --> <script>charts</script>
+    _conc_html_part = re.split(r'<!-- CONC DATA -->', _conc_standalone_raw, maxsplit=1)
+    conc_section_html = _conc_html_part[0].strip()
+    _conc_rest = _conc_html_part[1] if len(_conc_html_part) > 1 else ''
+    _conc_scripts = re.findall(r'<script>([\s\S]*?)</script>', _conc_rest)
+    conc_data_script = _conc_scripts[0].strip() if len(_conc_scripts) > 0 else ''
+    conc_logic_script = _conc_scripts[1].strip() if len(_conc_scripts) > 1 else ''
+    # CSS comes from the old source (still needed for scoping)
+    conc_css = extract_css(conc_raw)
+    conc_panel_t1 = conc_panel_t2 = conc_panel_t3 = ''
+    _conc_use_standalone = True
+    print("Concentracao: loaded from standalone (published version)")
+else:
+    conc_ids = ['t1', 't2', 't3', 'hist_ticket', 'thr_curve', 'tier_comp', 'tier_pie',
+                'tier_tbody', 'tier_bar_sust', 'lorenz_prod', 'scatter_tick']
+    conc_body = get_body(conc_raw)
+    conc_css = extract_css(conc_raw)
+    conc_scripts_all = re.findall(r'<script[^>]*>([\s\S]*?)</script>', conc_raw)
+    conc_data_script = conc_scripts_all[0] if len(conc_scripts_all) > 0 else ''
+    conc_logic_script = conc_scripts_all[1] if len(conc_scripts_all) > 1 else ''
+    conc_panel_t1 = extract_tab_panel(conc_body, 't1')
+    conc_panel_t2 = extract_tab_panel(conc_body, 't2')
+    conc_panel_t3 = extract_tab_panel(conc_body, 't3')
+    conc_panel_t1 = prefix_ids(conc_panel_t1, conc_ids, 'conc-').replace('class="tab-panel"', 'class="conc-panel"')
+    conc_panel_t2 = prefix_ids(conc_panel_t2, conc_ids, 'conc-').replace('class="tab-panel"', 'class="conc-panel"')
+    conc_panel_t3 = prefix_ids(conc_panel_t3, conc_ids, 'conc-').replace('class="tab-panel"', 'class="conc-panel"')
+    conc_data_script = prefix_ids(conc_data_script, conc_ids, 'conc-')
+    conc_logic_script = prefix_ids(conc_logic_script, conc_ids, 'conc-')
+    conc_logic_script = conc_logic_script.replace('function showTab(', 'function concShowTab_internal(')
+    conc_logic_script = re.sub(r'\bshowTab\(', 'concShowTab_internal(', conc_logic_script)
+    _conc_use_standalone = False
+    print("Concentracao: panels extracted (legacy)")
 
 # ─────────────────────────────────────────────────────────────────────────────
 # STEP 3 — CRITERIO SELECAO
@@ -708,61 +722,26 @@ pr_body = pr_body.replace("onclick='switchTab(", "onclick='prSwitchTab(")
 # Add "Por Cluster" init + hide extra panels when any standard tab is clicked
 pr_logic_script = pr_logic_script.replace(
     'if(i===3) renderFilms();',
-    'if(i===1) setTimeout(function(){_initFigsInContainer("pr-tab-clusters");},80);\n  if(i===3) renderFilms();\n  ["pr-ticket-panel","pr-conc-panel"].forEach(function(id){var p=document.getElementById(id);if(p){p.style.display="none";p.classList.remove("active");}});'
+    'if(i===1) setTimeout(function(){_initFigsInContainer("pr-tab-clusters");},80);\n  if(i===3) renderFilms();\n  ["pr-ticket-panel"].forEach(function(id){var p=document.getElementById(id);if(p){p.style.display="none";p.classList.remove("active");}});'
 )
 
 pr_css = extract_css(pr_raw)
 
-# ─── POST-PROCESSING: Normalize CSS across all sources ───
-
-# 1+2. Remove duplicate global rules (:root, *, body) — mega :root is authoritative
+# ─── POST-PROCESSING: Strip duplicate global rules ───
+# Sub-panels now use canonical variable names (shared_styles), so only
+# :root / * / body need stripping — no more variable renaming or font
+# normalization needed.
 def _strip_global_rules(css):
     css = re.sub(r':root\s*\{[^}]*\}', '', css)
     css = re.sub(r'\*\s*\{[^}]*box-sizing[^}]*\}', '', css)
     css = re.sub(r'(?:html,)?body\s*\{[^}]*\}', '', css)
+    css = re.sub(r'html\s*\{[^}]*\}', '', css)
     return css
 
 cmp_css = _strip_global_rules(cmp_css)
 cs_css = _strip_global_rules(cs_css)
 pr_css = _strip_global_rules(pr_css)
 conc_css = _strip_global_rules(conc_css)
-
-# 3. Normalize shorthand CSS variables → base theme names
-def _normalize_layout_vars(css):
-    """Map layout variables (surfaces, text) to base theme."""
-    css = css.replace('var(--s1)', 'var(--surface)')
-    css = css.replace('var(--s2)', 'var(--surface2)')
-    css = css.replace('var(--s3)', 'var(--border)')
-    css = css.replace('var(--s4)', 'var(--surface2)')
-    css = css.replace('var(--txt)', 'var(--text)')
-    return css
-
-# PR: --acc is primary accent (cyan)
-pr_css = _normalize_layout_vars(pr_css)
-pr_css = pr_css.replace('var(--acc2)', 'var(--gold)')
-pr_css = pr_css.replace('var(--acc)', 'var(--accent)')
-
-# Conc: --acc is warning/orange, --acc3 is OK/green, --acc4 is info/blue
-conc_css = _normalize_layout_vars(conc_css)
-conc_css = conc_css.replace('var(--acc4)', 'var(--muted-blue)')
-conc_css = conc_css.replace('var(--acc3)', 'var(--accent)')
-conc_css = conc_css.replace('var(--acc2)', 'var(--gold)')
-conc_css = conc_css.replace('var(--acc)', 'var(--coral)')
-
-# 4. Replace hardcoded fonts with CSS variables
-def _normalize_fonts(css):
-    css = css.replace("font-family:'Syne',sans-serif", "font-family:var(--font-head)")
-    css = css.replace("font-family: 'Syne', sans-serif", "font-family: var(--font-head)")
-    css = css.replace("font-family:'Segoe UI',sans-serif", "font-family:var(--font-mono)")
-    css = css.replace("font-family: 'Segoe UI', sans-serif", "font-family: var(--font-mono)")
-    css = css.replace("font-family:'DM Sans',sans-serif", "font-family:var(--font-mono)")
-    css = css.replace("font-family: 'DM Sans', sans-serif", "font-family: var(--font-mono)")
-    return css
-
-cmp_css = _normalize_fonts(cmp_css)
-cs_css = _normalize_fonts(cs_css)
-pr_css = _normalize_fonts(pr_css)
-conc_css = _normalize_fonts(conc_css)
 
 # 5. Scope conc_css rules to #conc-section to avoid leaking into other sections
 def _scope_css(css, scope):
@@ -823,21 +802,28 @@ def _scope_css(css, scope):
         i = j
     return ''.join(result)
 
-conc_css_scoped = _scope_css(conc_css, '#conc-section')
+if _conc_use_standalone:
+    conc_css_scoped = ''  # Standalone uses #mega-section-conc CSS already in template
+else:
+    conc_css_scoped = _scope_css(conc_css, '#conc-section')
 
 print("Produtoras: body extracted")
 
 # ─────────────────────────────────────────────────────────────────────────────
-# STEP 5 — Build Concentracao section (for Ticket panel inside Produtoras)
+# STEP 5 — Build Concentracao as standalone section (mega-section-conc)
 # ─────────────────────────────────────────────────────────────────────────────
-conc_section = f'''
-<div id="conc-section" style="padding:20px 0;border-top:1px solid var(--border);margin-top:24px">
-  <div style="font-family:'DM Serif Display',serif;font-size:14px;font-style:italic;color:var(--accent);margin-bottom:14px;padding-bottom:8px;border-bottom:1px solid var(--border)">
-    Concentração e Distribuição de Produtoras
-  </div>
+if _conc_use_standalone:
+    conc_section = conc_section_html
+else:
+    conc_section = f'''
+<div id="conc-section" style="overflow-y:auto;height:100%;padding:24px 28px 48px">
+<div style="margin-bottom:18px">
+  <div style="font-family:var(--font-head);font-size:21px;font-style:italic;color:var(--text);margin-bottom:5px">Concentração e Estrutura de Mercado</div>
+  <div style="font-size:10px;color:var(--muted);letter-spacing:.04em">Fomento anualizado + Proxy RLP (15% da renda total estimada)</div>
+</div>
   <div class="conc-subnav" style="display:flex;gap:0;border-bottom:1px solid var(--border);margin-bottom:20px">
-    <button class="conc-tab active" onclick="concShow('conc-t1')">Ticket Médio Anual</button>
-    <button class="conc-tab" onclick="concShow('conc-t2')">Análise por Tiers</button>
+    <button class="conc-tab active" onclick="concShow('conc-t1')">Proliferação das Produtoras</button>
+    <button class="conc-tab" onclick="concShow('conc-t2')">Ticket Médio Anual</button>
     <button class="conc-tab" onclick="concShow('conc-t3')">Concentração Lorenz</button>
   </div>
   {conc_panel_t1}
@@ -845,9 +831,8 @@ conc_section = f'''
   {conc_panel_t3}
 </div>
 '''
-
-conc_section = conc_section.replace('id="conc-t2"', 'id="conc-t2" style="display:none"')
-conc_section = conc_section.replace('id="conc-t3"', 'id="conc-t3" style="display:none"')
+    conc_section = conc_section.replace('id="conc-t2"', 'id="conc-t2" style="display:none"')
+    conc_section = conc_section.replace('id="conc-t3"', 'id="conc-t3" style="display:none"')
 
 # ─────────────────────────────────────────────────────────────────────────────
 # STEP 6 — Build Ticket panel for Produtoras
@@ -863,10 +848,8 @@ pr_ticket_panel = f'''<div id="pr-ticket-panel" class="tab-panel" style="overflo
 {ticket_div}
 </div>'''
 
-# Concentração panel — aba separada
-pr_conc_panel = f'''<div id="pr-conc-panel" class="tab-panel" style="overflow-y:auto;padding:14px 18px 18px">
-{conc_section}
-</div>'''
+# Concentração is now a standalone mega-section (not embedded in Produtoras)
+pr_conc_panel = ''  # kept as empty string so references don't break
 
 # ─────────────────────────────────────────────────────────────────────────────
 # STEP 6b — Build "Por Cluster" panel from PROD data (same source as Visão Geral)
@@ -887,10 +870,10 @@ else:
 # Build cluster figures from PROD data
 _CL_MAP = {
     'duplo':       ('Duplo Retorno',         '#f5c842'),
-    'dom':         ('Retorno Doméstico',      '#f09020'),
-    'intl':        ('Retorno Internacional',  '#4fa3e0'),
-    'sem_retorno': ('Fomento Baixo Retorno',  '#e05050'),
-    'pequeno':     ('Pequeno Porte',          '#4a4a60'),
+    'dom':         ('Retorno Doméstico',      '#5b8cff'),
+    'intl':        ('Retorno Internacional',  '#ff80b0'),
+    'sem_retorno': ('Fomento Baixo Retorno',  '#f87171'),
+    'pequeno':     ('Pequeno Porte',          '#7b849a'),
 }
 _CL_ORDER = ['duplo', 'dom', 'intl', 'sem_retorno', 'pequeno']
 _CL_LABELS = [_CL_MAP[k][0] for k in _CL_ORDER]
@@ -924,11 +907,7 @@ def _cl_stats(key):
 
 _cl_resumo = {k: _cl_stats(k) for k in _CL_ORDER}
 
-_LAYOUT_BASE = dict(
-    paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(20,20,20,0.5)',
-    font=dict(color='#ddd8cc', family='DM Mono, monospace', size=11),
-    margin=dict(l=50, r=20, t=80, b=120),
-)
+_LAYOUT_BASE = dict(**PLOTLY_LAYOUT)
 
 def _make_cl_kpi():
     from plotly.subplots import make_subplots as _msp
@@ -1104,9 +1083,9 @@ pr_body = pr_body.replace(
     clusters_content + '\n<div class="tab-panel main-tab" id="pr-tab1">'
 )
 
-# Append ticket and conc panels (needed for sidebar Concentração via prShowConc, no buttons)
+# Append ticket panel to Produtoras (Concentração is now a standalone section)
 pr_body = pr_body.rstrip()
-pr_body = pr_body + '\n' + pr_ticket_panel + '\n' + pr_conc_panel
+pr_body = pr_body + '\n' + pr_ticket_panel
 
 print("Por Cluster + Ticket + Concentração panels built for Produtoras")
 
@@ -1584,7 +1563,7 @@ def _build_curtas_longas_html():
     cl_layout = dict(
         paper_bgcolor='rgba(0,0,0,0)',
         plot_bgcolor='rgba(14,16,24,0.6)',
-        font=dict(color='#e8eaf2', family='DM Mono, monospace', size=10),
+        font=dict(color='#e8eaf2', family='Inter, system-ui, sans-serif', size=10),
         margin=dict(l=54, r=18, t=34, b=46),
     )
 
@@ -1595,7 +1574,7 @@ def _build_curtas_longas_html():
     fig_year = go.Figure()
     fig_year.add_trace(go.Bar(
         x=by_year['ano'].astype(int), y=by_year['selecoes'],
-        name='Seleções', marker_color='#00e5c8',
+        name='Seleções', marker_color='#6c7bf7',
         hovertemplate='Ano %{x}<br>Seleções: %{y}<extra></extra>'
     ))
     fig_year.add_trace(go.Scatter(
@@ -1617,7 +1596,7 @@ def _build_curtas_longas_html():
     fig_timeline = go.Figure()
     timeline_height = max(360, min(720, 120 + 34 * max(1, n_transicao)))
     for tipo, color, symbol, size in [
-        ('Curta selecionado', '#00e5c8', 'circle', 8),
+        ('Curta selecionado', '#6c7bf7', 'circle', 8),
         ('Longa selecionado', '#f5c842', 'diamond', 10),
     ]:
         part = timeline[timeline['tipo_evento'] == tipo]
@@ -1666,7 +1645,7 @@ def _build_curtas_longas_html():
         y=['Longa posterior identificada', 'Sem longa posterior identificada'],
         x=[n_transicao, max(n_diretores - n_transicao, 0)],
         orientation='h',
-        marker_color=['#00e5c8', '#5a6080'],
+        marker_color=['#6c7bf7', '#5a6080'],
         text=[f'{n_transicao} ({taxa_transicao:.1f}%)',
               f'{max(n_diretores - n_transicao, 0)} ({100 - taxa_transicao:.1f}%)'],
         textposition='outside',
@@ -1688,7 +1667,7 @@ def _build_curtas_longas_html():
         x=[taxa_transicao],
         name='Com longa posterior',
         orientation='h',
-        marker_color='#00e5c8',
+        marker_color='#6c7bf7',
         text=[f'{taxa_transicao:.1f}%<br>{n_transicao}/{n_diretores}'],
         textposition='inside',
         insidetextanchor='middle',
@@ -1732,7 +1711,7 @@ def _build_curtas_longas_html():
     fig_uplift = go.Figure(go.Bar(
         x=['Base geral de diretores de longas', 'Diretores com curta selecionado'],
         y=[taxa_base_fest, taxa_transicao],
-        marker_color=['#5a6080', '#00e5c8'],
+        marker_color=['#5a6080', '#6c7bf7'],
         text=[
             f'{base_dirs_fest}/{base_dirs_total}<br>{taxa_base_fest:.1f}%',
             f'{n_transicao}/{n_diretores}<br>{taxa_transicao:.1f}%'
@@ -1791,7 +1770,7 @@ def _build_curtas_longas_html():
         y=top_dir['diretor_individual'],
         x=top_dir['n_selecoes'],
         orientation='h',
-        marker_color='#00e5c8',
+        marker_color='#6c7bf7',
         customdata=top_dir[['n_curtas', 'n_premios', 'festivais']],
         hovertemplate='<b>%{y}</b><br>Seleções: %{x}<br>Curtas: %{customdata[0]}<br>Prêmios: %{customdata[1]}<br>%{customdata[2]}<extra></extra>'
     ))
@@ -1804,7 +1783,7 @@ def _build_curtas_longas_html():
         margin=dict(l=185, r=18, t=34, b=44),
         paper_bgcolor='rgba(0,0,0,0)',
         plot_bgcolor='rgba(14,16,24,0.6)',
-        font=dict(color='#e8eaf2', family='DM Mono, monospace', size=10),
+        font=dict(color='#e8eaf2', family='Inter, system-ui, sans-serif', size=10),
     )
 
     prem_rows = ''
@@ -1910,11 +1889,11 @@ def _build_curtas_longas_html():
     <div style="font-size:10px;color:var(--muted);letter-spacing:.04em">{n_filmes} curtas brasileiros · {n_selecoes} seleções internacionais · {n_diretores} diretores creditados · {ano_min}-{ano_max}</div>
   </div>
 
-  <div class="card" style="margin-bottom:16px;border-color:rgba(0,229,200,.35)">
+  <div class="card" style="margin-bottom:16px;border-color:rgba(108,123,247,.35)">
     <div class="card-t" style="color:var(--accent);font-size:17px">Pergunta comparativa: quanto o curta selecionado aumenta a chance?</div>
     <div class="grid2" style="align-items:stretch;margin-bottom:12px">
       <div><div id="cl-curtas-uplift" style="height:340px"></div></div>
-      <div style="background:rgba(0,229,200,.07);border:1px solid rgba(0,229,200,.22);border-left:3px solid var(--accent);border-radius:8px;padding:14px 16px;font-size:12px;line-height:1.75;color:var(--muted)">
+      <div style="background:rgba(108,123,247,.07);border:1px solid rgba(108,123,247,.22);border-left:3px solid var(--accent);border-radius:8px;padding:14px 16px;font-size:12px;line-height:1.75;color:var(--muted)">
         <div style="font-family:var(--font-head);font-size:16px;font-style:italic;color:var(--text);margin-bottom:8px">Resposta principal</div>
         <p style="margin:0 0 10px">
           Na base geral, <b style="color:var(--text)">{base_dirs_fest}</b> de
@@ -2114,7 +2093,7 @@ try:
         xaxis_title='Índice Crítico (1–5)', yaxis_title='ROI Internacional (0–100)',
         height=460, margin=dict(l=60, r=20, t=50, b=50),
         paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(14,16,24,0.6)',
-        font=dict(color='#e8eaf2', family='DM Mono, monospace', size=11),
+        font=dict(color='#e8eaf2', family='Inter, system-ui, sans-serif', size=11),
         xaxis=dict(gridcolor='#1e2035'), yaxis=dict(gridcolor='#1e2035'),
     )
     fig_sp_json = pio.to_json(fig_sp)
@@ -2171,7 +2150,7 @@ _div_render_script = r'''
   var baseLayout = {
     paper_bgcolor:'rgba(0,0,0,0)',
     plot_bgcolor:'rgba(14,16,24,0.6)',
-    font:{color:'#e8eaf2',family:'DM Mono, monospace',size:10},
+    font:{color:'#e8eaf2',family:'Inter, system-ui, sans-serif',size:10},
     margin:{l:48,r:18,t:18,b:44},
     xaxis:{gridcolor:'#1e2035',zerolinecolor:'#2a2d45'},
     yaxis:{gridcolor:'#1e2035',zerolinecolor:'#2a2d45',ticksuffix:'%'},
@@ -2190,7 +2169,7 @@ _div_render_script = r'''
       type:'bar',
       x:['Inscritos sem PA','Inscritos com PA','Selecionados com PA'],
       y:[15.2,22.8,32.4],
-      marker:{color:['#5a6080','#f5c842','#00e5c8']},
+      marker:{color:['#5a6080','#f5c842','#6c7bf7']},
       text:['15,2%','22,8%','32,4%'],
       textposition:'outside',
       hovertemplate:'%{x}<br>%{y:.1f}%<extra></extra>'
@@ -2200,7 +2179,7 @@ _div_render_script = r'''
       type:'bar',
       x:['Inscritas com PA','Selecionadas com PA','Direcao global','Producao executiva'],
       y:[37.0,52.6,30.0,66.0],
-      marker:{color:['#a78bfa','#00e5c8','#5fd1ff','#f5c842']},
+      marker:{color:['#a78bfa','#6c7bf7','#5fd1ff','#f5c842']},
       text:['37,0%','52,6%','30,0%','66,0%'],
       textposition:'outside',
       hovertemplate:'%{x}<br>%{y:.1f}%<extra></extra>'
@@ -2218,8 +2197,8 @@ _div_render_script = r'''
       mode:'lines+markers+text',
       x:['Sem PA: inscritos negros','Com PA: inscritos negros','Com PA: selecionados negros'],
       y:[15.2,22.8,32.4],
-      line:{color:'#00e5c8',width:3},
-      marker:{size:11,color:['#5a6080','#f5c842','#00e5c8']},
+      line:{color:'#6c7bf7',width:3},
+      marker:{size:11,color:['#5a6080','#f5c842','#6c7bf7']},
       text:['15,2%','22,8%','32,4%'],
       textposition:'top center',
       hovertemplate:'%{x}<br>%{y:.1f}%<extra></extra>'
@@ -2229,7 +2208,7 @@ _div_render_script = r'''
       type:'bar',
       x:['Direcao','Producao executiva','Inscritas com PA','Selecionadas com PA'],
       y:[30.0,66.0,37.0,52.6],
-      marker:{color:['#5fd1ff','#f5c842','#a78bfa','#00e5c8']},
+      marker:{color:['#5fd1ff','#f5c842','#a78bfa','#6c7bf7']},
       text:['30,0%','66,0%','37,0%','52,6%'],
       textposition:'outside',
       hovertemplate:'%{x}<br>%{y:.1f}%<extra></extra>'
@@ -2262,7 +2241,7 @@ try:
         y=cat_stats['Categoria'],
         customdata=cat_stats['n'],
         orientation='h',
-        marker_color='#00e5c8',
+        marker_color='#6c7bf7',
         hovertemplate='<b>%{y}</b><br>Indice medio: %{x:.2f}<br>Obras: %{customdata}<extra></extra>'
     ))
     fig_sp_cat.update_layout(
@@ -2272,7 +2251,7 @@ try:
         yaxis=dict(title='', gridcolor='#1e2035'),
         height=260,
         paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(14,16,24,0.6)',
-        font=dict(color='#e8eaf2', family='DM Mono, monospace', size=10),
+        font=dict(color='#e8eaf2', family='Inter, system-ui, sans-serif', size=10),
     )
 
     ev_stats = (df_crit_ok[df_crit_ok['Ano'].between(2012, 2023)]
@@ -2295,7 +2274,7 @@ try:
         yaxis=dict(title='Indice medio', range=[1, 5], gridcolor='#1e2035'),
         height=260,
         paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(14,16,24,0.6)',
-        font=dict(color='#e8eaf2', family='DM Mono, monospace', size=10),
+        font=dict(color='#e8eaf2', family='Inter, system-ui, sans-serif', size=10),
     )
 
     for col in ['CRITICA_INDICE_1_5', 'CRITICA_N_FONTES', 'ROI Internacional (0-100)']:
@@ -2320,7 +2299,7 @@ try:
         yaxis=dict(title='ROI Internacional (0-100)', gridcolor='#1e2035'),
         height=320,
         paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(14,16,24,0.6)',
-        font=dict(color='#e8eaf2', family='DM Mono, monospace', size=10),
+        font=dict(color='#e8eaf2', family='Inter, system-ui, sans-serif', size=10),
     )
 
     df_cit_sp['CITA_SOMA_CIT'] = pd.to_numeric(df_cit_sp.get('CITA_SOMA_CIT'), errors='coerce').fillna(0)
@@ -2330,7 +2309,7 @@ try:
         x=topcit_sp['CITA_SOMA_CIT'],
         y=topcit_sp['DIRETOR'],
         orientation='h',
-        marker_color='#00e5c8',
+        marker_color='#6c7bf7',
         hovertemplate='<b>%{y}</b><br>Citacoes: %{x:.0f}<extra></extra>'
     ))
     fig_sp_topcit.update_layout(
@@ -2339,7 +2318,7 @@ try:
         yaxis=dict(title='', gridcolor='#1e2035'),
         height=340,
         paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(14,16,24,0.6)',
-        font=dict(color='#e8eaf2', family='DM Mono, monospace', size=10),
+        font=dict(color='#e8eaf2', family='Inter, system-ui, sans-serif', size=10),
     )
 
     fig_sp_dist = go.Figure(go.Histogram(
@@ -2354,7 +2333,7 @@ try:
         yaxis=dict(title='Diretores', gridcolor='#1e2035'),
         height=340,
         paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(14,16,24,0.6)',
-        font=dict(color='#e8eaf2', family='DM Mono, monospace', size=10),
+        font=dict(color='#e8eaf2', family='Inter, system-ui, sans-serif', size=10),
     )
 
     _sp_render_script = f'''
@@ -2813,14 +2792,14 @@ def _build_soft_power_panel_v2():
         y=cat_stats['Categoria'],
         customdata=np.column_stack([cat_stats['n_obras'], cat_stats['n_festival'], cat_stats['fest_media'].round(1)]),
         orientation='h',
-        marker_color='#00e5c8',
+        marker_color='#6c7bf7',
         hovertemplate='<b>%{y}</b><br>% festival: %{x:.1f}%<br>Obras: %{customdata[0]}<br>Com festival: %{customdata[1]}<br>Score medio: %{customdata[2]}<extra></extra>',
     ))
     fig_cat.update_layout(height=320, margin=dict(l=220, r=18, t=10, b=42),
                           xaxis=dict(title='% de filmes com festival', gridcolor='#1e2035'),
                           yaxis=dict(title='', gridcolor='#1e2035'),
                           paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(14,16,24,.6)',
-                          font=dict(color='#e8eaf2', family='DM Mono, monospace', size=10))
+                          font=dict(color='#e8eaf2', family='Inter, system-ui, sans-serif', size=10))
 
     yearly = crit_ok[crit_ok['Ano'].notna()].groupby('Ano').agg(media=('critica', 'mean'), n=('Projeto', 'count')).reset_index().sort_values('Ano')
     fig_year = go.Figure(go.Scatter(
@@ -2836,7 +2815,7 @@ def _build_soft_power_panel_v2():
                            xaxis=dict(title='Ano', gridcolor='#1e2035'),
                            yaxis=dict(title='Indice critico', range=[1, 5], gridcolor='#1e2035'),
                            paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(14,16,24,.6)',
-                           font=dict(color='#e8eaf2', family='DM Mono, monospace', size=10))
+                           font=dict(color='#e8eaf2', family='Inter, system-ui, sans-serif', size=10))
 
     scat = crit_ok[crit_ok['roi_intl'].notna()].copy()
     fig_scat = go.Figure(go.Scatter(
@@ -2852,20 +2831,20 @@ def _build_soft_power_panel_v2():
                            xaxis=dict(title='Indice critico (1-5)', range=[1, 5], gridcolor='#1e2035'),
                            yaxis=dict(title='ROI internacional (0-100)', gridcolor='#1e2035'),
                            paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(14,16,24,.6)',
-                           font=dict(color='#e8eaf2', family='DM Mono, monospace', size=10))
+                           font=dict(color='#e8eaf2', family='Inter, system-ui, sans-serif', size=10))
 
     fig_cit = go.Figure(go.Bar(
         x=cit_top['CITA_SOMA_CIT'],
         y=cit_top['diretor_artistico'],
         orientation='h',
-        marker_color='#00e5c8',
+        marker_color='#6c7bf7',
         hovertemplate='<b>%{y}</b><br>Citacoes: %{x:.0f}<extra></extra>',
     ))
     fig_cit.update_layout(height=380, margin=dict(l=180, r=18, t=10, b=42),
                           xaxis=dict(title='Citacoes OpenAlex aprovadas por venue', gridcolor='#1e2035'),
                           yaxis=dict(title='', gridcolor='#1e2035'),
                           paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(14,16,24,.6)',
-                          font=dict(color='#e8eaf2', family='DM Mono, monospace', size=10))
+                          font=dict(color='#e8eaf2', family='Inter, system-ui, sans-serif', size=10))
 
     section_html = f'''
 <div id="mega-section-sp" class="mega-panel" style="display:none">
@@ -2971,6 +2950,16 @@ print("Sections built")
 # STEP 12 — Assemble mega HTML
 # ─────────────────────────────────────────────────────────────────────────────
 
+# Build centralized CSS (shared_styles.py + sub-panel CSS)
+_mega_css = mega_css(
+    cmp_css=cmp_css,
+    cs_css=cs_css,
+    pr_css=pr_css,
+    conc_css=conc_css_scoped,
+    extra=_cl_div_sp_css,
+)
+print(f"Mega CSS assembled: {len(_mega_css)} chars")
+
 mega_html = f'''<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -2978,363 +2967,13 @@ mega_html = f'''<!DOCTYPE html>
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>FSA Cinema — Painel Integrado de Análise</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@300;400;500&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <script src="https://cdn.plot.ly/plotly-2.35.2.min.js"></script>
 <script src="https://d3js.org/d3.v7.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/topojson@3/dist/topojson.min.js"></script>
 <style>
-/* ── BASE: dark theme ── */
-:root{{
-  --bg:#07080f;--surface:#0e1018;--surface2:#141620;--border:#1e2035;
-  --accent:#00e5c8;--accent-dim:rgba(0,229,200,.15);
-  --gold:#f5c842;--coral:#ff7c6e;--purple:#a78bfa;--muted-blue:#5fd1ff;
-  --text:#e8eaf2;--muted:#5a6080;--dim:#1e2035;
-  --font-head:'DM Serif Display',serif;--font-mono:'DM Mono',monospace;
-  --sidebar-w:210px;--sidebar-collapsed-w:0px;
-  --transition-speed:.25s;
-}}
-*{{box-sizing:border-box;margin:0;padding:0}}
-body{{background:var(--bg);color:var(--text);font-family:var(--font-mono);font-size:13px;min-height:100vh}}
-
-/* ── Header ── */
-.mega-header{{
-  padding:0;border-bottom:1px solid var(--border);
-  background:linear-gradient(180deg,#0c0e18 0%,var(--bg) 100%);
-  display:flex;flex-direction:column;flex-shrink:0;
-}}
-.mega-header-top{{
-  display:flex;align-items:center;gap:20px;padding:16px 32px 12px;
-}}
-.mega-header-icon{{
-  width:44px;height:44px;border-radius:12px;background:var(--accent);
-  display:flex;align-items:center;justify-content:center;flex-shrink:0;
-  box-shadow:0 0 20px rgba(0,229,200,.15);
-}}
-.mega-header-icon svg{{width:20px;height:20px}}
-.mega-header-titles{{flex:1}}
-.mega-header-titles h1{{
-  font-family:var(--font-head);font-size:21px;font-weight:400;letter-spacing:-.3px;line-height:1.15
-}}
-.mega-header-titles p{{font-size:11px;color:var(--muted);margin-top:3px;letter-spacing:.02em}}
-.mega-header-meta{{text-align:right;font-size:10px;color:var(--muted);line-height:1.7}}
-
-/* Methodology ribbon — collapsible */
-.mega-meto-bar{{
-  display:flex;align-items:center;gap:0;padding:0 32px;
-  border-top:1px solid var(--border);background:rgba(255,255,255,.02);
-  overflow:hidden;max-height:60px;transition:max-height var(--transition-speed) ease;
-}}
-.mega-meto-bar.collapsed{{max-height:0;border-top-color:transparent}}
-.meto-toggle{{
-  position:absolute;right:32px;top:0;height:100%;
-  display:flex;align-items:center;background:none;border:none;
-  color:var(--muted);cursor:pointer;font-family:var(--font-mono);font-size:9px;
-  letter-spacing:.08em;text-transform:uppercase;gap:4px;padding:0 4px;
-  transition:color .15s;
-}}
-.meto-toggle:hover{{color:var(--text)}}
-.meto-toggle svg{{width:10px;height:10px;transition:transform var(--transition-speed)}}
-.mega-meto-bar.collapsed ~ .meto-toggle svg{{transform:rotate(180deg)}}
-.mega-meto-wrap{{position:relative;border-top:1px solid var(--border)}}
-.mega-meto-wrap .meto-toggle{{top:0;height:32px}}
-.meto-item{{
-  display:flex;align-items:baseline;gap:7px;
-  padding:8px 18px 8px 0;
-  border-right:1px solid var(--border);margin-right:18px;
-  white-space:nowrap;font-size:10px;
-}}
-.meto-item:last-child{{border-right:none;margin-right:0}}
-.meto-label{{
-  font-size:9px;letter-spacing:.1em;text-transform:uppercase;
-  color:var(--accent);font-weight:600;
-}}
-.meto-def{{color:var(--muted);line-height:1.5}}
-.meto-def strong{{color:var(--text)}}
-
-/* ── Layout ── */
-body{{display:flex;flex-direction:column;height:100vh;overflow:hidden}}
-.mega-layout{{display:flex;flex:1;overflow:hidden}}
-
-/* ── Sidebar navigation ── */
-.mega-sidebar{{
-  width:var(--sidebar-w);min-width:var(--sidebar-w);
-  background:var(--surface);border-right:1px solid var(--border);
-  display:flex;flex-direction:column;overflow-y:auto;padding:8px 0;
-  transition:width var(--transition-speed) ease,min-width var(--transition-speed) ease,
-             opacity var(--transition-speed) ease,transform var(--transition-speed) ease;
-}}
-body.sidebar-collapsed .mega-sidebar{{
-  width:0;min-width:0;opacity:0;overflow:hidden;padding:0;border-right:none;
-}}
-.mega-sidebar-label{{padding:14px 18px 6px;font-size:9px;color:var(--muted);letter-spacing:.1em;text-transform:uppercase}}
-
-.mega-tab{{
-  display:flex;align-items:center;gap:10px;width:100%;text-align:left;
-  padding:10px 18px;font-size:10.5px;color:var(--muted);cursor:pointer;
-  border-left:2px solid transparent;transition:all .15s;
-  letter-spacing:.04em;text-transform:uppercase;font-family:var(--font-mono);
-  white-space:normal;background:none;border-top:none;border-bottom:none;border-right:none;
-  line-height:1.4;
-}}
-.mega-tab .tab-icon{{
-  width:16px;height:16px;flex-shrink:0;opacity:.5;transition:opacity .15s;
-}}
-.mega-tab.active .tab-icon{{opacity:1}}
-.mega-tab .tab-key{{
-  margin-left:auto;font-size:9px;color:var(--dim);
-  border:1px solid var(--border);border-radius:3px;
-  padding:1px 5px;font-family:var(--font-mono);line-height:1.4;
-}}
-.mega-tab.active{{color:var(--accent);border-left-color:var(--accent);background:var(--accent-dim)}}
-.mega-tab:hover:not(.active){{color:var(--text);background:rgba(255,255,255,.03)}}
-.mega-tab:hover .tab-key{{color:var(--muted)}}
-
-/* Sidebar toggle */
-.sidebar-toggle{{
-  position:fixed;left:var(--sidebar-w);top:50%;transform:translateY(-50%);
-  z-index:50;width:18px;height:38px;background:var(--surface);
-  border:1px solid var(--border);border-left:none;
-  border-radius:0 6px 6px 0;cursor:pointer;
-  display:flex;align-items:center;justify-content:center;
-  color:var(--muted);transition:left var(--transition-speed) ease,color .15s,background .15s;
-}}
-.sidebar-toggle:hover{{color:var(--accent);background:var(--surface2)}}
-.sidebar-toggle svg{{width:12px;height:12px;transition:transform var(--transition-speed)}}
-body.sidebar-collapsed .sidebar-toggle{{left:0}}
-body.sidebar-collapsed .sidebar-toggle svg{{transform:rotate(180deg)}}
-
-.mega-content{{flex:1;overflow-y:auto;position:relative}}
-.mega-panel{{display:none;min-height:100%}}
-.mega-panel.active{{display:block}}
-
-/* Scroll-to-top button */
-.scroll-top{{
-  position:fixed;bottom:24px;right:24px;z-index:100;
-  width:38px;height:38px;border-radius:50%;
-  background:var(--surface2);border:1px solid var(--border);
-  color:var(--muted);cursor:pointer;
-  display:flex;align-items:center;justify-content:center;
-  opacity:0;pointer-events:none;
-  transition:opacity .2s,background .15s,color .15s,transform .15s;
-  box-shadow:0 4px 12px rgba(0,0,0,.3);
-}}
-.scroll-top.visible{{opacity:1;pointer-events:auto}}
-.scroll-top:hover{{background:var(--accent);color:#000;transform:scale(1.08)}}
-.scroll-top svg{{width:16px;height:16px}}
-
-/* ── Visão Geral sub-nav (dark) ── */
-.vg-subnav{{
-  display:flex;padding:0 28px;background:var(--surface);
-  border-bottom:1px solid var(--border);position:sticky;top:0;z-index:10;
-}}
-.vg-subtab{{
-  padding:11px 18px;font-size:11px;color:var(--muted);cursor:pointer;
-  border-bottom:2px solid transparent;transition:all .2s;
-  letter-spacing:.06em;text-transform:uppercase;font-family:var(--font-mono);
-  background:none;border-top:none;border-left:none;border-right:none;
-  margin-bottom:-1px;white-space:nowrap;
-}}
-.vg-subtab.active{{color:var(--accent);border-bottom-color:var(--accent)}}
-.vg-subtab:hover:not(.active){{color:var(--text)}}
-
-/* ── Visão Geral: dark overrides (match panel theme) ── */
-#mega-section-cmp{{background:var(--bg)}}
-#mega-section-cmp .tab-content{{display:block!important;background:var(--bg)!important;padding:24px 28px!important}}
-#mega-section-cmp .card{{background:var(--surface)!important;box-shadow:none!important;border:1px solid var(--border)!important;color:var(--text)!important;border-radius:8px!important}}
-#mega-section-cmp .section-title{{color:var(--accent)!important;border-bottom-color:var(--border)!important}}
-#mega-section-cmp .kpi-card{{background:var(--surface)!important;box-shadow:none!important;border:1px solid var(--border)!important;color:var(--text)!important}}
-#mega-section-cmp .kpi-card .val{{color:var(--accent)!important}}
-#mega-section-cmp .kpi-card .label{{color:var(--muted)!important}}
-#mega-section-cmp .kpi-card .sub{{color:var(--muted)!important}}
-#mega-section-cmp table thead th{{color:var(--muted)!important;border-bottom-color:var(--border)!important;background:var(--bg)!important}}
-#mega-section-cmp table tbody td{{border-bottom-color:var(--border)!important;color:var(--text)!important}}
-#mega-section-cmp table tbody tr:hover{{background:var(--surface2)!important}}
-#mega-section-cmp h3,#mega-section-cmp h4{{color:var(--text)!important}}
-#mega-section-cmp .insight-box,#mega-section-cmp .alert-box{{background:var(--surface2)!important;border-color:var(--border)!important;color:var(--text)!important}}
-#mega-section-cmp select{{background:var(--surface2)!important;color:var(--text)!important;border-color:var(--border)!important}}
-#mega-section-cmp input{{background:var(--surface2)!important;color:var(--text)!important;border-color:var(--border)!important}}
-#mega-section-cmp .topbar{{display:none!important}}
-#mega-section-cmp .tabs{{display:none!important}}
-#mega-section-cmp .legenda{{background:var(--surface)!important;border:1px solid var(--border)!important;border-radius:8px}}
-#mega-section-cmp .legenda-item{{color:var(--text)!important}}
-#mega-section-cmp .legenda-item span{{color:var(--muted)!important}}
-#mega-section-cmp .chart-wrap{{background:var(--surface)!important;border:1px solid var(--border)!important;border-radius:12px!important}}
-#mega-section-cmp .chart-title{{color:var(--text)!important;font-family:var(--font-head)!important}}
-#mega-section-cmp .ctrl-btn{{border-color:var(--border)!important;color:var(--muted)!important;background:transparent!important}}
-#mega-section-cmp .ctrl-btn.active,#mega-section-cmp .ctrl-btn:hover{{background:var(--accent)!important;color:#000!important;border-color:var(--accent)!important;font-weight:600!important}}
-#mega-section-cmp .tog-btn{{border-color:var(--border)!important;color:var(--muted)!important;background:var(--surface2)!important}}
-#mega-section-cmp .tog-btn.active{{background:var(--accent)!important;color:#000!important;border-color:var(--accent)!important}}
-#mega-section-cmp .tog-btn:hover:not(.active){{background:var(--surface)!important;color:var(--text)!important}}
-#mega-section-cmp .search-input{{background:var(--surface2)!important;color:var(--text)!important;border-color:var(--border)!important}}
-#mega-section-cmp .search-input:focus{{border-color:var(--accent)!important;box-shadow:0 0 0 2px rgba(0,229,200,.18)!important}}
-#mega-section-cmp .search-count{{color:var(--muted)!important}}
-#mega-section-cmp .mod-bar-track{{background:var(--surface2)!important}}
-#mega-section-cmp .mod-bar-fill{{color:#000!important}}
-/* cluster cards */
-#mega-section-cmp .cl-card{{background:var(--surface)!important;border:1px solid var(--border)!important}}
-#mega-section-cmp .cl-card:hover{{background:var(--surface2)!important}}
-#mega-section-cmp .cl-name{{color:var(--text)!important}}
-#mega-section-cmp .cl-n{{color:var(--text)!important}}
-#mega-section-cmp .cl-desc,#mega-section-cmp .cl-stat span,#mega-section-cmp .cl-top,#mega-section-cmp .cl-pct{{color:var(--muted)!important}}
-#mega-section-cmp .cl-stat b{{color:var(--text)!important}}
-#mega-section-cmp .cl-top b{{color:var(--accent)!important}}
-#mega-section-cmp .ov-rank-head{{border-bottom-color:var(--border)!important}}
-#mega-section-cmp .bc-nm{{color:var(--text)!important}}
-#mega-section-cmp .bc-val{{color:var(--text)!important}}
-#mega-section-cmp .bc-rank,#mega-section-cmp .bc-sub{{color:var(--muted)!important}}
-#mega-section-cmp .bc-bar-wrap{{background:var(--surface2)!important}}
-#mega-section-cmp .quad-wrap{{background:var(--surface)!important;border:1px solid var(--border)!important}}
-#mega-section-cmp .filter-bar select,#mega-section-cmp .filter-bar input{{background:var(--surface2)!important;color:var(--text)!important;border-color:var(--border)!important}}
-#mega-section-cmp .bar-bg{{background:rgba(30,32,53,.8)!important}}
-#mega-section-cmp .comp-card{{background:var(--surface)!important;border:1px solid var(--border)!important}}
-#mega-section-cmp .comp-row .label{{color:var(--muted)!important}}
-#mega-section-cmp .comp-row .val{{color:var(--text)!important}}
-#mega-section-cmp .quad-ctrl .lbl{{color:var(--muted)!important}}
-#mega-section-cmp .obras-drawer{{background:var(--surface)!important;border:1px solid var(--border)!important}}
-#mega-section-cmp .obras-drawer-title{{color:var(--text)!important}}
-#mega-section-cmp .cl-panel{{background:var(--surface2)!important;border:1px solid var(--border)!important}}
-#mega-section-cmp .cat-pill{{background:var(--surface)!important;border-color:var(--border)!important;color:var(--muted)!important}}
-#mega-section-cmp .cat-pill.active{{background:var(--accent-dim)!important;border-color:var(--accent)!important;color:var(--accent)!important}}
-
-/* ── Retorno Internacional: override inline light-theme styles ── */
-#cmp-panel-ret-intl *{{color:var(--text)}}
-#cmp-panel-ret-intl [style*="background:#fff"],
-#cmp-panel-ret-intl [style*="background: #fff"]{{background:var(--bg)!important;color:var(--text)!important}}
-#cmp-panel-ret-intl [style*="background:#f7f8fb"]{{background:var(--surface)!important;border-color:var(--border)!important}}
-#cmp-panel-ret-intl [style*="background:#f0f4f8"]{{background:var(--surface)!important;border-color:var(--border)!important}}
-#cmp-panel-ret-intl [style*="background:#eef0f4"]{{background:var(--surface2)!important}}
-#cmp-panel-ret-intl [style*="background:rgba(255,255,255"]{{background:var(--surface)!important;border-color:var(--border)!important}}
-#cmp-panel-ret-intl [style*="color:#222"]{{color:var(--text)!important}}
-#cmp-panel-ret-intl [style*="color:#333"]{{color:var(--text)!important}}
-#cmp-panel-ret-intl [style*="color:#444"]{{color:var(--text)!important}}
-#cmp-panel-ret-intl [style*="color:#555"]{{color:var(--muted)!important}}
-#cmp-panel-ret-intl [style*="color:#666"]{{color:var(--muted)!important}}
-#cmp-panel-ret-intl [style*="color:#888"]{{color:var(--muted)!important}}
-#cmp-panel-ret-intl [style*="border:1px solid #dde0e8"]{{border-color:var(--border)!important}}
-#cmp-panel-ret-intl [style*="border:1px solid #ccd0da"]{{border-color:var(--border)!important}}
-#cmp-panel-ret-intl [style*="border:1px solid #ddd"]{{border-color:var(--border)!important}}
-#cmp-panel-ret-intl [style*="border:1px solid #5B6BB5"]{{border-color:var(--accent)!important}}
-#cmp-panel-ret-intl #intl-tooltip{{background:var(--surface2)!important;border-color:var(--accent)!important;color:var(--text)!important}}
-
-/* ── Concentracao section (inside Produtoras) ── */
-#conc-section .conc-subnav{{display:flex;gap:0;border-bottom:1px solid var(--border);margin-bottom:20px}}
-#conc-section .conc-tab{{padding:9px 16px;font-size:10px;color:var(--muted);cursor:pointer;border-bottom:2px solid transparent;letter-spacing:.06em;text-transform:uppercase;font-family:var(--font-mono);background:none;border-top:none;border-left:none;border-right:none;white-space:nowrap}}
-#conc-section .conc-tab.active{{color:var(--accent);border-bottom-color:var(--accent)}}
-#conc-section .tab-panel{{display:none;padding:0 4px;flex-direction:column}}
-#conc-section .tab-panel.active{{display:flex}}
-#conc-section .scroll{{overflow:visible!important;height:auto!important}}
-
-/* ── Criterio selecao ── */
-#mega-section-cs .header{{display:none!important}}
-#mega-section-cs .tabs{{background:var(--surface);border-bottom:1px solid var(--border);padding:0 20px}}
-#mega-section-cs .tab{{font-size:10px}}
-#mega-section-cs .panel{{padding:24px 28px}}
-#mega-section-cs #cs-tooltip{{position:fixed;display:none;background:var(--surface2);border:1px solid var(--accent);border-radius:8px;padding:12px 14px;font-size:11px;line-height:1.7;pointer-events:none;z-index:9999;max-width:310px}}
-/* Dark overrides for "Por Cluster" panel inside Produtoras */
-#pr-tab-clusters .card{{background:var(--surface)!important;box-shadow:none!important;border:1px solid var(--border)!important;color:var(--text)!important;border-radius:8px!important}}
-#pr-tab-clusters .card div{{color:var(--text)!important}}
-#pr-tab-clusters .search-input{{background:var(--surface2)!important;color:var(--text)!important;border-color:var(--border)!important}}
-#pr-tab-clusters .search-count{{color:var(--muted)!important}}
-#pr-tab-clusters table thead th{{color:var(--muted)!important;background:var(--bg)!important}}
-#pr-tab-clusters table tbody td{{color:var(--text)!important;border-bottom-color:var(--border)!important}}
-
-/* ── Produtoras dark overrides ── */
-#mega-section-pr{{
-  overflow:hidden!important;
-  flex-direction:column;
-  height:100%;
-  min-height:0;
-}}
-#mega-section-pr .hdr{{display:none!important}}
-#mega-section-pr .tab-bar{{background:var(--surface);border-bottom:1px solid var(--border);flex-shrink:0}}
-#mega-section-pr .tab-btn{{color:var(--muted);background:none;border-color:transparent}}
-#mega-section-pr .tab-btn.active{{color:var(--accent);border-bottom-color:var(--accent)!important}}
-#mega-section-pr .tab-panel{{background:var(--bg)}}
-/* Ticket panel inside produtoras */
-#pr-ticket-panel{{background:var(--bg)!important;padding:0!important;overflow-y:auto!important;flex-direction:column!important}}
-/* Concentração panel inside produtoras */
-#pr-conc-panel{{background:var(--bg)!important;padding:0!important;overflow-y:auto!important;flex-direction:column!important}}
-#pr-ticket-panel .cmp-tab-panel{{display:block!important}}
-#pr-ticket-panel .tab-content{{display:block!important;background:var(--bg)!important;padding:14px 18px!important}}
-#pr-ticket-panel .card{{background:var(--surface)!important;box-shadow:none!important;border:1px solid var(--border)!important;color:var(--text)!important}}
-#pr-ticket-panel .section-title{{color:var(--accent)!important;border-bottom-color:var(--border)!important}}
-#pr-ticket-panel .kpi-card{{background:var(--surface)!important;box-shadow:none!important;border:1px solid var(--border)!important;color:var(--text)!important}}
-#pr-ticket-panel .kpi-card .val{{color:var(--accent)!important}}
-#pr-ticket-panel table thead th{{color:var(--muted)!important;border-bottom-color:var(--border)!important;background:var(--bg)!important}}
-#pr-ticket-panel table tbody td{{border-bottom-color:var(--border)!important;color:var(--text)!important}}
-#pr-ticket-panel table tbody tr:hover{{background:var(--surface2)!important}}
-#pr-ticket-panel h3,#pr-ticket-panel h4{{color:var(--text)!important}}
-
-/* ── Responsive: small screens ── */
-@media (max-width: 900px) {{
-  .mega-sidebar{{position:fixed;left:0;top:0;bottom:0;z-index:200;transform:translateX(-100%);width:240px;min-width:240px}}
-  .mega-sidebar.mobile-open{{transform:translateX(0);box-shadow:4px 0 24px rgba(0,0,0,.5)}}
-  body.sidebar-collapsed .mega-sidebar{{width:240px;min-width:240px;opacity:1;padding:8px 0}}
-  .sidebar-toggle{{display:none}}
-  .mobile-menu-btn{{display:flex!important}}
-  .mega-header-top{{padding:12px 16px 10px}}
-  .mega-meto-bar{{padding:0 16px}}
-  .mobile-overlay{{display:block!important}}
-  .mobile-overlay.active{{opacity:1;pointer-events:auto}}
-}}
-@media (min-width: 901px) {{
-  .mobile-menu-btn{{display:none!important}}
-  .mobile-overlay{{display:none!important}}
-}}
-
-/* ── UI stabilization: viewport, scroll containers, responsive tabs ── */
-html{{height:100%;max-width:100%}}
-body{{height:100vh;height:100dvh;min-height:0;overflow:hidden;max-width:100vw}}
-.mega-header-titles{{min-width:0}}
-.mega-header-titles h1,.mega-header-titles p{{overflow-wrap:anywhere}}
-.mega-meto-bar{{overflow-x:auto;overflow-y:hidden;scrollbar-width:thin}}
-.meto-item{{flex-shrink:0}}
-.mega-layout{{min-height:0;width:100%}}
-.mega-content{{min-width:0;min-height:0;overflow-x:hidden;overscroll-behavior:contain;-webkit-overflow-scrolling:touch}}
-.mega-panel{{min-width:0}}
-#mega-section-pr{{height:100%}}
-#mega-section-cmp,#mega-section-cs,#mega-section-cl,#mega-section-div,#mega-section-sp{{min-height:100%}}
-.vg-subnav,#mega-section-cs .tabs,#mega-section-pr .tab-bar,#conc-section .conc-subnav{{
-  overflow-x:auto;overflow-y:hidden;scrollbar-width:thin;
-}}
-.vg-subnav::-webkit-scrollbar,#mega-section-cs .tabs::-webkit-scrollbar,
-#mega-section-pr .tab-bar::-webkit-scrollbar,#conc-section .conc-subnav::-webkit-scrollbar{{height:5px}}
-.vg-subtab,#mega-section-cs .tab,#mega-section-pr .tab-btn,#conc-section .conc-tab{{flex-shrink:0}}
-.card,.kpi,.kpi-card,.chart-wrap,.quad-wrap,.comp-card{{min-width:0}}
-#mega-section-cmp .card,#mega-section-cs .panel,#pr-ticket-panel .card,#conc-section .card{{overflow-x:auto}}
-.grid-2,.kpi-bar,#conc-section .grid2{{min-width:0}}
-.plotly-graph-div{{max-width:100%}}
-#mega-section-pr .tab-panel.main-tab.active{{overflow-y:auto}}
-@media (max-width: 900px) {{
-  .mega-header-top{{gap:10px;align-items:flex-start;padding:12px 14px 10px}}
-  .mega-header-icon{{width:40px;height:40px;border-radius:10px}}
-  .mega-header-titles h1{{font-size:15px;line-height:1.2}}
-  .mega-header-titles p{{font-size:10px;line-height:1.45}}
-  .mega-header-meta{{display:none}}
-  .mega-meto-wrap{{display:none}}
-  .mega-content{{width:100%}}
-  .vg-subnav{{padding:0 12px}}
-  #mega-section-cmp .tab-content,#mega-section-cs .panel{{padding:16px 14px!important}}
-  #pr-tab-clusters{{padding:16px 14px!important}}
-  .grid-2,.kpi-bar,#conc-section .grid2{{grid-template-columns:1fr!important}}
-  .plotly-graph-div{{min-width:680px;min-height:280px}}
-  .modal{{width:calc(100vw - 24px);max-height:calc(100dvh - 24px)}}
-}}
-
-/* ── CMP CSS (scoped) ── */
-{cmp_css}
-
-/* ── CS CSS (scoped - already dark) ── */
-{cs_css}
-
-/* ── PR CSS ── */
-{pr_css}
-
-/* ── CONC CSS (scoped to #conc-section) ── */
-{conc_css_scoped}
-
-/* ── CL/DIV/SP dark overrides + utility classes ── */
-{_cl_div_sp_css}
+{_mega_css}
 </style>
 </head>
 <body>
@@ -3362,6 +3001,10 @@ body{{height:100vh;height:100dvh;min-height:0;overflow:hidden;max-width:100vw}}
       {N_OBRAS} obras com estreia em cartaz · PRODECINE 2014–2023<br>
       Bilheteria > 0 · dados deflacionados R$2024
     </div>
+    <a href="auditoria_claims.html" class="audit-link" title="Auditoria de Claims">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>
+      Auditoria de Claims
+    </a>
   </div>
   <div class="mega-meto-wrap">
     <div class="mega-meto-bar" id="meto-bar">
@@ -3462,7 +3105,10 @@ body{{height:100vh;height:100dvh;min-height:0;overflow:hidden;max-width:100vw}}
 <!-- ── SECTION: PRODUTORAS ── -->
 {pr_section_html}
 
-<!-- Concentração: handled inside Produtoras tab via prShowConc() -->
+<!-- ── SECTION: CONCENTRAÇÃO ── -->
+<div id="mega-section-conc" class="mega-panel" style="display:none">
+{conc_section}
+</div>
 
 <!-- ── SECTION: CURTAS → LONGAS ── -->
 <div id="mega-section-cl" class="mega-panel" style="display:none">
@@ -3484,7 +3130,7 @@ body{{height:100vh;height:100dvh;min-height:0;overflow:hidden;max-width:100vw}}
 <!-- ── MEGA NAVIGATION SCRIPT ── -->
 <script>
 const MEGA_SECTIONS = {{
-  'vg':'cmp', 'cs':'cs', 'pr':'pr', 'conc':'pr', 'cl':'cl', 'div':'div', 'sp':'sp'
+  'vg':'cmp', 'cs':'cs', 'pr':'pr', 'conc':'conc', 'cl':'cl', 'div':'div', 'sp':'sp'
 }};
 
 function _resizeVisibleCharts(rootId) {{
@@ -3502,7 +3148,7 @@ function _resizeVisibleCharts(rootId) {{
 
 function megaShow(id) {{
   // Hide all sections
-  ['cmp','cs','pr','cl','div','sp'].forEach(s => {{
+  ['cmp','cs','pr','conc','cl','div','sp'].forEach(s => {{
     const el = document.getElementById('mega-section-'+s);
     if(el) el.style.display = 'none';
   }});
@@ -3547,8 +3193,9 @@ function megaShow(id) {{
 
   if(id === 'conc') {{
     setTimeout(function() {{
-      if(typeof prShowConc === 'function') prShowConc();
-    }}, 50);
+      concShow('conc-t1');
+      _resizeVisibleCharts('mega-section-conc');
+    }}, 80);
   }}
 
   if(id === 'cl') {{
@@ -3618,9 +3265,9 @@ var _vg_initialized = {{}};
 var _DARK_LAYOUT = {{
   paper_bgcolor: 'rgba(0,0,0,0)',
   plot_bgcolor:  'rgba(14,16,24,0.6)',
-  font: {{color:'#e8eaf2', family:'DM Mono, monospace', size:11}}
+  font: {{color:'#e2e8f0', family:'Inter, system-ui, sans-serif', size:11}}
 }};
-var _DARK_AXIS = {{gridcolor:'#1e2035',linecolor:'#2a2d42',zerolinecolor:'#2a2d42'}};
+var _DARK_AXIS = {{gridcolor:'#282d42',linecolor:'#343a54',zerolinecolor:'#343a54'}};
 
 function _applyDark(div, data, layout) {{
   var _dl = Object.assign({{}}, layout, _DARK_LAYOUT);
@@ -3674,7 +3321,7 @@ function vgFixInlineCharts() {{
         'paper_bgcolor': 'rgba(0,0,0,0)',
         'plot_bgcolor':  'rgba(14,16,24,0.6)',
         'font.color':    '#e8eaf2',
-        'font.family':   'DM Mono, monospace'
+        'font.family':   'Inter, system-ui, sans-serif'
       }});
       // go.Table: relayout não afeta cells.fill.color (propriedade de dados).
       // Restyle para escurecer células e tornar o texto legível no tema escuro.
@@ -3862,13 +3509,9 @@ window.addEventListener('hashchange', handleHash);
 {cmp_scripts_prefixed}
 {intl_map_fallback_script}
 
-<!-- ── CONCENTRACAO DATA ── -->
+<!-- ── CONCENTRACAO DATA + LOGIC ── -->
 <script>
 {conc_data_script}
-</script>
-
-<!-- ── CONCENTRACAO LOGIC ── -->
-<script>
 {conc_logic_script}
 </script>
 
@@ -3899,7 +3542,14 @@ window.addEventListener('hashchange', handleHash);
 with open(OUT, 'w', encoding='utf-8') as f:
     f.write(mega_html)
 
+# Também salva como docs/painel.html (GitHub Pages)
+DOCS_OUT = os.path.join(BASE, 'docs', 'painel.html')
+os.makedirs(os.path.dirname(DOCS_OUT), exist_ok=True)
+with open(DOCS_OUT, 'w', encoding='utf-8') as f:
+    f.write(mega_html)
+
 size_kb = os.path.getsize(OUT) / 1024
 print(f"\nDone! Output: {OUT}")
+print(f"       Docs:  {DOCS_OUT}")
 print(f"File size: {size_kb:.1f} KB")
 print(f"Lines: {mega_html.count(chr(10))}")

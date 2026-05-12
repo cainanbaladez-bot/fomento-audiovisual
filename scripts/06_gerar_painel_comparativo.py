@@ -29,10 +29,10 @@ OUTPUT = ROOT / "resultados" / "painel_comparativo.html"
 
 # ── Paleta ────────────────────────────────────────────────────────────────────
 CORES = {
-    "Renúncia Pura":               "#E07B54",
-    "FSA Puro":                    "#4C72B0",
-    "FSA + Renúncia — FSA Maj.":   "#55A868",
-    "FSA + Renúncia — Ren. Maj.":  "#8172B2",
+    "Renúncia Pura":               "#ff8040",   # renúncia orange
+    "FSA Puro":                    "#6c7bf7",   # FSA indigo
+    "FSA + Renúncia — FSA Maj.":   "#5b8cff",   # FSA-leaning blue
+    "FSA + Renúncia — Ren. Maj.":  "#f5c842",   # renúncia-leaning gold
 }
 COR_LISTA = list(CORES.values())
 
@@ -198,7 +198,7 @@ def make_tabela_resumo():
         columnwidth=[220, 80, 110, 110, 130, 110, 90],
         header=dict(
             values=[f"<b>{h}</b>" for h in headers],
-            fill_color="#2c3e50",
+            fill_color="#14171f",
             font=dict(color="white", size=12),
             align="center",
             height=36,
@@ -365,13 +365,13 @@ def make_composicao_inv():
 
     fig.add_trace(go.Bar(
         name="FSA", x=GRUPOS, y=fsa_vals,
-        marker_color="#4C72B0",
+        marker_color="#6c7bf7",
         text=[fmt_bi(v) for v in fsa_vals],
         textposition="inside", textfont_color="white",
     ))
     fig.add_trace(go.Bar(
         name="Renúncia Fiscal", x=GRUPOS, y=ren_vals,
-        marker_color="#E07B54",
+        marker_color="#ff8040",
         text=[fmt_bi(v) for v in ren_vals],
         textposition="inside", textfont_color="white",
     ))
@@ -491,27 +491,27 @@ df_cat = df[
 # Paleta por família (FSA em tons azul/verde, Renúncia em tons laranja/vermelho)
 def cor_categoria(cat):
     if cat.startswith("Renúncia"):
-        return "#E07B54" if "Art.3" in cat else "#D95F3A"
+        return "#ff8040"                                      # renúncia orange
     if "SAV" in cat or "Arranjos" in cat:
-        return "#8172B2"
+        return "#40c8ff"                                      # SAV/MINC teal
     if "Bilheteria e Roteiro" in cat and "Produtora" in cat:
-        return "#4C72B0"
+        return "#f5c842"                                      # bilheteria produtora gold
     if "Bilheteria e Roteiro" in cat and "Distribuidora" in cat:
-        return "#6B8FC7"
+        return "#f09020"                                      # bilheteria distribuidora amber
     if "Festivais e Roteiro" in cat:
-        return "#55A868"
+        return "#6c7bf7"                                      # festivais indigo
     if "Complementação" in cat:
-        return "#77B8A0"
+        return "#ff60c0"                                      # complementação magenta
     if "Automático Bilheteria" in cat:
-        return "#3A7CA8"
+        return "#5b8cff"                                      # automático bilheteria blue
     if "Automático Festivais" in cat:
-        return "#2E8B57"
+        return "#c080ff"                                      # automático festivais violet
     if "Coprodução Internacional" in cat:
-        return "#1F6091"
+        return "#ff80b0"                                      # coprodução pink
     if "Comercialização" in cat or "Distribuição" in cat:
-        return "#9CAFC2"
+        return "#a040e8"                                      # comercialização deep-purple
     if "Apenas roteiro" in cat:
-        return "#B0B0B0"
+        return "#80ffb0"                                      # apenas roteiro mint
     return "#888888"
 
 def stats_cat(g):
@@ -657,7 +657,7 @@ def make_cat_tabela():
     fig = go.Figure(go.Table(
         header=dict(
             values=[f"<b>{h}</b>" for h in header],
-            fill_color="#2c3e50", font=dict(color="white", size=11),
+            fill_color="#14171f", font=dict(color="white", size=11),
             align="center", height=34,
         ),
         cells=dict(
@@ -854,11 +854,11 @@ df_prod["cluster"] = df_prod["cluster"].replace(CLUSTER_ALIAS)
 df_prod = df_prod[df_prod["cluster"].isin(CLUSTERS_ORD)].copy()
 
 CLUSTER_CORES = {
-    "Duplo Retorno":         "#2E8B57",  # verde escuro — melhor
-    "Retorno Doméstico":     "#4C72B0",  # azul
-    "Retorno Internacional": "#8172B2",  # roxo
-    "Fomento Baixo Retorno": "#D95F3A",  # vermelho
-    "Outros":                "#A0A0A0",  # cinza — residual
+    "Duplo Retorno":         "#f5c842",  # gold  — alinhado com script 04
+    "Retorno Doméstico":     "#5b8cff",  # blue  — alinhado com script 04
+    "Retorno Internacional": "#ff80b0",  # pink  — alinhado com script 04
+    "Fomento Baixo Retorno": "#f87171",  # coral — alinhado com script 04
+    "Outros":                "#7b849a",  # muted — alinhado com script 04
 }
 
 def stats_cluster(g):
@@ -1095,7 +1095,7 @@ def make_cluster_tabela():
     fig = go.Figure(go.Table(
         header=dict(
             values=[f"<b>{h}</b>" for h in header],
-            fill_color="#2c3e50", font=dict(color="white", size=11),
+            fill_color="#14171f", font=dict(color="white", size=11),
             align="center", height=34,
         ),
         cells=dict(
@@ -1269,7 +1269,7 @@ def make_capital_parado_kpi():
     vals_bi  = [tiers[n]["fsa_bi"]  for n in nomes]
     vals_n   = [tiers[n]["n_obras"] for n in nomes]
     vals_pct = [tiers[n]["pct_fsa"] for n in nomes]
-    cores_tier = ["#8B0000", "#D95F3A", "#E07B54"]
+    cores_tier = ["#f87171", "#ef4444", "#dc2626"]
 
     fig = make_subplots(
         rows=1, cols=2,
@@ -1288,7 +1288,7 @@ def make_capital_parado_kpi():
         textposition="outside",
         showlegend=False,
     ), row=1, col=1)
-    fig.add_hline(y=fsa_universo/1e9, line_dash="dash", line_color="#2c3e50",
+    fig.add_hline(y=fsa_universo/1e9, line_dash="dash", line_color="#343a54",
                   annotation_text=f"Universo FSA: R$ {fsa_universo/1e9:.2f} bi",
                   annotation_position="top right", row=1, col=1)
 
@@ -1327,7 +1327,7 @@ def make_capital_parado_breakdown():
     ano_ser = df_parado.groupby("Ano")[COL_FSA].sum().sort_index() / 1e6
     fig.add_trace(go.Bar(
         x=ano_ser.index.astype(int), y=ano_ser.values,
-        marker_color="#D95F3A",
+        marker_color="#f87171",
         text=[f"{v:.0f}" for v in ano_ser.values], textposition="outside",
         showlegend=False,
     ), row=1, col=1)
@@ -1619,15 +1619,15 @@ def make_intl_festival_map():
         total_country = len(films) + n_fest
         name = COUNTRY_NAMES.get(iso2, iso2)
         w = round(total_country / max_vod * 100)
-        fest_badge = f' <span style="font-size:8px;color:#E8702A">+{n_fest} fest.</span>' if n_fest else ""
+        fest_badge = f' <span style="font-size:8px;color:#fbbf24">+{n_fest} fest.</span>' if n_fest else ""
         bar_parts.append(
             f'<div style="display:flex;align-items:center;gap:6px;margin-bottom:4px">'
             f'<div style="width:28px;flex-shrink:0;font-size:8px;color:#666;text-align:right">{iso2}</div>'
             f'<div style="flex:1;height:16px;background:#eef0f4;border-radius:2px;overflow:hidden;position:relative">'
-            f'<div style="width:{w}%;height:100%;background:#5B6BB5;opacity:.75;border-radius:2px"></div>'
+            f'<div style="width:{w}%;height:100%;background:#6c7bf7;opacity:.75;border-radius:2px"></div>'
             f'<div style="position:absolute;left:5px;top:0;height:100%;display:flex;align-items:center;font-size:9px;color:#222">'
             f'{name}{fest_badge}</div></div>'
-            f'<div style="width:22px;flex-shrink:0;font-size:9px;font-weight:700;color:#5B6BB5;text-align:right">{total_country}</div>'
+            f'<div style="width:22px;flex-shrink:0;font-size:9px;font-weight:700;color:#6c7bf7;text-align:right">{total_country}</div>'
             f'</div>'
         )
     bar_html = "".join(bar_parts)
@@ -1647,19 +1647,19 @@ def make_intl_festival_map():
 
   <!-- KPIs -->
   <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:14px">
-    <div style="background:#f7f8fb;border:1px solid #dde0e8;border-top:3px solid #E8702A;border-radius:4px;padding:12px 14px">
+    <div style="background:#f7f8fb;border:1px solid #dde0e8;border-top:3px solid #fbbf24;border-radius:4px;padding:12px 14px">
       <div style="font-size:8px;letter-spacing:.12em;text-transform:uppercase;color:#888;margin-bottom:4px">Festivais internacionais</div>
-      <div style="font-size:28px;font-weight:800;line-height:1;color:#E8702A;margin-bottom:2px">{n_fest_paises} <span style="font-size:12px;color:#888">países</span></div>
+      <div style="font-size:28px;font-weight:800;line-height:1;color:#fbbf24;margin-bottom:2px">{n_fest_paises} <span style="font-size:12px;color:#888">países</span></div>
       <div style="font-size:10px;color:#666">{n_fest_total} participações · fonte: ANCINE/base</div>
     </div>
-    <div style="background:#f7f8fb;border:1px solid #dde0e8;border-top:3px solid #5B6BB5;border-radius:4px;padding:12px 14px">
+    <div style="background:#f7f8fb;border:1px solid #dde0e8;border-top:3px solid #6c7bf7;border-radius:4px;padding:12px 14px">
       <div style="font-size:8px;letter-spacing:.12em;text-transform:uppercase;color:#888;margin-bottom:4px">VOD Europa</div>
-      <div style="font-size:28px;font-weight:800;line-height:1;color:#5B6BB5;margin-bottom:2px">{n_vod_paises} <span style="font-size:12px;color:#888">países</span></div>
+      <div style="font-size:28px;font-weight:800;line-height:1;color:#6c7bf7;margin-bottom:2px">{n_vod_paises} <span style="font-size:12px;color:#888">países</span></div>
       <div style="font-size:10px;color:#666">{n_vod_total} títulos · fonte: Lumière VOD</div>
     </div>
-    <div style="background:#f7f8fb;border:1px solid #dde0e8;border-top:3px solid #B8860B;border-radius:4px;padding:12px 14px">
+    <div style="background:#f7f8fb;border:1px solid #dde0e8;border-top:3px solid #38bdf8;border-radius:4px;padding:12px 14px">
       <div style="font-size:8px;letter-spacing:.12em;text-transform:uppercase;color:#888;margin-bottom:4px">Salas de cinema (Europa)</div>
-      <div style="font-size:28px;font-weight:800;line-height:1;color:#B8860B;margin-bottom:2px">{n_lum_total} <span style="font-size:12px;color:#888">obras</span></div>
+      <div style="font-size:28px;font-weight:800;line-height:1;color:#38bdf8;margin-bottom:2px">{n_lum_total} <span style="font-size:12px;color:#888">obras</span></div>
       <div style="font-size:10px;color:#666">{adm_str} admissões · fonte: Lumière/CNC</div>
     </div>
   </div>
@@ -1674,12 +1674,12 @@ def make_intl_festival_map():
         <span style="font-size:11px;font-weight:600;color:#444">Filtrar:</span>
         <label style="display:flex;align-items:center;gap:5px;font-size:10px;cursor:pointer">
           <input type="checkbox" id="chk-fest" checked onchange="intlMapUpdate()">
-          <span style="display:inline-block;width:12px;height:12px;border-radius:2px;background:#E8702A;vertical-align:middle"></span>
+          <span style="display:inline-block;width:12px;height:12px;border-radius:2px;background:#fbbf24;vertical-align:middle"></span>
           Festivais
         </label>
         <label style="display:flex;align-items:center;gap:5px;font-size:10px;cursor:pointer">
           <input type="checkbox" id="chk-vod" checked onchange="intlMapUpdate()">
-          <span style="display:inline-block;width:12px;height:12px;border-radius:2px;background:#5B6BB5;vertical-align:middle"></span>
+          <span style="display:inline-block;width:12px;height:12px;border-radius:2px;background:#6c7bf7;vertical-align:middle"></span>
           VOD Europa
         </label>
         <span style="font-size:9px;color:#888;margin-left:auto">passe o mouse para ver os filmes · scroll para zoom · arraste para mover</span>
@@ -1689,7 +1689,7 @@ def make_intl_festival_map():
              style="width:100%;display:block;cursor:grab"></svg>
         <!-- Lumière badge -->
         <div style="position:absolute;bottom:8px;left:8px;background:rgba(255,255,255,.9);border:1px solid #ddd;border-radius:3px;padding:5px 8px;font-size:9px;color:#555">
-          <span style="color:#B8860B;font-weight:700">★ Lumière/CNC</span> · {n_lum_total} obras em salas europeias · {adm_str} admissões
+          <span style="color:#38bdf8;font-weight:700">★ Lumière/CNC</span> · {n_lum_total} obras em salas europeias · {adm_str} admissões
         </div>
       </div>
     </div>
@@ -1702,7 +1702,7 @@ def make_intl_festival_map():
   </div>
 
   <!-- Tooltip -->
-  <div id="intl-tooltip" style="position:fixed;background:#fff;border:1px solid #5B6BB5;border-radius:5px;padding:10px 13px;font-size:10px;pointer-events:none;display:none;z-index:9999;max-width:520px;max-height:70vh;overflow:auto;box-shadow:0 4px 20px rgba(0,0,0,.18)">
+  <div id="intl-tooltip" style="position:fixed;background:#fff;border:1px solid #6c7bf7;border-radius:5px;padding:10px 13px;font-size:10px;pointer-events:none;display:none;z-index:9999;max-width:520px;max-height:70vh;overflow:auto;box-shadow:0 4px 20px rgba(0,0,0,.18)">
     <div id="intl-tt-title" style="font-size:11px;font-weight:700;color:#333;margin-bottom:6px"></div>
     <div id="intl-tt-body"></div>
   </div>
@@ -1779,8 +1779,8 @@ def make_intl_festival_map():
     const hasFest  = showFest && info.fest && info.fest.length > 0;
     const hasVod   = showVod  && info.vod  && info.vod.length  > 0;
     if (hasFest && hasVod) return '#7B5EA7';   // ambos — roxo
-    if (hasFest)           return '#E8702A';   // só festivais — laranja
-    if (hasVod)            return '#5B6BB5';   // só VOD — azul
+    if (hasFest)           return '#fbbf24';   // só festivais — laranja
+    if (hasVod)            return '#6c7bf7';   // só VOD — azul
     return '#dde0e8';                          // sem dados visíveis
   }}
 
@@ -1799,11 +1799,11 @@ def make_intl_festival_map():
     let html = '<div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:8px">';
     html += '<div><div style="font-size:12px;font-weight:800;color:#222">' + esc(name) + ' (' + esc(info.iso2) + ')</div>';
     html += '<div style="font-size:9px;color:#666;margin-top:2px">Fontes: festivais na base ATA BRDE/FSA 2024; VOD na base Lumière VOD.</div></div>';
-    html += '<div style="font-size:10px;color:#555;white-space:nowrap"><b style="color:#E8702A">' + fest.length + '</b> obras em festival · <b style="color:#5B6BB5">' + vod.length + '</b> títulos VOD</div></div>';
+    html += '<div style="font-size:10px;color:#555;white-space:nowrap"><b style="color:#fbbf24">' + fest.length + '</b> obras em festival · <b style="color:#6c7bf7">' + vod.length + '</b> títulos VOD</div></div>';
     html += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;align-items:start">';
-    html += '<div><div style="font-size:9px;font-weight:700;color:#E8702A;margin-bottom:5px;text-transform:uppercase;letter-spacing:.06em">Festivais</div>';
+    html += '<div><div style="font-size:9px;font-weight:700;color:#fbbf24;margin-bottom:5px;text-transform:uppercase;letter-spacing:.06em">Festivais</div>';
     html += fest.length ? fest.map(function(f) {{ return '<div style="padding:4px 0;border-bottom:1px solid #e3e5eb;line-height:1.25">' + esc(f) + '</div>'; }}).join('') : '<div style="color:#888">Sem obra identificada em festival neste país.</div>';
-    html += '</div><div><div style="font-size:9px;font-weight:700;color:#5B6BB5;margin-bottom:5px;text-transform:uppercase;letter-spacing:.06em">VOD Europa</div>';
+    html += '</div><div><div style="font-size:9px;font-weight:700;color:#6c7bf7;margin-bottom:5px;text-transform:uppercase;letter-spacing:.06em">VOD Europa</div>';
     html += vod.length ? vod.map(function(f) {{ return '<div style="padding:4px 0;border-bottom:1px solid #e3e5eb;line-height:1.25">' + esc(f) + '</div>'; }}).join('') : '<div style="color:#888">Sem título identificado em VOD neste país.</div>';
     html += '</div></div>';
     box.innerHTML = html;
@@ -1839,11 +1839,11 @@ def make_intl_festival_map():
         ttT.textContent = name;
         let html = '';
         if (fest.length) {{
-          html += '<div style="font-size:9px;font-weight:600;color:#E8702A;margin-bottom:3px">🎬 Festivais (' + fest.length + ' obras)</div>';
+          html += '<div style="font-size:9px;font-weight:600;color:#fbbf24;margin-bottom:3px">🎬 Festivais (' + fest.length + ' obras)</div>';
           html += fest.map(f => '<div style="font-size:9px;padding:1px 0;border-bottom:1px solid #eee">' + esc(f) + '</div>').join('');
         }}
         if (vod.length) {{
-          html += '<div style="font-size:9px;font-weight:600;color:#5B6BB5;margin:' + (fest.length?'8px':'0') + ' 0 3px">📺 VOD (' + vod.length + ' títulos)</div>';
+          html += '<div style="font-size:9px;font-weight:600;color:#6c7bf7;margin:' + (fest.length?'8px':'0') + ' 0 3px">📺 VOD (' + vod.length + ' títulos)</div>';
           html += vod.map(f => '<div style="font-size:9px;padding:1px 0;border-bottom:1px solid #eee">' + esc(f) + '</div>').join('');
         }}
         ttB.innerHTML = html;
@@ -2025,14 +2025,14 @@ HTML = f"""<!DOCTYPE html>
 
   .tabs {{
     background: #34495e; display: flex; gap: 0; padding: 0 24px;
-    border-bottom: 3px solid #1abc9c;
+    border-bottom: 3px solid #6c7bf7;
   }}
   .tab-btn {{
     padding: 12px 22px; cursor: pointer; color: #ccc; font-size: 0.9rem;
     border: none; background: none; transition: all .2s;
   }}
   .tab-btn:hover {{ color: white; background: rgba(255,255,255,0.08); }}
-  .tab-btn.active {{ color: white; border-bottom: 3px solid #1abc9c; margin-bottom: -3px; }}
+  .tab-btn.active {{ color: white; border-bottom: 3px solid #6c7bf7; margin-bottom: -3px; }}
 
   .tab-content {{ display: none; padding: 28px 32px; }}
   .tab-content.active {{ display: block; }}
@@ -2040,7 +2040,7 @@ HTML = f"""<!DOCTYPE html>
   .section-title {{
     font-size: 1rem; font-weight: 600; color: #2c3e50;
     margin-bottom: 12px; padding-bottom: 6px;
-    border-bottom: 2px solid #1abc9c;
+    border-bottom: 2px solid #6c7bf7;
   }}
   .card {{
     background: white; border-radius: 10px;
@@ -2084,7 +2084,7 @@ HTML = f"""<!DOCTYPE html>
     font-size: 0.88rem; font-family: inherit;
     transition: border-color .15s;
   }}
-  .search-input:focus {{ outline: none; border-color: #1abc9c; box-shadow: 0 0 0 2px rgba(26,188,156,0.18); }}
+  .search-input:focus {{ outline: none; border-color: #6c7bf7; box-shadow: 0 0 0 2px rgba(26,188,156,0.18); }}
   .search-count {{ font-size: 0.78rem; color: #666; }}
   @media (max-width: 900px) {{
     .grid-2, .kpi-bar {{ grid-template-columns: 1fr; }}
@@ -2116,13 +2116,13 @@ HTML = f"""<!DOCTYPE html>
 <!-- ── TAB 1: VISÃO GERAL ───────────────────────────────────────────── -->
 <div id="tab-visao-geral" class="tab-content active">
   <div class="legenda">
-    <div class="legenda-item"><div class="legenda-dot" style="background:#E07B54"></div>
+    <div class="legenda-item"><div class="legenda-dot" style="background:#fbbf24"></div>
       <span><b>Renúncia Pura</b> — só Lei do Audiovisual (Art.3/3-A/39), sem FSA</span></div>
-    <div class="legenda-item"><div class="legenda-dot" style="background:#4C72B0"></div>
+    <div class="legenda-item"><div class="legenda-dot" style="background:#6c7bf7"></div>
       <span><b>FSA Puro</b> — só Fundo Setorial do Audiovisual, sem renúncia</span></div>
-    <div class="legenda-item"><div class="legenda-dot" style="background:#55A868"></div>
+    <div class="legenda-item"><div class="legenda-dot" style="background:#34d399"></div>
       <span><b>FSA + Renúncia — FSA Maj.</b> — ambos; FSA ≥ 50% do total</span></div>
-    <div class="legenda-item"><div class="legenda-dot" style="background:#8172B2"></div>
+    <div class="legenda-item"><div class="legenda-dot" style="background:#a78bfa"></div>
       <span><b>FSA + Renúncia — Ren. Maj.</b> — ambos; Renúncia &gt; 50% do total</span></div>
   </div>
   <div class="card">
@@ -2169,7 +2169,7 @@ HTML = f"""<!DOCTYPE html>
 
 <!-- ── TAB 6: POR CATEGORIA ────────────────────────────────────────── -->
 <div id="tab-categorias" class="tab-content">
-  <div class="card" style="background:#eef4fb;border-left:4px solid #1abc9c;">
+  <div class="card" style="background:#eef4fb;border-left:4px solid #6c7bf7;">
     <div style="font-size:0.88rem;color:#333;">
       <b>Análise por Categoria de Chamada</b> — agrupa {len(df_cat):,} obras
       (excluídas <code>Renúncia</code>, <code>SAV/MINC / Arranjos Regionais</code>,
@@ -2191,15 +2191,15 @@ HTML = f"""<!DOCTYPE html>
 <!-- ── TAB 7: POR CLUSTER DE PRODUTORA ─────────────────────────────── -->
 <div id="tab-clusters" class="tab-content">
   <div class="card">{to_lazy(fig_cl_scat,      "cl_scat",      580, search="text")}</div>
-  <div class="card" style="background:#eef4fb;border-left:4px solid #1abc9c;">
+  <div class="card" style="background:#eef4fb;border-left:4px solid #6c7bf7;">
     <div style="font-size:0.88rem;color:#333;line-height:1.5;">
       <b>Análise por Cluster de Produtora</b> — {len(df_prod):,} produtoras
       classificadas em 5 clusters segundo padrão de retorno:
       <ul style="margin:8px 0 0 20px;">
-        <li><b style="color:#2E8B57;">Duplo Retorno</b> — receita ≥ R$ 2,5 mi <i>e</i> ROI intl máx ≥ 13 (cauda superior)</li>
-        <li><b style="color:#4C72B0;">Retorno Doméstico</b> — receita ≥ R$ 10 mi, ou ROI doméstico > 0,6 com receita ≥ R$ 2,5 mi, sem ROI intl máx ≥ 13</li>
-        <li><b style="color:#8172B2;">Retorno Internacional</b> — ROI intl máx ≥ 13 e sem critério de Retorno Doméstico</li>
-        <li><b style="color:#D95F3A;">Fomento Baixo Retorno</b> — investimento > R$ 5 mi e ROI Internacional máx < 13</li>
+        <li><b style="color:#34d399;">Duplo Retorno</b> — receita ≥ R$ 2,5 mi <i>e</i> ROI intl máx ≥ 13 (cauda superior)</li>
+        <li><b style="color:#6c7bf7;">Retorno Doméstico</b> — receita ≥ R$ 10 mi, ou ROI doméstico > 0,6 com receita ≥ R$ 2,5 mi, sem ROI intl máx ≥ 13</li>
+        <li><b style="color:#a78bfa;">Retorno Internacional</b> — ROI intl máx ≥ 13 e sem critério de Retorno Doméstico</li>
+        <li><b style="color:#f87171;">Fomento Baixo Retorno</b> — investimento > R$ 5 mi e ROI Internacional máx < 13</li>
         <li><b style="color:#A0A0A0;">Pequeno Porte</b> — demais produtoras (investimento ≤ R$ 5 mi)</li>
       </ul>
     </div>
@@ -2216,7 +2216,7 @@ HTML = f"""<!DOCTYPE html>
 
 <!-- ── TAB 8: TICKET & CAPITAL PARADO ──────────────────────────────── -->
 <div id="tab-ticket" class="tab-content">
-  <div class="card" style="background:#eef4fb;border-left:4px solid #1abc9c;">
+  <div class="card" style="background:#eef4fb;border-left:4px solid #6c7bf7;">
     <div style="font-size:0.88rem;color:#333;line-height:1.5;">
       <b>Ticket médio & Capital FSA sem retorno</b> — duas análises combinadas:
       <ul style="margin:8px 0 0 20px;">
