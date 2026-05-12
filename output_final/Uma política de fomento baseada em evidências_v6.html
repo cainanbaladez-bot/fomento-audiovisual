@@ -1,250 +1,435 @@
 <!DOCTYPE html>
-<html lang="pt-BR" data-theme="dark">
+<html lang="pt-BR">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Uma política de fomento baseada em evidências</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Literata:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&display=swap" rel="stylesheet">
+<title>Uma política de fomento baseada em evidências v6</title>
 <style>
-/* ── Color tokens ── */
-:root, [data-theme="dark"] {
-  --bg: #141416;
-  --bg-sub: #1a1a1e;
-  --paper: #1e1e22;
-  --paper-2: #252529;
-  --ink: #d8d4ce;
-  --ink-strong: #eae7e2;
-  --muted: #908a80;
-  --faint: #6a655c;
-  --rule: rgba(255,255,255,.08);
-  --accent: #6ab4c8;
-  --accent-2: #c89a6a;
-  --accent-soft: rgba(106,180,200,.1);
-  --accent-2-soft: rgba(200,154,106,.1);
-  --overlay-bg: rgba(0,0,0,.6);
-  --shadow-sm: 0 2px 12px rgba(0,0,0,.3);
-  --shadow-md: 0 8px 32px rgba(0,0,0,.4);
-  --shadow-lg: 0 20px 60px rgba(0,0,0,.5);
-  --evidence-bg: rgba(106,180,200,.08);
-  --evidence-border: rgba(106,180,200,.3);
-  --quote-bg: rgba(106,180,200,.05);
-  --th-bg: rgba(255,255,255,.03);
-  --scrollbar-bg: transparent;
-  --scrollbar-thumb: rgba(255,255,255,.12);
-}
-[data-theme="light"] {
-  --bg: #f5f3ee;
-  --bg-sub: #eeebe4;
-  --paper: #ffffff;
-  --paper-2: #f7f5f0;
-  --ink: #2a2622;
-  --ink-strong: #1a1816;
-  --muted: #736d64;
-  --faint: #a09888;
-  --rule: rgba(0,0,0,.08);
-  --accent: #1a6b82;
+:root {
+  color-scheme: light;
+  --bg: #f7f4ed;
+  --paper: #fffdf8;
+  --paper-2: #f0ece2;
+  --ink: #191816;
+  --muted: #706a5f;
+  --faint: #9a9285;
+  --rule: #ded7cb;
+  --accent: #245d6f;
   --accent-2: #9b5a2e;
-  --accent-soft: rgba(26,107,130,.08);
-  --accent-2-soft: rgba(155,90,46,.07);
-  --overlay-bg: rgba(18,16,14,.45);
-  --shadow-sm: 0 2px 8px rgba(0,0,0,.06);
-  --shadow-md: 0 8px 30px rgba(0,0,0,.10);
-  --shadow-lg: 0 20px 60px rgba(0,0,0,.14);
-  --evidence-bg: rgba(26,107,130,.06);
-  --evidence-border: rgba(26,107,130,.25);
-  --quote-bg: rgba(26,107,130,.04);
-  --th-bg: rgba(0,0,0,.025);
-  --scrollbar-bg: transparent;
-  --scrollbar-thumb: rgba(0,0,0,.12);
+  --accent-soft: #e8f1f3;
+  --evidence: #7a4a24;
+  --shadow: 0 18px 44px rgba(44, 37, 27, .12);
 }
-
-*{box-sizing:border-box;margin:0;padding:0}
-html{scroll-behavior:smooth;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale}
-body{background:var(--bg);color:var(--ink);font:19px/1.85 'Literata',Georgia,'Times New Roman',serif;overflow-x:hidden;transition:background .35s,color .35s}
-
-/* Scrollbar */
-::-webkit-scrollbar{width:8px}
-::-webkit-scrollbar-track{background:var(--scrollbar-bg)}
-::-webkit-scrollbar-thumb{background:var(--scrollbar-thumb);border-radius:4px}
-
-/* ── Top bar ── */
-.topbar{position:sticky;top:0;z-index:100;display:flex;align-items:center;gap:10px;padding:0 20px;height:48px;background:color-mix(in srgb,var(--bg) 85%,transparent);backdrop-filter:blur(20px) saturate(1.5);border-bottom:1px solid var(--rule);font-family:'Inter',system-ui,sans-serif;transition:background .35s}
-.topbar-brand{font-weight:700;font-size:11px;color:var(--accent-2);text-transform:uppercase;letter-spacing:.14em;white-space:nowrap}
-.topbar-sep{flex:1}
-.tb-btn{display:inline-flex;align-items:center;justify-content:center;gap:5px;height:32px;padding:0 12px;border:1px solid var(--rule);border-radius:8px;background:transparent;color:var(--muted);cursor:pointer;font:600 12px/1 'Inter',system-ui,sans-serif;text-decoration:none;transition:all .2s;white-space:nowrap}
-.tb-btn:hover{border-color:var(--accent);color:var(--accent);background:var(--accent-soft)}
-.tb-btn svg{width:14px;height:14px;flex-shrink:0}
-.tb-btn span{display:inline}
-@media(max-width:700px){.tb-btn span{display:none}.topbar{gap:6px;padding:0 10px}}
-
-/* ── Reading area ── */
-.reading-area{max-width:720px;margin:0 auto;padding:56px 24px 140px}
-@media(max-width:780px){.reading-area{padding:28px 14px 100px}}
-
-/* ── Typography ── */
-a{color:var(--accent);text-underline-offset:3px}
-h1,h2,h3,h4{font-family:'Inter',system-ui,sans-serif;line-height:1.22;letter-spacing:-.02em;color:var(--ink-strong)}
-h1{font-size:clamp(30px,5vw,42px);font-weight:800;color:var(--accent);margin-bottom:6px;line-height:1.08}
-.subtitle{color:var(--muted);font:500 15px/1.55 'Inter',system-ui,sans-serif;margin-bottom:40px;max-width:500px}
-
-h2{font-size:22px;font-weight:700;margin:64px 0 20px;padding:28px 0 14px;border-top:1px solid var(--rule);position:relative;scroll-margin-top:64px}
-h2[data-panel]{cursor:pointer;transition:color .2s}
-h2[data-panel]:hover{color:var(--accent)}
-h2[data-panel]::after{content:"ver dados";display:inline-block;margin-left:10px;padding:2px 10px;border-radius:99px;border:1px solid var(--rule);color:var(--muted);font:600 10px/1.4 'Inter',system-ui,sans-serif;letter-spacing:.04em;text-transform:uppercase;vertical-align:middle;transition:all .2s}
-h2[data-panel]:hover::after{border-color:var(--accent);color:var(--accent);background:var(--accent-soft)}
-
-h3{font-size:17px;font-weight:700;color:var(--accent-2);margin:40px 0 12px;scroll-margin-top:64px}
-h4{font-size:12px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin:24px 0 8px}
-p{margin:0 0 20px}
-ul,ol{margin:0 0 20px 22px}
-li{margin:7px 0}
-strong{color:var(--ink-strong)}
-blockquote{margin:32px 0;padding:20px 24px;border-left:3px solid var(--accent);background:var(--quote-bg);border-radius:0 10px 10px 0;color:var(--muted);font-style:italic}
-table{width:100%;border-collapse:collapse;margin:24px 0;font:13px/1.55 'Inter',system-ui,sans-serif}
-th,td{padding:10px 12px;border-bottom:1px solid var(--rule);text-align:left}
-th{background:var(--th-bg);font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--accent);font-weight:700}
-img{max-width:100%;height:auto;display:block;margin:28px auto;border-radius:8px}
-figure{margin:28px 0}
-figcaption{color:var(--muted);font-size:14px;font-style:italic;text-align:center}
-
-
-/* ── TOC drawer ── */
-.toc-overlay{position:fixed;inset:0;z-index:200;background:var(--overlay-bg);opacity:0;visibility:hidden;transition:opacity .3s,visibility .3s}
-.toc-overlay.open{opacity:1;visibility:visible}
-.toc-drawer{position:fixed;top:0;left:0;z-index:201;width:min(340px,84vw);height:100vh;background:var(--paper);box-shadow:var(--shadow-lg);transform:translateX(-100%);transition:transform .3s cubic-bezier(.4,0,.2,1),background .35s;overflow-y:auto;padding:28px 22px;font-family:'Inter',system-ui,sans-serif}
-.toc-drawer.open{transform:translateX(0)}
-.toc-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.12em;color:var(--accent-2);margin-bottom:18px}
-.toc-drawer a{display:block;padding:9px 12px;border-radius:8px;color:var(--muted);text-decoration:none;font-size:14px;font-weight:500;line-height:1.4;transition:all .2s}
-.toc-drawer a:hover,.toc-drawer a.active{background:var(--accent-soft);color:var(--accent)}
-
-.toc-sep{height:1px;background:var(--rule);margin:14px 0}
-.toc-ext{display:flex!important;align-items:center;gap:8px;background:var(--accent-2-soft)!important;color:var(--accent-2)!important;font-weight:600!important;font-size:13px!important;margin-top:4px}
-.toc-ext:hover{filter:brightness(1.15)}
-.toc-ext svg{width:15px;height:15px;flex-shrink:0}
-
-/* ── Data modal ── */
-.dm-overlay{position:fixed;inset:0;z-index:300;background:var(--overlay-bg);opacity:0;visibility:hidden;transition:opacity .3s,visibility .3s}
-.dm-overlay.open{opacity:1;visibility:visible}
-.dm-modal{position:fixed;top:0;right:0;z-index:301;width:min(900px,94vw);height:100vh;background:var(--bg-sub);box-shadow:var(--shadow-lg);transform:translateX(100%);transition:transform .35s cubic-bezier(.4,0,.2,1),background .35s;display:flex;flex-direction:column}
-.dm-overlay.open~.dm-modal{transform:translateX(0)}
-.dm-head{display:flex;align-items:center;gap:12px;padding:14px 18px;border-bottom:1px solid var(--rule);background:var(--paper);font-family:'Inter',system-ui,sans-serif;flex-shrink:0;transition:background .35s}
-.dm-head .dm-title{flex:1;font-size:15px;font-weight:700;color:var(--ink-strong)}
-.dm-head .dm-sub{font-size:11px;color:var(--muted);font-weight:500}
-.dm-metrics{display:flex;gap:8px;padding:10px 18px;background:var(--paper);border-bottom:1px solid var(--rule);flex-shrink:0;overflow-x:auto;font-family:'Inter',system-ui,sans-serif;transition:background .35s}
-.dm-metric{padding:8px 12px;border:1px solid var(--rule);border-radius:8px;background:var(--accent-soft);white-space:nowrap}
-.dm-metric b{display:block;color:var(--accent);font-size:17px;font-weight:800}
-.dm-metric span{display:block;margin-top:2px;color:var(--muted);font-size:10px}
-.dm-actions{display:flex;gap:6px;padding:8px 18px;background:var(--paper);border-bottom:1px solid var(--rule);flex-shrink:0;font-family:'Inter',system-ui,sans-serif;flex-wrap:wrap;transition:background .35s}
-.dm-actions a{display:inline-flex;align-items:center;gap:4px;padding:5px 12px;border:1px solid var(--rule);border-radius:8px;background:transparent;color:var(--accent);text-decoration:none;font-size:11px;font-weight:600;transition:all .2s;white-space:nowrap}
-.dm-actions a:hover{background:var(--accent);color:#fff;border-color:var(--accent)}
-.dm-actions a svg{width:12px;height:12px}
-.dm-close{display:inline-flex;align-items:center;justify-content:center;width:32px;height:32px;border:1px solid var(--rule);border-radius:8px;background:transparent;cursor:pointer;color:var(--muted);font-size:18px;transition:all .2s;flex-shrink:0}
-.dm-close:hover{background:rgba(200,60,60,.15);color:#e55;border-color:rgba(200,60,60,.3)}
-.dm-tabs{display:flex;flex-wrap:wrap;gap:5px;padding:8px 18px;background:var(--paper);border-bottom:1px solid var(--rule);flex-shrink:0;font-family:'Inter',system-ui,sans-serif;transition:background .35s}
-.dm-tabs button{padding:4px 11px;border:1px solid var(--rule);border-radius:7px;background:transparent;color:var(--muted);cursor:pointer;font:600 10px/1.3 'Inter',system-ui,sans-serif;transition:all .2s;text-transform:uppercase;letter-spacing:.03em}
-.dm-tabs button:hover{border-color:var(--accent);color:var(--accent)}
-.dm-tabs button.on{border-color:var(--accent);background:var(--accent);color:#fff}
-.dm-frame-wrap{flex:1;overflow:hidden}
-.dm-frame{display:block;width:100%;height:100%;border:0;background:#11131f}
-
-/* ── Progress ── */
-.progress{position:fixed;top:48px;left:0;height:2px;background:var(--accent);z-index:99;width:0%;transition:width .08s linear;opacity:.7}
-
-/* ── Back to top ── */
-.btt{position:fixed;bottom:24px;right:24px;z-index:50;width:40px;height:40px;border-radius:50%;background:var(--paper);border:1px solid var(--rule);box-shadow:var(--shadow-md);cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--accent);opacity:0;transform:translateY(10px);transition:all .25s;pointer-events:none}
-.btt.on{opacity:1;transform:translateY(0);pointer-events:auto}
-.btt:hover{background:var(--accent);color:#fff}
-.btt svg{width:18px;height:18px}
-
-@media print{.topbar,.toc-overlay,.toc-drawer,.dm-overlay,.dm-modal,.progress,.btt{display:none!important}.reading-area{padding:0;max-width:none}}
-
-/* ── Epigraph ── */
-.epigraph{margin:32px 0 44px;padding:0;display:flex;flex-direction:column;gap:0}
-.epigraph blockquote{margin:0;padding:16px 24px;border-left:2px solid var(--rule);background:transparent;font-size:15px;line-height:1.65;font-style:italic;color:var(--muted);border-radius:0}
-.epigraph blockquote p{margin:0 0 6px}
-.epigraph cite{display:block;font-style:normal;font:500 13px/1.4 'Inter',system-ui,sans-serif;color:var(--faint);margin-top:2px}
-.epigraph cite a{color:var(--accent);font-weight:600}
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font: 17px/1.75 Georgia, "Times New Roman", serif;
+}
+a { color: var(--accent); text-underline-offset: 3px; }
+.layout {
+  display: grid;
+  grid-template-columns: 310px minmax(0, 1fr);
+  min-height: 100vh;
+}
+.sidebar {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  overflow: auto;
+  padding: 28px 22px;
+  border-right: 1px solid var(--rule);
+  background: rgba(255, 253, 248, .84);
+  backdrop-filter: blur(14px);
+}
+.brand {
+  font: 700 12px/1.2 Inter, Segoe UI, Arial, sans-serif;
+  text-transform: uppercase;
+  letter-spacing: .12em;
+  color: var(--accent-2);
+  margin-bottom: 10px;
+}
+.doc-title {
+  margin: 0 0 22px;
+  font: 650 21px/1.2 Inter, Segoe UI, Arial, sans-serif;
+  letter-spacing: 0;
+}
+.search {
+  width: 100%;
+  height: 38px;
+  border: 1px solid var(--rule);
+  border-radius: 7px;
+  background: #fff;
+  padding: 0 11px;
+  margin-bottom: 18px;
+  color: var(--ink);
+  font: 13px Inter, Segoe UI, Arial, sans-serif;
+}
+.toc {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+.toc a {
+  display: block;
+  padding: 7px 9px;
+  border-radius: 7px;
+  color: var(--muted);
+  text-decoration: none;
+  font: 500 13px/1.35 Inter, Segoe UI, Arial, sans-serif;
+}
+.toc a.depth-2 { padding-left: 20px; font-size: 12px; color: var(--faint); }
+.toc a.depth-3 { padding-left: 32px; font-size: 12px; color: var(--faint); }
+.toc a:hover, .toc a.active { background: var(--accent-soft); color: var(--accent); }
+.sidebar-footer {
+  margin-top: 24px;
+  padding-top: 16px;
+  border-top: 1px solid var(--rule);
+  color: var(--faint);
+  font: 12px/1.5 Inter, Segoe UI, Arial, sans-serif;
+}
+.content-wrap {
+  width: min(100%, 1060px);
+  margin: 0 auto;
+  padding: 54px 46px 90px;
+}
+article {
+  max-width: 820px;
+  margin: 0 auto;
+  padding: 56px 64px 72px;
+  background: var(--paper);
+  border: 1px solid rgba(222, 215, 203, .72);
+  box-shadow: var(--shadow);
+}
+h1, h2, h3, h4 {
+  font-family: Inter, Segoe UI, Arial, sans-serif;
+  line-height: 1.22;
+  letter-spacing: 0;
+}
+h1 {
+  margin: 0 0 28px;
+  color: var(--accent);
+  font-size: 34px;
+}
+h2 {
+  margin: 46px 0 14px;
+  padding-top: 16px;
+  border-top: 1px solid var(--rule);
+  color: var(--ink);
+  font-size: 23px;
+}
+h3 { margin: 30px 0 12px; font-size: 18px; color: var(--accent-2); }
+h4 { margin: 22px 0 8px; font-size: 14px; color: var(--muted); text-transform: uppercase; letter-spacing: .08em; }
+p { margin: 0 0 17px; }
+ul, ol { margin: 0 0 18px 24px; padding: 0; }
+li { margin: 6px 0; }
+blockquote {
+  margin: 24px 0;
+  padding: 16px 20px;
+  border-left: 3px solid var(--accent);
+  background: var(--paper-2);
+  color: var(--muted);
+}
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 24px 0;
+  font: 13px/1.45 Inter, Segoe UI, Arial, sans-serif;
+}
+th, td { padding: 9px 10px; border-bottom: 1px solid var(--rule); text-align: left; vertical-align: top; }
+th { color: var(--accent); background: var(--paper-2); font-size: 12px; text-transform: uppercase; letter-spacing: .06em; }
+img { max-width: 100%; height: auto; display: block; margin: 24px auto; border-radius: 6px; }
+figure { margin: 26px 0; }
+figcaption, .chart-caption {
+  color: var(--muted);
+  font-size: 14px;
+  font-style: italic;
+  text-align: center;
+}
+.evidence-link {
+  color: inherit;
+  text-decoration: none;
+  border-bottom: 2px solid rgba(122, 74, 36, .28);
+  background: linear-gradient(transparent 62%, rgba(218, 190, 150, .32) 0);
+}
+.evidence-link:hover { border-bottom-color: rgba(122, 74, 36, .75); }
+.evidence-link::after {
+  content: " ver análise";
+  margin-left: 3px;
+  color: var(--evidence);
+  font: 600 11px Inter, Segoe UI, Arial, sans-serif;
+  white-space: nowrap;
+}
+.evidence-panel {
+  margin: 26px 0 10px;
+  padding: 15px 17px;
+  border: 1px solid var(--rule);
+  border-radius: 8px;
+  background: #fbf7ef;
+  font: 13px/1.5 Inter, Segoe UI, Arial, sans-serif;
+  color: var(--muted);
+}
+.evidence-panel strong { display: block; margin-bottom: 8px; color: var(--accent-2); }
+.evidence-panel a {
+  display: inline-block;
+  margin: 4px 8px 4px 0;
+  padding: 4px 8px;
+  border-radius: 999px;
+  background: #fff;
+  border: 1px solid var(--rule);
+  text-decoration: none;
+  color: var(--accent);
+}
+.hide-by-search { display: none !important; }
+mark.search-hit { background: #ffe7a8; color: inherit; padding: 0 2px; }
+@media (max-width: 920px) {
+  .layout { display: block; }
+  .sidebar {
+    position: relative;
+    height: auto;
+    border-right: 0;
+    border-bottom: 1px solid var(--rule);
+  }
+  .content-wrap { padding: 24px 14px 54px; }
+  article { padding: 34px 22px 46px; }
+  h1 { font-size: 28px; }
+}
+</style>
+<style>
+:root {
+  --rail: #f3efe5;
+  --rail-ink: #26231f;
+  --chip: #fff9ee;
+}
+body {
+  background:
+    linear-gradient(90deg, rgba(36, 93, 111, .05), transparent 34%),
+    var(--bg);
+}
+.policy-layout {
+  width: min(1900px, 100%);
+  margin: 0 auto;
+  padding: 18px 18px 56px;
+}
+.policy-topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  max-width: 1320px;
+  margin: 0 auto 22px;
+  color: var(--muted);
+  font: 600 12px/1.3 Inter, Segoe UI, Arial, sans-serif;
+  text-transform: uppercase;
+  letter-spacing: .12em;
+}
+.policy-topbar a {
+  text-transform: none;
+  letter-spacing: 0;
+  color: var(--accent);
+}
+.policy-reader {
+  display: grid;
+  grid-template-columns: minmax(0, 660px) minmax(700px, 980px);
+  align-items: start;
+  justify-content: center;
+  gap: 24px;
+}
+.policy-reader article {
+  max-width: none;
+  margin: 0;
+  padding: 56px 54px 76px;
+}
+.policy-reader article > h1:first-child {
+  font-size: clamp(34px, 4vw, 52px);
+  line-height: 1.05;
+  max-width: 12ch;
+  margin-bottom: 26px;
+}
+.policy-reader article > h1:first-child::after {
+  content: "Leitura guiada por evidências: clique nos dados destacados para abrir o contexto visual ao lado.";
+  display: block;
+  max-width: 620px;
+  margin-top: 18px;
+  color: var(--muted);
+  font: 500 15px/1.55 Inter, Segoe UI, Arial, sans-serif;
+}
+.policy-reader p {
+  font-size: 18px;
+}
+.policy-reader h2 {
+  font-size: 26px;
+  margin-top: 58px;
+}
+.policy-reader h3 {
+  font-size: 19px;
+}
+.evidence-link {
+  cursor: pointer;
+  border-bottom: 2px solid rgba(36, 93, 111, .36);
+  background: linear-gradient(transparent 58%, rgba(36, 93, 111, .13) 0);
+}
+.evidence-link:hover,
+.evidence-link.is-active {
+  border-bottom-color: var(--accent);
+  background: linear-gradient(transparent 52%, rgba(36, 93, 111, .22) 0);
+}
+.evidence-link::after {
+  content: " dado";
+  color: var(--accent);
+}
+.evidence-panel {
+  margin: 22px 0 28px;
+  background: #fff8ec;
+}
+.evidence-panel strong {
+  font: 700 12px/1.3 Inter, Segoe UI, Arial, sans-serif;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+}
+.evidence-panel a {
+  cursor: pointer;
+}
+.evidence-rail {
+  position: sticky;
+  top: 12px;
+  max-height: calc(100vh - 24px);
+  overflow: auto;
+  padding: 16px;
+  border: 1px solid rgba(222, 215, 203, .9);
+  border-radius: 8px;
+  background: rgba(255, 253, 248, .9);
+  box-shadow: var(--shadow);
+}
+.rail-kicker {
+  color: var(--accent-2);
+  font: 700 11px/1.2 Inter, Segoe UI, Arial, sans-serif;
+  text-transform: uppercase;
+  letter-spacing: .12em;
+  margin-bottom: 8px;
+}
+.rail-title {
+  margin: 0 0 8px;
+  color: var(--rail-ink);
+  font: 750 22px/1.18 Inter, Segoe UI, Arial, sans-serif;
+}
+.rail-copy {
+  margin: 0 0 14px;
+  color: var(--muted);
+  font: 14px/1.55 Inter, Segoe UI, Arial, sans-serif;
+}
+.rail-metrics {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin: 12px 0 14px;
+}
+.metric {
+  padding: 10px;
+  border: 1px solid var(--rule);
+  border-radius: 7px;
+  background: var(--chip);
+}
+.metric b {
+  display: block;
+  color: var(--accent);
+  font: 750 18px/1.1 Inter, Segoe UI, Arial, sans-serif;
+}
+.metric span {
+  display: block;
+  margin-top: 4px;
+  color: var(--muted);
+  font: 11px/1.3 Inter, Segoe UI, Arial, sans-serif;
+}
+.panel-map {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+  margin: 12px 0 14px;
+}
+.panel-map button {
+  min-height: 31px;
+  border: 1px solid var(--rule);
+  border-radius: 7px;
+  background: #fff;
+  color: var(--accent);
+  cursor: pointer;
+  font: 750 11px/1.2 Inter, Segoe UI, Arial, sans-serif;
+}
+.panel-map button:hover,
+.panel-map button.is-active {
+  border-color: var(--accent);
+  background: #eef7f6;
+}
+.rail-frame-wrap {
+  overflow: hidden;
+  border: 1px solid #1d2230;
+  border-radius: 8px;
+  background: #11131f;
+}
+.rail-frame-label {
+  padding: 8px 10px;
+  color: #ddd8cc;
+  background: #171a2a;
+  font: 600 11px/1.3 Inter, Segoe UI, Arial, sans-serif;
+}
+.rail-frame {
+  display: block;
+  width: 100%;
+  height: min(78vh, 920px);
+  min-height: 760px;
+  border: 0;
+  background: #11131f;
+}
+.rail-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 14px;
+}
+.rail-actions a {
+  display: inline-flex;
+  min-height: 34px;
+  align-items: center;
+  padding: 7px 10px;
+  border: 1px solid var(--rule);
+  border-radius: 7px;
+  background: #fff;
+  color: var(--accent);
+  text-decoration: none;
+  font: 700 12px/1.2 Inter, Segoe UI, Arial, sans-serif;
+}
+.rail-empty {
+  padding: 26px 18px;
+  border: 1px dashed var(--rule);
+  border-radius: 8px;
+  color: var(--muted);
+  background: var(--rail);
+  font: 14px/1.55 Inter, Segoe UI, Arial, sans-serif;
+}
+@media (max-width: 1080px) {
+  .policy-layout { padding: 18px 14px 52px; }
+  .policy-reader { display: block; }
+  .policy-reader article { padding: 34px 22px 46px; }
+  .evidence-rail {
+    position: relative;
+    top: auto;
+    max-height: none;
+    margin-top: 18px;
+  }
+}
 </style>
 </head>
 <body>
-
-<div class="progress" id="prog"></div>
-
-<header class="topbar">
-  <button class="tb-btn" id="tocBtn" aria-label="Sumário" title="Sumário"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg></button>
-  <span class="topbar-brand">Fomento Audiovisual</span>
-  <span class="topbar-sep"></span>
-  <a class="tb-btn" href="analise.html" target="_blank" rel="noopener" title="Análise Técnica"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h6v6"/><path d="M10 14L21 3"/><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/></svg> <span>Análise</span></a>
-  <a class="tb-btn" href="painel.html" target="_blank" rel="noopener" title="Painel de Dados"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="3" width="7" height="9" rx="1"/><rect x="14" y="3" width="7" height="5" rx="1"/><rect x="14" y="12" width="7" height="9" rx="1"/><rect x="3" y="16" width="7" height="5" rx="1"/></svg> <span>Painel</span></a>
-  <button class="tb-btn" id="themeBtn" aria-label="Alternar tema" title="Alternar claro/escuro"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg></button>
-</header>
-
-<div class="toc-overlay" id="tocO"></div>
-<nav class="toc-drawer" id="tocD">
-  <div class="toc-label">Sumário</div>
-  
-  
-  <a href="#o-que-determina-o-sucesso-em-salas-cinema-e-o-investimento-d">O que determina o sucesso em salas cinema é o inve...</a>
-  <a href="#chamadas-bilheteria-e-festival">Chamadas que usam desempenho de bilheteria tem mel...</a>
-  <a href="#de-forma-geral-as-distribuidoras-selecionam-melhor-do-que-as">De forma geral as distribuidoras selecionam melhor...</a>
-  <a href="#mas-os-dados-revelam-dois-perfis-completamente-distintos">Mas os dados revelam dois perfis completamente dis...</a>
-  <a href="#e-as-chamadas-de-ampla-concorrencia">E as chamadas de ampla concorrência?</a>
-  <a href="#o-que-o-retorno-das-produtoras-revela">O que o retorno das produtoras revela</a>
-  <a href="#a-estrutura-que-o-fomento-desconstruiu">A estrutura que o fomento (des)construiu</a>
-  <a href="#a-proliferacao-das-produtoras-vs-sustentabilidade">A proliferação das produtoras vs sustentabilidade</a>
-  <a href="#a-diversidade-que-temos">A Diversidade que temos</a>
-  <a href="#a-instabilidade-tem-endereco-o-cgfsa">A instabilidade tem endereço: o CGFSA</a>
-  <a href="#o-que-o-fsa-poderia-ser">O que o FSA poderia ser</a>
-  <a href="#joint-ventures-as-spes-brasileiras">Joint Ventures, as SPEs brasileiras</a>
-  <a href="#previsibilidade-e-planejamento-de-longo-prazo">Previsibilidade e planejamento de longo prazo para...</a>
-  <a href="#novas-possibilidades-de-investimento">Novas possibilidades de investimento em infraestru...</a>
-  <a href="#renovacao-depende-do-desempenho">Renovação depende do desempenho da própria carteir...</a>
-  <a href="#seletivos">Seletivos</a>
-  <a href="#suat-internacional-curtas">SUAT Internacional Curtas</a>
-  <a href="#ampla-concorrencia-a-partir-do-desenvolvimento">Ampla concorrência a partir do desenvolvimento</a>
-
-
-  <div class="toc-sep"></div>
-  <a class="toc-ext" href="analise.html" target="_blank" rel="noopener">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h6v6"/><path d="M10 14L21 3"/><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/></svg> Análise Técnica
-  </a>
-  <a class="toc-ext" href="painel.html" target="_blank" rel="noopener">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="3" width="7" height="9" rx="1"/><rect x="14" y="3" width="7" height="5" rx="1"/><rect x="14" y="12" width="7" height="9" rx="1"/><rect x="3" y="16" width="7" height="5" rx="1"/></svg> Painel de Dados
-  </a>
-</nav>
-
-<div class="dm-overlay" id="dmO"></div>
-<aside class="dm-modal">
-  <div class="dm-head">
-    <div><div class="dm-title" id="dmT">Dados</div><div class="dm-sub" id="dmS"></div></div>
-    <button class="dm-close" id="dmX" title="Fechar">&times;</button>
-  </div>
-  <div class="dm-metrics" id="dmM"></div>
-  <div class="dm-tabs" id="dmTabs">
-    <button data-h="#visao-geral">Visão geral</button>
-    <button data-h="#retorno-domestico">Ret. doméstico</button>
-    <button data-h="#retorno-internacional">Ret. intl</button>
-    <button data-h="#categorias">Categorias</button>
-    <button data-h="#produtoras">Produtoras</button>
-    <button data-h="#concentracao">Concentração</button>
-    <button data-h="#curtas-longas">Curtas</button>
-    <button data-h="#diversidade">Diversidade</button>
-    <button data-h="#soft-power">Soft power</button>
-  </div>
-  <div class="dm-actions">
-    <a id="dmAL" href="analise.html" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h6v6"/><path d="M10 14L21 3"/><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/></svg> Abrir análise</a>
-    <a id="dmPL" href="painel.html" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="3" width="7" height="9" rx="1"/><rect x="14" y="3" width="7" height="5" rx="1"/><rect x="14" y="12" width="7" height="9" rx="1"/><rect x="3" y="16" width="7" height="5" rx="1"/></svg> Abrir painel</a>
-  </div>
-  <div class="dm-frame-wrap">
-    <iframe class="dm-frame" id="dmF" title="Painel de dados" loading="lazy"></iframe>
-  </div>
-</aside>
-
-<div class="reading-area">
-  <article>
-
+<div class="policy-layout">
+  <header class="policy-topbar">
+    <div>Fomento Audiovisual · leitura guiada por dados</div>
+    <a href="Análise de Dados - Fomento Audiovisual Brasileiro.html" target="_blank" rel="noopener">Abrir análise técnica completa</a>
+  </header>
+  <main class="policy-reader">
+    <article>
 <p>Uma política de fomento baseada em evidências</p>
 <div class="epigraph">
 <blockquote>
@@ -419,94 +604,221 @@ figcaption{color:var(--muted);font-size:14px;font-style:italic;text-align:center
 <p>O fomento público precisa aproveitar o seu maior legado que é justamente aquilo que ele já financiou. Se você garante que teremos 10 longas de estreantes por ano de projetos que vem sendo amadurecidos e acompanhados ao longo de três ou quatro anos creio que rompemos a barreira de entrada de uma forma mais qualificada. Sabe qual é o custo de todas essas chamadas por ano? 10-15M para desenvolvimento, 30M para produção e 10M para distribuição. Não tem quem vá me convencer que o FSA não deve investir ao menos 15% em renovação (10% nessa ampla concorrência e 5% SUAT Curtas).</p>
 <p>Se supormos um ticket médio desejável de 5M (só a parte do FSA) e que podemos ter como meta 150 filmes lançados com financiamento do FSA, estamos falando de 750 milhões. No último PAI foi 500M para o Prodecine, não estamos tão longe.</p>
 </article>
+    <aside class="evidence-rail" aria-label="Dados relacionados">
+      <div class="rail-kicker">Dados relacionados</div>
+      <h2 class="rail-title" data-rail-title>Escolha um dado no texto</h2>
+      <p class="rail-copy" data-rail-copy>Clique em um trecho destacado para abrir o contexto visual sem interromper a leitura.</p>
+      <div class="rail-metrics" data-rail-metrics>
+        <div class="metric"><b>Texto</b><span>argumento principal</span></div>
+        <div class="metric"><b>Dados</b><span>evidência ao lado</span></div>
+      </div>
+      <div class="panel-map" aria-label="Atalhos do painel">
+        <button type="button" data-panel-shortcut data-hash="#visao-geral">Visão geral</button>
+        <button type="button" data-panel-shortcut data-hash="#retorno-domestico">Retorno doméstico</button>
+        <button type="button" data-panel-shortcut data-hash="#retorno-internacional">Retorno internacional</button>
+        <button type="button" data-panel-shortcut data-hash="#categorias">Categorias</button>
+        <button type="button" data-panel-shortcut data-hash="#produtoras">Produtoras</button>
+        <button type="button" data-panel-shortcut data-hash="#concentracao">Concentração</button>
+        <button type="button" data-panel-shortcut data-hash="#curtas-longas">Curtas</button>
+        <button type="button" data-panel-shortcut data-hash="#diversidade">Diversidade</button>
+        <button type="button" data-panel-shortcut data-hash="#soft-power">Soft power</button>
+      </div>
+      <div class="rail-frame-wrap">
+        <div class="rail-frame-label">Mini painel interativo</div>
+        <iframe class="rail-frame" data-rail-frame title="Mini painel de dados" loading="lazy"></iframe>
+      </div>
+      <div class="rail-actions">
+        <a data-rail-analysis href="Análise de Dados - Fomento Audiovisual Brasileiro.html" target="_blank" rel="noopener">Abrir seção na análise</a>
+        <a data-rail-panel href="Análise do Retorno do Fomento Público ao Audiovisual Brasileiro (FSA - Renúncia Fiscal)_v2.html" target="_blank" rel="noopener">Abrir painel completo</a>
+      </div>
+    </aside>
+  </main>
 </div>
-
-<button class="btt" id="btt" title="Voltar ao topo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"/></svg></button>
-
 <script>
-const PF=decodeURIComponent('painel.html');
-const AF=decodeURIComponent('analise.html');
-const P={
-'#visao-geral':{t:'Vis\u00e3o geral do sistema',s:'Panorama: base, retorno agregado, mecanismos',ah:'#vis%C3%A3o-geral-tamanho-do-sistema-e-retorno-agregado',m:[['2.990','obras na base'],['R$ 2,38 bi','receita dom\u00e9stica']]},
-'#categorias':{t:'Categorias FSA',s:'Bilheteria, festivais, roteiro, distribuidora, produtora',ah:'#categorias-fsa-e-crit%C3%A9rio-de-sele%C3%A7%C3%A3o',m:[['0,94x','ROI distribuidora'],['3,41','ROI intl m\u00e9dio']]},
-'#retorno-domestico':{t:'Retorno dom\u00e9stico',s:'FSA, ren\u00fancia fiscal, bilheteria, financiamento',ah:'#retorno-dom%C3%A9stico-e-composi%C3%A7%C3%A3o-do-financiamento',m:[['0,79x','ROI dom\u00e9stico'],['R$ 2,38 bi','receita estimada']]},
-'#retorno-internacional':{t:'Retorno internacional',s:'Festivais, VOD, Lumi\u00e8re/CNC, circula\u00e7\u00e3o europeia',ah:'#retorno-internacional',m:[['535','festiv. participa\u00e7\u00f5es'],['31','pa\u00edses VOD']]},
-'#produtoras':{t:'Produtoras e clusters',s:'Dom\u00e9stico, internacional, duplo retorno, pequeno porte',ah:'#produtoras-e-clusters',m:[['39','duplo retorno'],['51/52','dom./intl']]},
-'#concentracao':{t:'Concentra\u00e7\u00e3o do capital',s:'Curva de Lorenz, tiers, tickets anuais',ah:'#concentra%C3%A7%C3%A3o-e-distribui%C3%A7%C3%A3o-do-capital',m:[['0,634','Gini (FSA+)'],['71%','< R$1mi/ano']]},
-'#curtas-longas':{t:'Curtas para longas',s:'Curta-festival \u2192 matura\u00e7\u00e3o \u2192 longa internacional',ah:'#curtas-para-longas-trajet%C3%B3ria-de-forma%C3%A7%C3%A3o',m:[['23,1%','curta\u2192longa intl'],['2,2x','chance relativa']]},
-'#diversidade':{t:'Diversidade e sele\u00e7\u00e3o',s:'Taxas por ra\u00e7a e g\u00eanero, pol\u00edtica afirmativa',ah:'#diversidade-inscritos-e-selecionados',m:[['32,4%','negros c/ PA'],['52,6%','mulheres c/ PA']]},
-'#soft-power':{t:'Soft power e cr\u00edtica',s:'Cr\u00edtica, cita\u00e7\u00f5es acad\u00eamicas, circula\u00e7\u00e3o simb\u00f3lica',ah:'',m:[['OpenAlex','cita\u00e7\u00f5es'],['Cr\u00edtica','nac. e intl']]}
+const PANEL_FILE = 'Análise do Retorno do Fomento Público ao Audiovisual Brasileiro (FSA - Renúncia Fiscal)_v2.html';
+const ANALYSIS_FILE = 'Análise de Dados - Fomento Audiovisual Brasileiro.html';
+
+const defaultProfile = {
+  title: 'Visão geral do sistema',
+  copy: 'Comece pelo panorama: tamanho da base, retorno agregado, mecanismos de financiamento e leitura inicial do desempenho público.',
+  panelHash: '#visao-geral',
+  analysisHref: ANALYSIS_FILE + '#visão-geral-tamanho-do-sistema-e-retorno-agregado',
+  metrics: [['2.990', 'obras na base analisada'], ['R$ 2,38 bi', 'receita doméstica estimada']]
 };
 
-/* Theme */
-const root=document.documentElement;
-const themeBtn=document.getElementById('themeBtn');
-function setTheme(t){root.dataset.theme=t;localStorage.setItem('theme',t);themeBtn.innerHTML=t==='dark'?SUN:MOON}
-const SUN='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>';
-const MOON='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg>';
-setTheme(localStorage.getItem('theme')||'dark');
-themeBtn.addEventListener('click',()=>setTheme(root.dataset.theme==='dark'?'light':'dark'));
+const shortcutProfiles = {
+  '#visao-geral': defaultProfile,
+  '#categorias': {
+    title: 'Categorias FSA e critérios',
+    copy: 'Compare como bilheteria, festivais, roteiro, distribuidora e produtora como proponente mudam o perfil de retorno dos filmes.',
+    panelHash: '#categorias',
+    analysisHref: ANALYSIS_FILE + '#categorias-fsa-e-critério-de-seleção',
+    metrics: [['0,94x', 'ROI doméstico do padrão distribuidora'], ['3,41', 'ROI internacional médio']]
+  },
+  '#retorno-domestico': {
+    title: 'Retorno doméstico e mecanismos',
+    copy: 'Compare FSA, renúncia fiscal, bilheteria, composição do financiamento e retorno doméstico por mecanismo.',
+    panelHash: '#retorno-domestico',
+    analysisHref: ANALYSIS_FILE + '#retorno-doméstico-e-composição-do-financiamento',
+    metrics: [['0,79x', 'ROI doméstico agregado'], ['R$ 2,38 bi', 'receita doméstica estimada']]
+  },
+  '#retorno-internacional': {
+    title: 'Retorno internacional',
+    copy: 'Veja festivais, VOD internacional, Lumière/CNC, circulação em salas europeias e alcance internacional das obras.',
+    panelHash: '#retorno-internacional',
+    analysisHref: ANALYSIS_FILE + '#retorno-internacional',
+    metrics: [['535', 'participações em festivais'], ['31', 'países em VOD Europa']]
+  },
+  '#produtoras': {
+    title: 'Produtoras e clusters',
+    copy: 'A leitura por produtora separa empresas de retorno doméstico, retorno internacional, duplo retorno, pequeno porte e baixo retorno.',
+    panelHash: '#produtoras',
+    analysisHref: ANALYSIS_FILE + '#produtoras-e-clusters',
+    metrics: [['39', 'produtoras de duplo retorno'], ['51 / 52', 'doméstico / internacional']]
+  },
+  '#concentracao': {
+    title: 'Concentração do capital',
+    copy: 'Veja curva de concentração, tiers de produtoras, tickets anuais e o quanto a fragmentação limita capacidade empresarial.',
+    panelHash: '#concentracao',
+    analysisHref: ANALYSIS_FILE + '#concentração-e-distribuição-do-capital',
+    metrics: [['0,634', 'Gini no recorte de FSA positivo'], ['71,0%', 'abaixo de R$ 1 mi/ano']]
+  },
+  '#curtas-longas': {
+    title: 'Curtas para longas',
+    copy: 'Acompanhe a ponte entre curta selecionado em festival, maturação profissional e chance posterior de longa com circulação internacional.',
+    panelHash: '#curtas-longas',
+    analysisHref: ANALYSIS_FILE + '#curtas-para-longas-trajetória-de-formação',
+    metrics: [['23,1%', 'curta e longa internacional posterior'], ['2,2x', 'chance relativa vs. base geral']]
+  },
+  '#diversidade': {
+    title: 'Diversidade e seleção',
+    copy: 'Compare taxas de seleção por raça e gênero em editais com e sem política afirmativa.',
+    panelHash: '#diversidade',
+    analysisHref: ANALYSIS_FILE + '#diversidade-inscritos-e-selecionados',
+    metrics: [['32,4%', 'pessoas negras selecionadas com PA'], ['52,6%', 'mulheres selecionadas com PA']]
+  },
+  '#soft-power': {
+    title: 'Soft power e crítica',
+    copy: 'Contextualize crítica nacional, crítica internacional, festivais, citações acadêmicas e circulação simbólica das obras.',
+    panelHash: '#soft-power',
+    analysisHref: PANEL_FILE + '#soft-power',
+    metrics: [['OpenAlex', 'citações acadêmicas'], ['Crítica', 'nacional e internacional']]
+  }
+};
 
-/* TOC */
-const tocO=document.getElementById('tocO');
-const tocD=document.getElementById('tocD');
-const tocBtn=document.getElementById('tocBtn');
-function openToc(){tocO.classList.add('open');tocD.classList.add('open')}
-function closeToc(){tocO.classList.remove('open');tocD.classList.remove('open')}
-tocBtn.addEventListener('click',openToc);
-tocO.addEventListener('click',closeToc);
-tocD.querySelectorAll('a[href^="#"]').forEach(a=>a.addEventListener('click',closeToc));
-document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeToc();closeModal()}});
+const evidenceProfiles = [
+  { test: /curtas|curta selecionado|suat internacional curtas|curtas-longas/i, profile: shortcutProfiles['#curtas-longas'] },
+  { test: /soft-power|soft power|crítica|criticas|openalex|adoro cinema/i, profile: shortcutProfiles['#soft-power'] },
+  { test: /joint ventures|spe|produtoras-e-clusters|clusters|baixo-retorno/i, profile: shortcutProfiles['#produtoras'] },
+  { test: /retorno internacional|retorno-internacional|festival|festivais|vod|lumière/i, profile: shortcutProfiles['#retorno-internacional'] },
+  { test: /retorno doméstico|retorno-doméstico|bilheteria|renúncia|mecanismo|fsa e renúncia/i, profile: shortcutProfiles['#retorno-domestico'] },
+  { test: /visão geral|cgfsa/i, profile: shortcutProfiles['#visao-geral'] },
+  {
+    test: /categorias|critério|proponente|comercialização|distribuidora/i,
+    title: 'Critério de seleção e categorias FSA',
+    copy: 'Compare como bilheteria, festivais, roteiro, distribuidora e produtora como proponente mudam o perfil de retorno dos filmes.',
+    panelHash: '#categorias',
+    metrics: [['0,94x', 'ROI doméstico do padrão distribuidora'], ['3,41', 'ROI internacional médio']]
+  },
+  {
+    test: /retorno-internacional|curtas|festival|festivais/i,
+    title: 'Retorno internacional',
+    copy: 'Evidências de circulação internacional: festivais, janela de curtas para longas, Lumière/CNC e VOD internacional.',
+    panelHash: '#curtas-longas',
+    metrics: [['23,1%', 'diretores com curta e longa internacional posterior'], ['2,2x', 'chance relativa vs. base geral']]
+  },
+  {
+    test: /produtoras-e-clusters|clusters|baixo-retorno/i,
+    title: 'Produtoras e clusters',
+    copy: 'A leitura por produtora separa empresas de retorno doméstico, retorno internacional, duplo retorno, pequeno porte e baixo retorno.',
+    panelHash: '#produtoras',
+    metrics: [['39', 'produtoras de duplo retorno'], ['51 / 52', 'doméstico / internacional']]
+  },
+  {
+    test: /concentração|distribuição|capital|gini/i,
+    title: 'Concentração do capital',
+    copy: 'Veja a curva de concentração, tiers de produtoras, tickets anuais e o quanto a fragmentação limita capacidade empresarial.',
+    panelHash: '#concentracao',
+    metrics: [['0,634', 'Gini no recorte de FSA positivo'], ['71,0%', 'abaixo de R$ 1 mi/ano']]
+  },
+  {
+    test: /diversidade|inscritos|selecionados/i,
+    title: 'Diversidade e políticas afirmativas',
+    copy: 'Compare taxas de seleção por raça e gênero em editais com e sem política afirmativa.',
+    panelHash: '#diversidade',
+    metrics: [['32,4%', 'pessoas negras selecionadas com PA'], ['52,6%', 'mulheres selecionadas com PA']]
+  },
+  {
+    test: /retorno-doméstico|bilheteria|renúncia|mecanismo/i,
+    title: 'Retorno doméstico e mecanismos',
+    copy: 'Use a visão geral do painel para comparar FSA, renúncia fiscal, bilheteria e composição do financiamento.',
+    panelHash: '#visao-geral',
+    metrics: [['0,79x', 'ROI doméstico agregado'], ['R$ 2,38 bi', 'receita estimada']]
+  }
+];
 
-/* Modal */
-const dmO=document.getElementById('dmO');
-const dmT=document.getElementById('dmT');
-const dmS=document.getElementById('dmS');
-const dmM=document.getElementById('dmM');
-const dmF=document.getElementById('dmF');
-const dmAL=document.getElementById('dmAL');
-const dmPL=document.getElementById('dmPL');
-function openModal(h){
-  const p=P[h]||P['#visao-geral'];
-  dmT.textContent=p.t;
-  dmS.textContent=p.s;
-  dmM.innerHTML=p.m.map(([v,l])=>'<div class="dm-metric"><b>'+v+'</b><span>'+l+'</span></div>').join('');
-  dmF.src=PF+h;
-  dmAL.href=AF+decodeURIComponent(p.ah||'');
-  dmPL.href=PF+h;
-  document.querySelectorAll('#dmTabs button').forEach(b=>b.classList.toggle('on',b.dataset.h===h));
-  dmO.classList.add('open');
-  document.body.style.overflow='hidden';
+function profileFor(link) {
+  if (link.dataset.panelHash && shortcutProfiles[link.dataset.panelHash]) {
+    return shortcutProfiles[link.dataset.panelHash];
+  }
+  const key = `${link.href || ''} ${link.title || ''} ${link.textContent || ''}`;
+  const matched = evidenceProfiles.find(p => p.test.test(key));
+  if (matched?.profile) return matched.profile;
+  return matched || {
+    title: link.title || 'Evidência relacionada',
+    copy: 'Abra o painel ou a seção técnica para ver o dado em contexto.',
+    panelHash: '#visao-geral',
+    analysisHref: ANALYSIS_FILE,
+    metrics: [['Dados', 'contexto visual no painel'], ['Fonte', 'análise técnica']]
+  };
 }
-function closeModal(){dmO.classList.remove('open');document.body.style.overflow='';setTimeout(()=>{dmF.src=''},350)}
-document.getElementById('dmX').addEventListener('click',closeModal);
-dmO.addEventListener('click',closeModal);
-document.querySelectorAll('#dmTabs button').forEach(b=>b.addEventListener('click',()=>openModal(b.dataset.h)));
 
-/* Evidence links */
-document.querySelectorAll('.evidence-link').forEach(a=>{
-  a.addEventListener('click',e=>{e.preventDefault();openModal(a.dataset.panelHash||'#visao-geral')});
+function renderRail(p, analysisHref, activeHash) {
+  const title = document.querySelector('[data-rail-title]');
+  const copy = document.querySelector('[data-rail-copy]');
+  const metrics = document.querySelector('[data-rail-metrics]');
+  const frame = document.querySelector('[data-rail-frame]');
+  const analysis = document.querySelector('[data-rail-analysis]');
+  const panel = document.querySelector('[data-rail-panel]');
+  if (!title || !copy || !metrics || !frame || !analysis || !panel) return;
+
+  title.textContent = p.title;
+  copy.textContent = p.copy;
+  metrics.innerHTML = p.metrics.map(([value, label]) => `<div class="metric"><b>${value}</b><span>${label}</span></div>`).join('');
+  frame.src = encodeURI(PANEL_FILE + p.panelHash);
+  analysis.href = analysisHref || p.analysisHref || ANALYSIS_FILE;
+  panel.href = encodeURI(PANEL_FILE + p.panelHash);
+  document.querySelectorAll('[data-panel-shortcut]').forEach(button => {
+    button.classList.toggle('is-active', button.dataset.hash === (activeHash || p.panelHash));
+  });
+}
+
+function setRail(link) {
+  const p = profileFor(link);
+  document.querySelectorAll('.evidence-link.is-active').forEach(el => el.classList.remove('is-active'));
+  link.classList.add('is-active');
+  renderRail(p, link.href, link.dataset.panelHash || p.panelHash);
+}
+
+document.querySelectorAll('.evidence-link, .evidence-panel a').forEach(link => {
+  link.addEventListener('click', event => {
+    event.preventDefault();
+    setRail(link);
+    if (window.matchMedia('(max-width: 1080px)').matches) {
+      document.querySelector('.evidence-rail')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  });
 });
-/* H2 topic links */
-document.querySelectorAll('h2[data-panel]').forEach(h=>{
-  h.addEventListener('click',e=>{if(e.target===h||e.target.closest('h2')===h)openModal(h.dataset.panel)});
+
+document.querySelectorAll('[data-panel-shortcut]').forEach(button => {
+  button.addEventListener('click', () => {
+    document.querySelectorAll('.evidence-link.is-active').forEach(el => el.classList.remove('is-active'));
+    const profile = shortcutProfiles[button.dataset.hash] || defaultProfile;
+    renderRail(profile, profile.analysisHref, button.dataset.hash);
+  });
 });
 
-/* Progress + back-to-top */
-const prog=document.getElementById('prog');
-const btt=document.getElementById('btt');
-let tick=false;
-window.addEventListener('scroll',()=>{if(!tick){requestAnimationFrame(()=>{
-  const s=window.scrollY,d=document.documentElement.scrollHeight-window.innerHeight;
-  prog.style.width=(d>0?(s/d)*100:0)+'%';
-  btt.classList.toggle('on',s>500);
-  tick=false});tick=true}});
-btt.addEventListener('click',()=>window.scrollTo({top:0,behavior:'smooth'}));
-
-/* TOC active */
-const hs=Array.from(document.querySelectorAll('article h1[id],article h2[id],article h3[id]'));
-const tls=Array.from(tocD.querySelectorAll('a[href^="#"]'));
-const iob=new IntersectionObserver(es=>{es.forEach(e=>{if(e.isIntersecting){const id=e.target.id;tls.forEach(a=>{a.classList.toggle('active',decodeURIComponent(a.getAttribute('href').slice(1))===id)})}})},{rootMargin:'-60px 0px -70% 0px'});hs.forEach(h=>iob.observe(h));
+renderRail(defaultProfile, defaultProfile.analysisHref, '#visao-geral');
 </script>
 </body>
 </html>
