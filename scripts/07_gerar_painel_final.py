@@ -3548,8 +3548,14 @@ os.makedirs(os.path.dirname(DOCS_OUT), exist_ok=True)
 with open(DOCS_OUT, 'w', encoding='utf-8') as f:
     f.write(mega_html)
 
+# Também salva como output_final/painel.html (acesso local)
+OF_OUT = os.path.join(BASE, 'output_final', 'painel.html')
+with open(OF_OUT, 'w', encoding='utf-8') as f:
+    f.write(mega_html)
+
 size_kb = os.path.getsize(OUT) / 1024
 print(f"\nDone! Output: {OUT}")
 print(f"       Docs:  {DOCS_OUT}")
+print(f"  LocalOut:  {OF_OUT}")
 print(f"File size: {size_kb:.1f} KB")
 print(f"Lines: {mega_html.count(chr(10))}")
