@@ -32,36 +32,36 @@ mpl.rcParams.update({
     "font.sans-serif":     ["Arial", "Helvetica", "DejaVu Sans", "sans-serif"],
     "svg.fonttype":        "none",
     "pdf.fonttype":        42,
-    "font.size":           10,
-    "axes.titlesize":      11,
+    "font.size":           20,
+    "axes.titlesize":      22,
     "axes.titleweight":    "bold",
-    "axes.titlepad":       10,
-    "axes.labelsize":      10,
+    "axes.titlepad":       20,
+    "axes.labelsize":      20,
     "axes.labelcolor":     "#333333",
     "axes.spines.right":   False,
     "axes.spines.top":     False,
-    "axes.linewidth":      0.8,
+    "axes.linewidth":      1.5,
     "axes.edgecolor":      "#aaaaaa",
     "axes.facecolor":      "#fafafa",
     "figure.facecolor":    "white",
-    "xtick.labelsize":     9,
-    "ytick.labelsize":     9,
+    "xtick.labelsize":     18,
+    "ytick.labelsize":     18,
     "xtick.color":         "#555555",
     "ytick.color":         "#555555",
-    "xtick.major.size":    3,
-    "ytick.major.size":    3,
+    "xtick.major.size":    6,
+    "ytick.major.size":    6,
     "legend.frameon":      False,
-    "legend.fontsize":     9,
+    "legend.fontsize":     18,
     "grid.alpha":          0.45,
-    "grid.linewidth":      0.5,
+    "grid.linewidth":      1.0,
     "grid.color":          "#cccccc",
     "axes.grid":           True,
     "axes.grid.axis":      "y",
-    "figure.dpi":          130,
-    "savefig.dpi":         150,
+    "figure.dpi":          110,
+    "savefig.dpi":         160,
     "savefig.facecolor":   "white",
     "savefig.bbox":        "tight",
-    "savefig.pad_inches":  0.15,
+    "savefig.pad_inches":  0.3,
 })
 
 # ── Paleta científica (muted, distinguível) ────────────────────────────────────
@@ -112,7 +112,7 @@ def fig_b64(fig):
     return base64.b64encode(buf.getvalue()).decode()
 
 
-def make_fig(w=10, h=4.5):
+def make_fig(w=20, h=9):
     return plt.figure(figsize=(w, h))
 
 
@@ -123,7 +123,7 @@ def fmt_b(v, p):
     return f"R${v:.0f}"
 
 
-def add_bar_labels(ax, bars, fmt="{:.2f}", color="#333333", fontsize=9, offset=None):
+def add_bar_labels(ax, bars, fmt="{:.2f}", color="#333333", fontsize=18, offset=None):
     for b in bars:
         h = b.get_height()
         if h < 0.001: continue
@@ -133,7 +133,7 @@ def add_bar_labels(ax, bars, fmt="{:.2f}", color="#333333", fontsize=9, offset=N
                 fontsize=fontsize, color=color)
 
 
-def add_hbar_labels(ax, bars, fmt="{:.2f}", color="#333333", fontsize=9):
+def add_hbar_labels(ax, bars, fmt="{:.2f}", color="#333333", fontsize=18):
     for b in bars:
         w = b.get_width()
         if abs(w) < 0.001: continue
@@ -143,9 +143,52 @@ def add_hbar_labels(ax, bars, fmt="{:.2f}", color="#333333", fontsize=9):
 
 # ── Carrega datasets ───────────────────────────────────────────────────────────
 df_cham  = load_csv("base_nivel_chamada.csv")
-df_prod  = load_csv("base_nivel_produtora.csv")
 df_inv   = load_csv("base_nivel_investimento.csv")
 df_obra  = load_csv("base_nivel_obra.csv")
+
+# ── Filtro: só obras com bilheteria > 0 ────────────────────────────────────────
+df_obra = df_obra[_num(df_obra, "bilheteria_deflac") > 0].copy().reset_index(drop=True)
+
+# ── Produtoras: carrega do painel.html (1243 prod., todos os mecanismos/clusters)
+_PAINEL_PATH = os.path.join(ROOT, "output_final", "painel.html")
+def _load_prod_painel():
+    import json as _json
+    with open(_PAINEL_PATH, encoding="utf-8") as _f:
+        _html = _f.read()
+    _m = re.search(r'const PROD\s*=\s*(\[.+?\]);\s*(?:const|var|let|//)', _html, re.DOTALL)
+    _data = _json.loads(_m.group(1))
+    _df = pd.DataFrame(_data)
+    _CL = {"duplo": "Duplo Retorno", "dom": "Retorno Doméstico", "intl": "Retorno Internacional",
+           "sem_retorno": "Fomento Baixo Retorno", "pequeno": "Pequeno Porte"}
+    _df["cluster"]                   = _df["cl"].map(_CL).fillna(_df["cl"])
+    _df["CNPJ_produtora"]            = _df["nm"]
+    _df["razao_social"]              = _df["nm"]
+    _df["n_obras"]                   = pd.to_numeric(_df["n"],         errors="coerce").fillna(0)
+    _df["investimento_fsa_deflac"]   = pd.to_numeric(_df["inv_fsa_d"], errors="coerce").fillna(0)
+    _df["investimento_total_deflac"] = pd.to_numeric(_df["inv_def"],   errors="coerce").fillna(0)
+    _df["receita_total_deflac"]      = pd.to_numeric(_df["rec_def"],   errors="coerce").fillna(0)
+    _df["roi_intl_medio"]            = pd.to_numeric(_df["ria"],       errors="coerce").fillna(0)
+    _df["roi_dom_fsa_deflac"]        = _df.apply(
+        lambda r: r["receita_total_deflac"] / r["investimento_fsa_deflac"]
+        if r["investimento_fsa_deflac"] > 0 else 0.0, axis=1)
+    return _df
+
+df_prod = _load_prod_painel()
+
+# ── df_cat: agregação por categoria FSA calculada do df_obra filtrado ──────────
+# Substitui df_cham nos charts de categoria para garantir recorte consistente
+_obra_fsa = df_obra[df_obra["categoria"].astype(str).str.startswith("FSA")].copy()
+df_cat = (_obra_fsa.groupby("categoria")
+          .apply(lambda g: pd.Series({
+              "roi_dom_total_agregado":    _num(g, "receita_total_deflac").sum() / max(_num(g, "investimento_total_deflac").sum(), 1),
+              "roi_intl_medio":            _num(g, "roi_internacional_0_100").mean(),
+              "n_obras":                   len(g),
+              "investimento_total_deflac": _num(g, "investimento_total_deflac").sum(),
+              "pontuacao_festivais_media": _num(g, "pontuacao_festivais").mean(),
+              "pontuacao_festivais_max":   _num(g, "pontuacao_festivais").max(),
+              "critica_media":             _num(g, "critica_indice_1_5").mean(),
+          }))
+          .reset_index())
 
 
 # ══════════════════════════════════════════════════════════════════════════════
@@ -164,28 +207,28 @@ def chart_fig1():
              .reset_index()
              .sort_values("ano"))
 
-    fig, ax = plt.subplots(figsize=(11, 4.5))
+    fig, ax = plt.subplots(figsize=(22, 9))
     x = np.arange(len(grp))
     w = 0.38
     b1 = ax.bar(x - w/2, grp["inv"]   / 1e6, w, color=C_BLUE,   alpha=0.85, label="Investimento total (FSA + Renúncia)", zorder=3)
     b2 = ax.bar(x + w/2, grp["receita"]/ 1e6, w, color=C_ORANGE, alpha=0.85, label="Receita estimada (bilheteria + janelas)", zorder=3)
     ax.set_xticks(x)
-    ax.set_xticklabels(grp["ano"].astype(int), fontsize=9)
+    ax.set_xticklabels(grp["ano"].astype(int), fontsize=18)
     ax.yaxis.set_major_formatter(FuncFormatter(lambda v, _: f"R${v:.0f}M"))
     ax.set_ylabel("R$ milhões (deflac. 2024)")
     ax.set_title("Investimento total e receita estimada por ano de produção")
-    ax.legend(loc="upper left", fontsize=9)
+    ax.legend(loc="upper left", fontsize=18)
 
     ax2 = ax.twinx()
-    ax2.plot(x, grp["n"], "o--", color=C_PURPLE, linewidth=1.5, markersize=5,
+    ax2.plot(x, grp["n"], "o--", color=C_PURPLE, linewidth=1.5, markersize=10,
              label="Nº de obras", zorder=4, alpha=0.8)
-    ax2.set_ylabel("Nº de obras", color=C_PURPLE, fontsize=9)
-    ax2.tick_params(axis="y", colors=C_PURPLE, labelsize=8)
+    ax2.set_ylabel("Nº de obras", color=C_PURPLE, fontsize=18)
+    ax2.tick_params(axis="y", colors=C_PURPLE, labelsize=16)
     ax2.spines["right"].set_visible(True)
     ax2.spines["right"].set_color("#cccccc")
     ax2.spines["top"].set_visible(False)
     ax2.grid(False)
-    ax2.legend(loc="upper right", fontsize=9)
+    ax2.legend(loc="upper right", fontsize=18)
 
     fig.tight_layout()
     return fig_b64(fig)
@@ -220,7 +263,7 @@ def chart_figA1():
 
     colors = [C_BLUE if p >= 50 else C_ORANGE if p >= 20 else C_GREY for p in pcts]
 
-    fig, ax = plt.subplots(figsize=(10, 4))
+    fig, ax = plt.subplots(figsize=(20, 8))
     bars = ax.barh(labels, pcts, color=colors, alpha=0.85, edgecolor="white", linewidth=0.5)
     ax.set_xlabel("% das obras com dado disponível")
     ax.set_title("Cobertura de dados por fonte de evidência na base de obras")
@@ -230,12 +273,12 @@ def chart_figA1():
     ax.grid(axis="y", alpha=0)
     for b, p in zip(bars, pcts):
         ax.text(p + 1, b.get_y() + b.get_height() / 2,
-                f"{p:.1f}%", va="center", fontsize=9, color="#333333")
+                f"{p:.1f}%", va="center", fontsize=18, color="#333333")
 
     handles = [mpatches.Patch(color=C_BLUE, label="≥ 50% cobertura"),
                mpatches.Patch(color=C_ORANGE, label="20–50% cobertura"),
                mpatches.Patch(color=C_GREY, label="< 20% cobertura")]
-    ax.legend(handles=handles, loc="lower right", fontsize=8)
+    ax.legend(handles=handles, loc="lower right", fontsize=16)
     fig.tight_layout()
     return fig_b64(fig)
 
@@ -260,22 +303,22 @@ def chart_fig2():
     agg = agg.set_index("grupo").reindex(order).reset_index()
     colors = [C_BLUE, C_PURPLE, C_ORANGE]
 
-    fig, axes = plt.subplots(1, 3, figsize=(12, 4))
+    fig, axes = plt.subplots(1, 3, figsize=(24, 8))
     titles = ["Nº de obras", "Investimento total (R$ bi deflac.)", "Bilheteria total (R$ bi deflac.)"]
     data = [agg["n_obras"], agg["inv_tot"] / 1e9, agg["bil"] / 1e9]
     fmts = ["{:.0f}", "R${:.2f}bi", "R${:.2f}bi"]
 
     for ax, title, vals, colors_, fmt in zip(axes, titles, data, [colors]*3, fmts):
         bars = ax.bar(agg["grupo"], vals, color=colors_, alpha=0.85, edgecolor="white", linewidth=0.5)
-        ax.set_title(title, fontsize=10)
-        ax.set_xticklabels(agg["grupo"], fontsize=8, rotation=0, wrap=True)
-        ax.tick_params(axis="x", labelsize=8)
+        ax.set_title(title, fontsize=20)
+        ax.set_xticklabels(agg["grupo"], fontsize=16, rotation=0, wrap=True)
+        ax.tick_params(axis="x", labelsize=16)
         for b, v in zip(bars, vals):
             ax.text(b.get_x() + b.get_width() / 2,
                     b.get_height() + max(vals) * 0.02,
-                    fmt.format(v), ha="center", va="bottom", fontsize=9)
+                    fmt.format(v), ha="center", va="bottom", fontsize=18)
     fig.suptitle("Distribuição do investimento entre FSA puro, renúncia pura e arranjos mistos",
-                 fontsize=11, fontweight="bold", y=1.02)
+                 fontsize=22, fontweight="bold", y=1.02)
     fig.tight_layout()
     return fig_b64(fig)
 
@@ -306,17 +349,17 @@ def chart_fig3():
     order = ["FSA Puro", "Misto", "Renúncia Pura"]
     agg = agg.set_index("grupo").reindex(order).reset_index()
 
-    fig, ax = plt.subplots(figsize=(9, 4))
+    fig, ax = plt.subplots(figsize=(18, 8))
     x = np.arange(len(agg))
     w = 0.35
     b1 = ax.bar(x - w/2, agg["roi_bil"], w, color=C_BLUE, alpha=0.85, label="ROI Bilheteria / Investimento")
     b2 = ax.bar(x + w/2, agg["roi_rec"], w, color=C_TEAL,  alpha=0.85, label="ROI Receita total / Investimento")
     ax.axhline(1.0, color="#666666", linewidth=1, linestyle="--", alpha=0.6, label="Paridade (ROI = 1)")
     ax.set_xticks(x)
-    ax.set_xticklabels(agg["grupo"], fontsize=9)
+    ax.set_xticklabels(agg["grupo"], fontsize=18)
     ax.set_ylabel("ROI agregado")
     ax.set_title("ROI doméstico agregado por grupo de mecanismo de financiamento")
-    ax.legend(fontsize=9)
+    ax.legend(fontsize=18)
     add_bar_labels(ax, b1, fmt="{:.2f}x", color=C_BLUE)
     add_bar_labels(ax, b2, fmt="{:.2f}x", color=C_TEAL)
     fig.tight_layout()
@@ -327,16 +370,13 @@ def chart_fig3():
 # FIGURA 21 — Bubble chart: categorias no espaço ROI dom × ROI intl
 # ══════════════════════════════════════════════════════════════════════════════
 def chart_fig21():
-    fsa_cats = [c for c in df_cham["categoria"].unique() if str(c).startswith("FSA")]
-    df = (df_cham[df_cham["categoria"].isin(fsa_cats)]
-          .groupby("categoria", as_index=False)
-          .agg(roi_dom=("roi_dom_fsa_agregado", "mean"),
-               roi_intl=("roi_intl_medio", "mean"),
-               n_obras=("n_obras", "sum"),
-               inv=("investimento_total_deflac", "sum"))
-          .assign(label=lambda x: x["categoria"].map(CAT_SHORT).fillna(x["categoria"])))
+    df = (df_cat
+          .assign(roi_dom=lambda x: x["roi_dom_total_agregado"],
+                  roi_intl=lambda x: x["roi_intl_medio"],
+                  inv=lambda x: x["investimento_total_deflac"],
+                  label=lambda x: x["categoria"].map(CAT_SHORT).fillna(x["categoria"])))
 
-    fig, ax = plt.subplots(figsize=(11, 6))
+    fig, ax = plt.subplots(figsize=(22, 12))
     scatter = ax.scatter(df["roi_dom"], df["roi_intl"],
                          s=df["n_obras"] * 2.5, alpha=0.75,
                          c=df["inv"], cmap="Blues_r",
@@ -347,18 +387,18 @@ def chart_fig21():
     med_intl = df["roi_intl"].median()
     ax.axvline(med_dom,  color="#aaaaaa", linewidth=1, linestyle="--", alpha=0.7)
     ax.axhline(med_intl, color="#aaaaaa", linewidth=1, linestyle="--", alpha=0.7)
-    ax.text(ax.get_xlim()[1]*0.98, med_intl + 0.1, "mediana intl.", ha="right", fontsize=8, color="#888888")
-    ax.text(med_dom + 0.01, ax.get_ylim()[1]*0.97, "mediana dom.", ha="left", fontsize=8, color="#888888")
+    ax.text(ax.get_xlim()[1]*0.98, med_intl + 0.1, "mediana intl.", ha="right", fontsize=16, color="#888888")
+    ax.text(med_dom + 0.01, ax.get_ylim()[1]*0.97, "mediana dom.", ha="left", fontsize=16, color="#888888")
 
     for _, row in df.iterrows():
         ax.annotate(row["label"], (row["roi_dom"], row["roi_intl"]),
                     textcoords="offset points", xytext=(6, 4),
-                    fontsize=8, color="#333333")
+                    fontsize=16, color="#333333")
 
     cbar = fig.colorbar(scatter, ax=ax, shrink=0.6, pad=0.01)
-    cbar.set_label("Investimento total (R$ deflac.)", fontsize=8)
+    cbar.set_label("Investimento total (R$ deflac.)", fontsize=16)
     cbar.ax.yaxis.set_major_formatter(FuncFormatter(lambda v, _: f"R${v/1e6:.0f}M"))
-    ax.set_xlabel("ROI Doméstico (bilheteria + janelas / FSA)")
+    ax.set_xlabel("ROI Doméstico (receita / invest. total)")
     ax.set_ylabel("ROI Internacional médio")
     ax.set_title("Posicionamento de cada categoria FSA: retorno doméstico vs. alcance internacional")
     fig.tight_layout()
@@ -369,14 +409,13 @@ def chart_fig21():
 # FIGURA 5 — Volume de investimento por categoria FSA
 # ══════════════════════════════════════════════════════════════════════════════
 def chart_fig5():
-    fsa_cats = [c for c in df_cham["categoria"].unique() if str(c).startswith("FSA")]
-    df = (df_cham[df_cham["categoria"].isin(fsa_cats)]
-          .groupby("categoria", as_index=False)
-          .agg(inv=("investimento_total_deflac", "sum"), n=("n_obras", "sum"))
-          .assign(label=lambda x: x["categoria"].map(CAT_SHORT).fillna(x["categoria"].str.replace("FSA ", "")))
+    df = (df_cat
+          .assign(inv=lambda x: x["investimento_total_deflac"],
+                  n=lambda x: x["n_obras"],
+                  label=lambda x: x["categoria"].map(CAT_SHORT).fillna(x["categoria"].str.replace("FSA ", "")))
           .sort_values("inv"))
 
-    fig, ax = plt.subplots(figsize=(10, 5))
+    fig, ax = plt.subplots(figsize=(20, 10))
     colors = [C_BLUE if v > df["inv"].median() else C_GREY for v in df["inv"]]
     bars = ax.barh(df["label"], df["inv"] / 1e6, color=colors, alpha=0.85,
                    edgecolor="white", linewidth=0.5)
@@ -386,7 +425,7 @@ def chart_fig5():
     ax.grid(axis="x"); ax.grid(axis="y", alpha=0)
     for b, v in zip(bars, df["inv"] / 1e6):
         ax.text(v + df["inv"].max() / 1e6 * 0.01, b.get_y() + b.get_height() / 2,
-                f"R${v:.0f}M", va="center", fontsize=9, color="#333333")
+                f"R${v:.0f}M", va="center", fontsize=18, color="#333333")
     fig.tight_layout()
     return fig_b64(fig)
 
@@ -395,14 +434,13 @@ def chart_fig5():
 # FIGURA 6 — ROI Total por categoria FSA
 # ══════════════════════════════════════════════════════════════════════════════
 def chart_fig6():
-    fsa_cats = [c for c in df_cham["categoria"].unique() if str(c).startswith("FSA")]
-    df = (df_cham[df_cham["categoria"].isin(fsa_cats)]
-          .groupby("categoria", as_index=False)
-          .agg(roi=("roi_dom_total_agregado", "mean"), n=("n_obras", "sum"))
-          .assign(label=lambda x: x["categoria"].map(CAT_SHORT).fillna(x["categoria"].str.replace("FSA ", "")))
+    df = (df_cat
+          .assign(roi=lambda x: x["roi_dom_total_agregado"],
+                  n=lambda x: x["n_obras"],
+                  label=lambda x: x["categoria"].map(CAT_SHORT).fillna(x["categoria"].str.replace("FSA ", "")))
           .sort_values("roi"))
 
-    fig, ax = plt.subplots(figsize=(10, 5))
+    fig, ax = plt.subplots(figsize=(20, 10))
     colors = [C_GREEN if v >= 1 else C_ORANGE if v >= 0.5 else C_RED for v in df["roi"]]
     bars = ax.barh(df["label"], df["roi"], color=colors, alpha=0.85, edgecolor="white", linewidth=0.5)
     ax.axvline(1.0, color="#666666", linewidth=1, linestyle="--", alpha=0.7, label="Paridade (ROI = 1)")
@@ -411,11 +449,11 @@ def chart_fig6():
     ax.grid(axis="x"); ax.grid(axis="y", alpha=0)
     for b, v in zip(bars, df["roi"]):
         ax.text(v + 0.01, b.get_y() + b.get_height() / 2,
-                f"{v:.2f}x", va="center", fontsize=9, color="#333333")
+                f"{v:.2f}x", va="center", fontsize=18, color="#333333")
     handles = [mpatches.Patch(color=C_GREEN, label="ROI ≥ 1"),
                mpatches.Patch(color=C_ORANGE, label="ROI 0,5–1"),
                mpatches.Patch(color=C_RED, label="ROI < 0,5")]
-    ax.legend(handles=handles, fontsize=8, loc="lower right")
+    ax.legend(handles=handles, fontsize=16, loc="lower right")
     fig.tight_layout()
     return fig_b64(fig)
 
@@ -424,40 +462,51 @@ def chart_fig6():
 # FIGURA 7 — Score internacional total e médio por categoria
 # ══════════════════════════════════════════════════════════════════════════════
 def chart_fig7():
-    fsa_cats = [c for c in df_cham["categoria"].unique() if str(c).startswith("FSA")]
-    df = (df_cham[df_cham["categoria"].isin(fsa_cats)]
-          .groupby("categoria", as_index=False)
-          .agg(score_med=("pontuacao_festivais_media", "mean"),
-               score_max=("pontuacao_festivais_max", "mean"),
-               roi_intl=("roi_intl_medio", "mean"),
-               n=("n_obras", "sum"))
-          .assign(label=lambda x: x["categoria"].map(CAT_SHORT).fillna(x["categoria"].str.replace("FSA ", "")))
-          .sort_values("roi_intl"))
+    df = df_cat.copy()
+    df["score_med"] = _num(df, "pontuacao_festivais_media")
+    df["total"]     = df["score_med"] * df["n_obras"]
+    df["roi_intl"]  = _num(df, "roi_intl_medio")
+    df["label"]     = df["categoria"].map(CAT_SHORT).fillna(df["categoria"].str.replace("FSA ", ""))
 
-    fig, axes = plt.subplots(1, 2, figsize=(12, 5))
+    def _cor(lbl):
+        s = str(lbl)
+        if "Distrib" in s: return C_GREEN
+        if "Produt"  in s: return C_BLUE
+        if "Festiv"  in s: return C_ORANGE
+        if "Coprod"  in s: return C_PURPLE
+        if "Autom"   in s: return C_TEAL
+        return C_GREY
 
-    # Left: ROI Internacional médio
+    colors = [_cor(l) for l in df["label"]]
+
+    fig, axes = plt.subplots(1, 2, figsize=(24, 10))
+
+    # Left: scatter score médio vs total acumulado
     ax = axes[0]
-    bars = ax.barh(df["label"], df["roi_intl"], color=C_ORANGE, alpha=0.85, edgecolor="white")
-    ax.set_xlabel("ROI Internacional médio")
-    ax.set_title("ROI Internacional médio")
-    ax.grid(axis="x"); ax.grid(axis="y", alpha=0)
-    for b, v in zip(bars, df["roi_intl"]):
-        ax.text(v + df["roi_intl"].max() * 0.01, b.get_y() + b.get_height() / 2,
-                f"{v:.2f}", va="center", fontsize=9, color="#333333")
+    ax.scatter(df["score_med"], df["total"],
+               s=df["n_obras"] * 20, c=colors, alpha=0.80,
+               edgecolors="#555555", linewidths=1.0, zorder=3)
+    for _, row in df.iterrows():
+        ax.annotate(row["label"], (row["score_med"], row["total"]),
+                    textcoords="offset points", xytext=(10, 5),
+                    fontsize=16, color="#333333")
+    ax.set_xlabel("Score médio por obra (festivais)")
+    ax.set_ylabel("Score total acumulado (festivais)")
+    ax.set_title("Média por obra vs. total acumulado\npor categoria FSA")
+    ax.grid(True, alpha=0.3)
 
-    # Right: pontuação festivais média
+    # Right: ROI Internacional médio por categoria
     ax2 = axes[1]
-    df2 = df.sort_values("score_med")
-    bars2 = ax2.barh(df2["label"], df2["score_med"], color=C_PURPLE, alpha=0.85, edgecolor="white")
-    ax2.set_xlabel("Pontuação média em festivais")
-    ax2.set_title("Pontuação em festivais (média por obra)")
+    df2 = df.sort_values("roi_intl")
+    bars = ax2.barh(df2["label"], df2["roi_intl"], color=C_ORANGE, alpha=0.85, edgecolor="white")
+    ax2.set_xlabel("ROI Internacional médio")
+    ax2.set_title("ROI Internacional médio\npor categoria FSA")
     ax2.grid(axis="x"); ax2.grid(axis="y", alpha=0)
-    for b, v in zip(bars2, df2["score_med"]):
-        ax2.text(v + df2["score_med"].max() * 0.01, b.get_y() + b.get_height() / 2,
-                 f"{v:.1f}", va="center", fontsize=9, color="#333333")
+    for b, v in zip(bars, df2["roi_intl"]):
+        ax2.text(v + df2["roi_intl"].max() * 0.01, b.get_y() + b.get_height() / 2,
+                 f"{v:.2f}", va="center", fontsize=18, color="#333333")
 
-    fig.suptitle("Score internacional total e médio por categoria FSA", fontsize=11, fontweight="bold")
+    fig.suptitle("Score de festivais e retorno internacional por categoria FSA", fontsize=22, fontweight="bold")
     fig.tight_layout()
     return fig_b64(fig)
 
@@ -466,25 +515,33 @@ def chart_fig7():
 # FIGURA 25 — Índice crítico médio por categoria
 # ══════════════════════════════════════════════════════════════════════════════
 def chart_fig25():
-    fsa_cats = [c for c in df_cham["categoria"].unique() if str(c).startswith("FSA")]
-    df = (df_cham[df_cham["categoria"].isin(fsa_cats)]
-          .groupby("categoria", as_index=False)
-          .agg(critica=("critica_media", "mean"), n=("n_obras", "sum"))
-          .assign(label=lambda x: x["categoria"].map(CAT_SHORT).fillna(x["categoria"].str.replace("FSA ", "")))
-          .sort_values("critica"))
+    # % obras com presença em festivais (pontuação > 0) por categoria
+    obra_fsa = df_obra[df_obra["categoria"].astype(str).str.startswith("FSA")].copy()
+    pct = (obra_fsa.groupby("categoria")
+           .apply(lambda g: pd.Series({
+               "pct_festival": (_num(g, "pontuacao_festivais") > 0).mean() * 100,
+               "score_med":    _num(g, "pontuacao_festivais").mean(),
+               "n":            len(g),
+           }))
+           .reset_index())
+    pct["label"] = pct["categoria"].map(CAT_SHORT).fillna(pct["categoria"].str.replace("FSA ", ""))
+    pct = pct[pct["n"] >= 5].sort_values("pct_festival")
+    mean_pct = pct["pct_festival"].mean()
 
-    fig, ax = plt.subplots(figsize=(10, 4.5))
-    bars = ax.barh(df["label"], df["critica"], color=C_TEAL, alpha=0.85, edgecolor="white")
-    ax.axvline(df["critica"].mean(), color="#666666", linewidth=1, linestyle="--",
-               alpha=0.7, label=f"Média = {df['critica'].mean():.2f}")
-    ax.set_xlabel("Índice crítico médio (escala 1–5)")
-    ax.set_title("Índice crítico médio (1–5, múltiplas fontes) por categoria FSA")
-    ax.set_xlim(0, 5)
+    fig, ax = plt.subplots(figsize=(20, 9))
+    colors = [C_GREEN if v >= 50 else C_ORANGE if v >= 25 else C_RED for v in pct["pct_festival"]]
+    bars = ax.barh(pct["label"], pct["pct_festival"], color=colors, alpha=0.85, edgecolor="white")
+    ax.axvline(mean_pct, color="#666666", linewidth=1.5, linestyle="--",
+               alpha=0.7, label=f"Média (categ. ≥ 5 obras) = {mean_pct:.1f}%")
+    ax.set_xlabel("% de obras com presença em festivais")
+    ax.set_title("Presença em festivais por categoria FSA\n(obras com bilheteria > 0, pontuação > 0)")
+    ax.xaxis.set_major_formatter(PercentFormatter())
+    ax.set_xlim(0, 115)
     ax.grid(axis="x"); ax.grid(axis="y", alpha=0)
-    ax.legend(fontsize=9)
-    for b, v in zip(bars, df["critica"]):
-        ax.text(v + 0.05, b.get_y() + b.get_height() / 2,
-                f"{v:.2f}", va="center", fontsize=9, color="#333333")
+    for b, (v, s) in zip(bars, zip(pct["pct_festival"], pct["score_med"])):
+        ax.text(v + 1, b.get_y() + b.get_height() / 2,
+                f"{v:.0f}%  (méd {s:.1f}pts)", va="center", fontsize=16, color="#333333")
+    ax.legend(fontsize=18)
     fig.tight_layout()
     return fig_b64(fig)
 
@@ -510,14 +567,14 @@ def chart_fig4():
     order = ["FSA Puro", "Misto", "Renúncia Pura"]
     agg = agg.set_index("grupo").reindex(order).reset_index()
 
-    fig, ax = plt.subplots(figsize=(9, 4))
+    fig, ax = plt.subplots(figsize=(18, 8))
     bars = ax.bar(agg["grupo"], agg["pct"], color=[C_BLUE, C_PURPLE, C_ORANGE], alpha=0.85, edgecolor="white")
     ax.yaxis.set_major_formatter(PercentFormatter())
     ax.set_ylabel("% de obras com ROI Internacional ≥ 13")
     ax.set_title("Percentual de obras com ROI Internacional qualificado (≥ 13) por grupo de mecanismo")
     for b, (v, n, q) in zip(bars, zip(agg["pct"], agg["total"], agg["qualif"])):
         ax.text(b.get_x() + b.get_width() / 2, b.get_height() + 0.3,
-                f"{v:.1f}%\n({q:.0f}/{n:.0f})", ha="center", va="bottom", fontsize=9)
+                f"{v:.1f}%\n({q:.0f}/{n:.0f})", ha="center", va="bottom", fontsize=18)
     fig.tight_layout()
     return fig_b64(fig)
 
@@ -537,19 +594,19 @@ def chart_fig8():
     order = [c for c in CLUSTER_COLORS if c in agg["cluster"].values]
     agg = agg.set_index("cluster").reindex(order).reset_index().dropna(subset=["n"])
 
-    fig, axes = plt.subplots(1, 2, figsize=(12, 4.5))
+    fig, axes = plt.subplots(1, 2, figsize=(24, 9))
 
     # Nº de produtoras
     ax = axes[0]
     colors = [CLUSTER_COLORS.get(c, C_GREY) for c in agg["cluster"]]
     bars = ax.bar(range(len(agg)), agg["n"], color=colors, alpha=0.85, edgecolor="white")
     ax.set_xticks(range(len(agg)))
-    ax.set_xticklabels([c.replace(" ", "\n") for c in agg["cluster"]], fontsize=8)
+    ax.set_xticklabels([c.replace(" ", "\n") for c in agg["cluster"]], fontsize=16)
     ax.set_title("Nº de produtoras por cluster")
     ax.set_ylabel("Nº de produtoras")
     for b, v in zip(bars, agg["n"]):
         ax.text(b.get_x() + b.get_width() / 2, b.get_height() + agg["n"].max() * 0.02,
-                f"{int(v)}", ha="center", va="bottom", fontsize=9)
+                f"{int(v)}", ha="center", va="bottom", fontsize=18)
 
     # Investimento FSA
     ax2 = axes[1]
@@ -559,15 +616,15 @@ def chart_fig8():
     colors2 = [CLUSTER_COLORS.get(c, C_GREY) for c in agg2["cluster"]]
     bars2 = ax2.bar(range(len(agg2)), agg2["fsa"] / 1e6, color=colors2, alpha=0.85, edgecolor="white")
     ax2.set_xticks(range(len(agg2)))
-    ax2.set_xticklabels([c.replace(" ", "\n") for c in agg2["cluster"]], fontsize=8)
+    ax2.set_xticklabels([c.replace(" ", "\n") for c in agg2["cluster"]], fontsize=16)
     ax2.set_title("Investimento FSA por cluster (R$ M deflac.)")
     ax2.set_ylabel("R$ milhões (deflac. 2024)")
     ax2.yaxis.set_major_formatter(FuncFormatter(lambda v, _: f"R${v:.0f}M"))
     for b, v in zip(bars2, agg2["fsa"] / 1e6):
         ax2.text(b.get_x() + b.get_width() / 2, b.get_height() + agg2["fsa"].max() / 1e6 * 0.02,
-                 f"R${v:.0f}M", ha="center", va="bottom", fontsize=9)
+                 f"R${v:.0f}M", ha="center", va="bottom", fontsize=18)
 
-    fig.suptitle("Distribuição de produtoras por cluster (retorno internacional ≥ 13)", fontsize=11, fontweight="bold")
+    fig.suptitle("Distribuição de produtoras por cluster (retorno internacional ≥ 13)", fontsize=22, fontweight="bold")
     fig.tight_layout()
     return fig_b64(fig)
 
@@ -585,18 +642,18 @@ def chart_fig9():
         fsa=("fsa", "sum"), tot=("tot", "sum"), rec=("rec", "sum"), n=("CNPJ_produtora", "count")
     ).reindex(order).reset_index()
 
-    fig, ax = plt.subplots(figsize=(11, 4.5))
+    fig, ax = plt.subplots(figsize=(22, 9))
     x = np.arange(len(agg))
     w = 0.27
     b1 = ax.bar(x - w, agg["tot"] / 1e6, w, color=C_BLUE, alpha=0.85, label="Investimento total")
     b2 = ax.bar(x,     agg["fsa"] / 1e6, w, color=C_PURPLE, alpha=0.85, label="Investimento FSA")
     b3 = ax.bar(x + w, agg["rec"] / 1e6, w, color=C_ORANGE, alpha=0.85, label="Receita estimada")
     ax.set_xticks(x)
-    ax.set_xticklabels([c.replace(" ", "\n") for c in agg["cluster"]], fontsize=9)
+    ax.set_xticklabels([c.replace(" ", "\n") for c in agg["cluster"]], fontsize=18)
     ax.yaxis.set_major_formatter(FuncFormatter(lambda v, _: f"R${v:.0f}M"))
     ax.set_ylabel("R$ milhões (deflac. 2024)")
     ax.set_title("Investimento e receita estimada por cluster de produtora")
-    ax.legend(fontsize=9)
+    ax.legend(fontsize=18)
     fig.tight_layout()
     return fig_b64(fig)
 
@@ -607,27 +664,28 @@ def chart_fig9():
 def chart_fig10():
     df = df_prod.copy()
     df["fsa"] = _num(df, "investimento_fsa_deflac")
+    df["tot"] = _num(df, "investimento_total_deflac")
     df["rec"] = _num(df, "receita_total_deflac")
     df["roi_i"] = _num(df, "roi_intl_medio")
-    # ROI dom: sum(rec) / sum(fsa) per cluster
+    # ROI dom: sum(rec) / sum(invest. total) per cluster — mesmo denominador do painel
     order = [c for c in CLUSTER_COLORS if c in df["cluster"].values]
     agg = df.groupby("cluster").apply(lambda g: pd.Series({
-        "roi_dom": g["rec"].sum() / max(g["fsa"].sum(), 1),
+        "roi_dom": g["rec"].sum() / max(g["tot"].sum(), 1),
         "roi_intl": g["roi_i"].mean(),
         "n": len(g),
     })).reindex(order).reset_index()
 
-    fig, ax = plt.subplots(figsize=(11, 4.5))
+    fig, ax = plt.subplots(figsize=(22, 9))
     x = np.arange(len(agg))
     w = 0.35
     b1 = ax.bar(x - w/2, agg["roi_dom"],  w, color=C_BLUE,   alpha=0.85, label="ROI Doméstico agregado")
     b2 = ax.bar(x + w/2, agg["roi_intl"], w, color=C_ORANGE, alpha=0.85, label="ROI Internacional médio")
     ax.axhline(1.0, color="#666666", linewidth=1, linestyle="--", alpha=0.6, label="Paridade")
     ax.set_xticks(x)
-    ax.set_xticklabels([c.replace(" ", "\n") for c in agg["cluster"]], fontsize=9)
+    ax.set_xticklabels([c.replace(" ", "\n") for c in agg["cluster"]], fontsize=18)
     ax.set_ylabel("ROI")
     ax.set_title("ROI doméstico agregado e intensidade internacional média por cluster")
-    ax.legend(fontsize=9)
+    ax.legend(fontsize=18)
     add_bar_labels(ax, b1, fmt="{:.2f}x", color=C_BLUE)
     add_bar_labels(ax, b2, fmt="{:.2f}x", color=C_ORANGE)
     fig.tight_layout()
@@ -647,21 +705,24 @@ def chart_fig22():
     df["roi_d"] = df["roi_d"].clip(-2, 15)
     df["roi_i"] = df["roi_i"].clip(0, 80)
 
-    fig, ax = plt.subplots(figsize=(11, 6))
+    fig, ax = plt.subplots(figsize=(22, 12))
     for cluster, color in CLUSTER_COLORS.items():
         sub = df[df["cluster"] == cluster]
         if len(sub) == 0: continue
-        sz = np.clip(np.sqrt(sub["fsa"] / 50000), 8, 120)
-        ax.scatter(sub["roi_d"], sub["roi_i"], c=color, s=sz, alpha=0.55,
+        sz = np.clip(np.sqrt(sub["fsa"] / 500), 100, 3000)
+        ax.scatter(sub["roi_d"], sub["roi_i"], c=color, s=sz, alpha=0.65,
                    label=f"{cluster} (n={len(sub)})", zorder=3, linewidths=0)
 
-    ax.axvline(1.0, color="#888888", linewidth=1, linestyle="--", alpha=0.6)
-    ax.axhline(0,   color="#888888", linewidth=1, linestyle="--", alpha=0.6)
-    ax.text(1.05, ax.get_ylim()[1]*0.97, "ROI Dom = 1", fontsize=8, color="#888888")
+    ax.axvline(1.0,  color="#888888", linewidth=2, linestyle="--", alpha=0.7)
+    ax.axhline(13.0, color="#555555", linewidth=2, linestyle="--", alpha=0.7)
+    ax.text(1.05, ax.get_ylim()[1] * 0.97 if ax.get_ylim()[1] > 0 else 75,
+            "ROI Dom = 1,0x", fontsize=16, color="#888888")
+    ax.text(ax.get_xlim()[0] + 0.1 if ax.get_xlim()[0] > -2 else -1.8,
+            13.5, "ROI Intl = 13", fontsize=16, color="#555555")
     ax.set_xlabel("ROI Doméstico (receita / FSA)")
     ax.set_ylabel("ROI Internacional médio")
     ax.set_title("Produtoras: retorno doméstico vs. alcance internacional por cluster\n(tamanho = investimento FSA)")
-    ax.legend(fontsize=8, markerscale=1.5, loc="upper right")
+    ax.legend(fontsize=18, markerscale=4, loc="upper right")
     ax.grid(True, alpha=0.3)
     fig.tight_layout()
     return fig_b64(fig)
@@ -677,13 +738,13 @@ def chart_fig11():
     df["n"]   = _num(df, "n_obras")
     df = df[(df["fsa"] > 0) | (df["rec"] > 0)]
 
-    fig, ax = plt.subplots(figsize=(11, 6))
+    fig, ax = plt.subplots(figsize=(22, 12))
     for cluster, color in CLUSTER_COLORS.items():
         sub = df[df["cluster"] == cluster]
         if len(sub) == 0: continue
         ax.scatter(sub["fsa"] / 1e6, sub["rec"] / 1e6,
-                   c=color, s=np.clip(sub["n"] * 8, 12, 200),
-                   alpha=0.55, label=cluster, zorder=3, linewidths=0)
+                   c=color, s=np.clip(sub["n"] * 80, 150, 3000),
+                   alpha=0.65, label=cluster, zorder=3, linewidths=0)
 
     mx = max(df["fsa"].max(), df["rec"].max()) / 1e6 * 1.05
     ax.plot([0, mx], [0, mx], color="#bbbbbb", linewidth=1, linestyle="--",
@@ -693,7 +754,7 @@ def chart_fig11():
     ax.set_xlabel("Investimento FSA total (R$ M deflac. 2024)")
     ax.set_ylabel("Receita total estimada (R$ M deflac. 2024)")
     ax.set_title("Relação entre investimento e receita por produtora\n(tamanho = nº de obras, cor = cluster)")
-    ax.legend(fontsize=8, markerscale=1.5)
+    ax.legend(fontsize=18, markerscale=3)
     fig.tight_layout()
     return fig_b64(fig)
 
@@ -713,7 +774,7 @@ def chart_fig12():
     n = len(df_pos)
     gini = 1 - 2 * np.trapz(cumfsa, cumprod)
 
-    fig, ax = plt.subplots(figsize=(9, 6))
+    fig, ax = plt.subplots(figsize=(18, 12))
     ax.plot(cumprod * 100, cumfsa * 100, color=C_BLUE, linewidth=2,
             label=f"Curva de Lorenz (Gini = {gini:.3f})")
     ax.plot([0, 100], [0, 100], color="#cccccc", linewidth=1, linestyle="--",
@@ -722,8 +783,8 @@ def chart_fig12():
                     alpha=0.10, color=C_BLUE)
     ax.set_xlabel("% acumulado de produtoras (ordenadas por investimento)")
     ax.set_ylabel("% acumulado do investimento FSA")
-    ax.set_title("Concentração do FSA entre produtoras com bilheteria positiva\n(Curva de Lorenz)")
-    ax.legend(fontsize=9)
+    ax.set_title("Concentração do FSA entre produtoras do sistema (FSA + renúncia)\n(Curva de Lorenz)")
+    ax.legend(fontsize=18)
     ax.set_xlim(0, 100); ax.set_ylim(0, 100)
 
     # Anotações de percentis
@@ -734,7 +795,7 @@ def chart_fig12():
         ax.annotate(f"Top {100-pct*100:.0f}% = {100-y_val:.0f}% do FSA",
                     xy=(x_val, y_val), xytext=(x_val - 30, y_val + 8),
                     arrowprops=dict(arrowstyle="->", color="#888888", lw=0.8),
-                    fontsize=8, color="#555555")
+                    fontsize=16, color="#555555")
 
     ax.xaxis.set_major_formatter(PercentFormatter())
     ax.yaxis.set_major_formatter(PercentFormatter())
@@ -752,7 +813,7 @@ def chart_fig23():
     cumfsa = df_pos["fsa"].cumsum() / df_pos["fsa"].sum() * 100
     x = np.arange(1, len(df_pos) + 1)
 
-    fig, ax = plt.subplots(figsize=(10, 4.5))
+    fig, ax = plt.subplots(figsize=(20, 9))
     ax.plot(x, cumfsa, color=C_BLUE, linewidth=2)
     ax.fill_between(x, cumfsa, alpha=0.08, color=C_BLUE)
 
@@ -761,7 +822,7 @@ def chart_fig23():
         y_val = cumfsa.iloc[n_top - 1]
         ax.axvline(n_top, color=color, linewidth=1, linestyle="--", alpha=0.7)
         ax.text(n_top + 1, y_val - 3, f"Top {n_top}\n= {y_val:.1f}%",
-                fontsize=8, color=color)
+                fontsize=16, color=color)
 
     ax.set_xlabel("Nº de produtoras (da maior para a menor investidora)")
     ax.set_ylabel("% acumulado do FSA total")
@@ -795,7 +856,7 @@ def chart_fig13():
     tickets = [t[1]["fsa"].median() / 1e6 for t in tiers]  # R$ milhões
     ns      = [len(t[1]) for t in tiers]
 
-    fig, ax1 = plt.subplots(figsize=(10, 4.5))
+    fig, ax1 = plt.subplots(figsize=(20, 9))
     ax2 = ax1.twinx()
     x = np.arange(len(labels))
     w = 0.4
@@ -803,7 +864,7 @@ def chart_fig13():
     ax2.bar(x + w/2, tickets, w, color=C_ORANGE, alpha=0.85, label="Ticket mediano (R$ M)")
 
     ax1.set_xticks(x)
-    ax1.set_xticklabels([f"{l}\n(n={ns[i]})" for i, l in enumerate(labels)], fontsize=9)
+    ax1.set_xticklabels([f"{l}\n(n={ns[i]})" for i, l in enumerate(labels)], fontsize=18)
     ax1.set_ylabel("Participação no FSA total (%)")
     ax1.yaxis.set_major_formatter(PercentFormatter())
     ax2.set_ylabel("Ticket mediano por produtora (R$ M deflac.)", color=C_ORANGE)
@@ -814,12 +875,12 @@ def chart_fig13():
 
     for b, v in zip(bars, shares):
         ax1.text(b.get_x() + b.get_width() / 2, b.get_height() + 0.5,
-                 f"{v:.1f}%", ha="center", va="bottom", fontsize=9)
+                 f"{v:.1f}%", ha="center", va="bottom", fontsize=18)
 
     ax1.set_title("Participação no FSA e ticket mediano anual por tier de produtora")
     lines1, labels1 = ax1.get_legend_handles_labels()
     lines2, labels2 = ax2.get_legend_handles_labels()
-    ax1.legend(lines1 + lines2, labels1 + labels2, fontsize=9)
+    ax1.legend(lines1 + lines2, labels1 + labels2, fontsize=18)
     fig.tight_layout()
     return fig_b64(fig)
 

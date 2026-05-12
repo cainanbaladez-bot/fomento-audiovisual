@@ -5,13 +5,15 @@ gerar_graficos_politica.py
 Regenera os gráficos de 'Uma política de fomento baseada em evidências_v6.html'
 com estética de publicação científica (Nature-style: fundo branco, tipografia limpa).
 
-Mesma lógica de gerar_graficos_analise.py, mas para o artigo de opinião.
-
 Uso:
     python scripts/gerar_graficos_politica.py
+
+Tamanho de fonte:
+    savefig.dpi=160, figsize width≈11" → imagem 1760px → exibida em 880px (escala 0.5)
+    Todas as fontes no rcParams são 2× o tamanho desejado no HTML renderizado.
 """
 
-import os, re, base64, io
+import os, re, base64, io, json
 import numpy as np
 import pandas as pd
 import matplotlib as mpl
@@ -25,42 +27,44 @@ HTML_PATH = os.path.join(
     "Uma política de fomento baseada em evidências_v6.html"
 )
 
-# ── Nature-style rcParams (idêntico ao gerar_graficos_analise.py) ──────────────
+# ── Nature-style rcParams ──────────────────────────────────────────────────────
+# Imagem salva em 1760px (11" × 160dpi), exibida em 880px → escala 0.5
+# Fontes: 2× o tamanho desejado para compensar o downscaling
 mpl.rcParams.update({
     "font.family":         "sans-serif",
     "font.sans-serif":     ["Arial", "Helvetica", "DejaVu Sans", "sans-serif"],
     "svg.fonttype":        "none",
     "pdf.fonttype":        42,
-    "font.size":           10,
-    "axes.titlesize":      11,
+    "font.size":           26,
+    "axes.titlesize":      28,
     "axes.titleweight":    "bold",
-    "axes.titlepad":       10,
-    "axes.labelsize":      10,
+    "axes.titlepad":       18,
+    "axes.labelsize":      24,
     "axes.labelcolor":     "#333333",
     "axes.spines.right":   False,
     "axes.spines.top":     False,
-    "axes.linewidth":      0.8,
+    "axes.linewidth":      1.5,
     "axes.edgecolor":      "#aaaaaa",
     "axes.facecolor":      "#fafafa",
     "figure.facecolor":    "white",
-    "xtick.labelsize":     9,
-    "ytick.labelsize":     9,
+    "xtick.labelsize":     22,
+    "ytick.labelsize":     22,
     "xtick.color":         "#555555",
     "ytick.color":         "#555555",
-    "xtick.major.size":    3,
-    "ytick.major.size":    3,
+    "xtick.major.size":    6,
+    "ytick.major.size":    6,
     "legend.frameon":      False,
-    "legend.fontsize":     9,
+    "legend.fontsize":     22,
     "grid.alpha":          0.45,
-    "grid.linewidth":      0.5,
+    "grid.linewidth":      0.9,
     "grid.color":          "#cccccc",
     "axes.grid":           True,
     "axes.grid.axis":      "y",
-    "figure.dpi":          130,
-    "savefig.dpi":         150,
+    "figure.dpi":          110,
+    "savefig.dpi":         160,
     "savefig.facecolor":   "white",
     "savefig.bbox":        "tight",
-    "savefig.pad_inches":  0.15,
+    "savefig.pad_inches":  0.3,
 })
 
 # ── Paleta científica ──────────────────────────────────────────────────────────
@@ -74,14 +78,6 @@ C_GREY   = "#888888"
 C_AMBER  = "#b8860b"
 C_MUTED  = "#999999"
 
-CLUSTER_COLORS = {
-    "Duplo Retorno":         C_TEAL,
-    "Retorno Doméstico":     C_BLUE,
-    "Retorno Internacional": C_ORANGE,
-    "Fomento Baixo Retorno": C_RED,
-    "Pequeno Porte":         C_GREY,
-}
-
 CAT_SHORT = {
     "FSA Pontuação Bilheteria e Roteiro — Distribuidora": "Seletivo\nDistribuidora",
     "FSA Pontuação Bilheteria e Roteiro — Produtora":     "Seletivo\nProdutora",
@@ -91,7 +87,6 @@ CAT_SHORT = {
     "FSA Comercialização / Distribuição":                 "Comercialização",
     "FSA Complementação":                                 "Complementação",
     "FSA Coprodução Internacional":                       "Coprodução\nIntl",
-    "FSA SAV/MINC / Arranjos Regionais":                  "SAV/MINC\nRegionais",
 }
 
 # ── Helpers ────────────────────────────────────────────────────────────────────
@@ -119,191 +114,341 @@ def fmt_m(v, p):
 
 
 # ── Datasets ───────────────────────────────────────────────────────────────────
-df_cham = load_csv("base_nivel_chamada.csv")
 df_prod = load_csv("base_nivel_produtora.csv")
 df_inv  = load_csv("base_nivel_investimento.csv")
+df_obra = load_csv("base_nivel_obra.csv")
+
+# ── Dados por categoria — hardcoded do objeto CATS do painel (script 03) ──────
+# roi_tot_def = sum(receita_def) / sum(FSA_def + renúncia_def) por categoria
+_CAT_DATA = {
+    "FSA Pontuação Festivais e Roteiro":               {"roi_tot_def": 0.0230, "intl_avg": 3.69,  "intl_total": 282.10, "n_obras": 78,  "inv": 104324502},
+    "FSA Pontuação Bilheteria e Roteiro — Produtora":  {"roi_tot_def": 0.5349, "intl_avg": 2.28,  "intl_total": 213.26, "n_obras": 163, "inv": 173848657},
+    "FSA Pontuação Bilheteria e Roteiro — Distribuidora": {"roi_tot_def": 0.9419, "intl_avg": 3.41, "intl_total": 394.63, "n_obras": 131, "inv": 222132407},
+    "FSA Automático Bilheteria":                       {"roi_tot_def": 0.3206, "intl_avg": 2.37,  "intl_total":  58.65, "n_obras": 52,  "inv": 72508712},
+    "FSA Automático Festivais":                        {"roi_tot_def": 0.0607, "intl_avg": 8.17,  "intl_total":  39.71, "n_obras": 10,  "inv": 8325780},
+    "FSA Coprodução Internacional":                    {"roi_tot_def": 0.0657, "intl_avg": 2.53,  "intl_total":  75.80, "n_obras": 30,  "inv": 11967067},
+    "FSA Comercialização / Distribuição":              {"roi_tot_def": 0.3820, "intl_avg": 3.78,  "intl_total":  62.35, "n_obras": 147, "inv": 37519926},
+    "FSA Complementação":                              {"roi_tot_def": 0.4748, "intl_avg": 1.98,  "intl_total":  73.06, "n_obras": 90,  "inv": 65480424},
+}
+df_cat_painel = pd.DataFrame([
+    {"categoria": k, "roi_dom_med": v["roi_tot_def"], "roi_intl": v["intl_avg"],
+     "intl_total": v["intl_total"], "n_obras": v["n_obras"], "inv": v["inv"]}
+    for k, v in _CAT_DATA.items()
+])
 
 
 # ══════════════════════════════════════════════════════════════════════════════
-# CHART 1 — Desempenho por tipo de chamada: ROI dom vs. intl
+# CHART 1 — Vocação Comercial vs. Alcance Internacional por Categoria FSA
+# Canvas máximo: 22×12" — S=22/11=2 para manter fontes idênticas em 880px
+# Colorbar/legenda embaixo (horizontal)
 # ══════════════════════════════════════════════════════════════════════════════
 def chart1():
-    agg = (df_cham[df_cham["categoria"].isin(CAT_SHORT)]
-           .groupby("categoria", as_index=False)
-           .agg(roi_dom=("roi_dom_fsa_agregado", "mean"),
-                roi_intl=("roi_intl_medio", "mean"),
-                n=("n_obras", "sum"))
-           .assign(label=lambda x: x["categoria"].map(CAT_SHORT))
-           .sort_values("roi_dom", ascending=False))
+    S = 22 / 11  # figsize 22" @ 160dpi = 3520px → 880px display → escala 0.25
+    df = df_cat_painel.copy()
+    df["label"] = df["categoria"].map(CAT_SHORT).fillna(df["categoria"])
 
-    fig, ax = plt.subplots(figsize=(13, 5))
-    x = np.arange(len(agg))
-    w = 0.36
-    b1 = ax.bar(x - w/2, agg["roi_dom"],  w, color=C_BLUE,   alpha=0.85,
-                label="ROI Doméstico / FSA", zorder=3)
-    b2 = ax.bar(x + w/2, agg["roi_intl"], w, color=C_ORANGE, alpha=0.85,
-                label="ROI Internacional médio", zorder=3)
-    ax.axhline(1.0, color="#666666", linewidth=1, linestyle="--", alpha=0.5,
-               label="Paridade (ROI = 1)")
+    with mpl.rc_context({
+        "font.size":        round(26 * S),
+        "axes.titlesize":   round(28 * S),
+        "axes.labelsize":   round(24 * S),
+        "xtick.labelsize":  round(22 * S),
+        "ytick.labelsize":  round(22 * S),
+        "legend.fontsize":  round(22 * S),
+    }):
+        fig, ax = plt.subplots(figsize=(33, 18))
+        scatter = ax.scatter(df["roi_dom_med"], df["roi_intl"],
+                             s=df["n_obras"] * 12, alpha=0.75,
+                             c=df["inv"], cmap="Blues_r",
+                             vmin=0, vmax=df["inv"].max(),
+                             edgecolors=C_BLUE, linewidths=1.0, zorder=3)
 
-    for bar, col in [(b1, C_BLUE), (b2, C_ORANGE)]:
-        for b in bar:
-            h = b.get_height()
-            if h > 0.05:
-                ax.text(b.get_x() + b.get_width() / 2, h + 0.03,
-                        f"{h:.2f}", ha="center", va="bottom", fontsize=8.5, color=col)
+        med_dom  = df["roi_dom_med"].median()
+        med_intl = df["roi_intl"].median()
+        ax.axvline(med_dom,  color="#aaaaaa", linewidth=1.5, linestyle="--", alpha=0.7)
+        ax.axhline(med_intl, color="#aaaaaa", linewidth=1.5, linestyle="--", alpha=0.7)
 
-    ax.set_xticks(x)
-    ax.set_xticklabels(agg["label"], fontsize=9)
-    ax.set_ylabel("ROI médio")
-    ax.set_title("Desempenho por tipo de chamada: retorno doméstico vs. internacional")
-    ax.legend(fontsize=9, loc="upper right")
-    ax.set_ylim(0, max(agg["roi_intl"].max(), agg["roi_dom"].max()) * 1.22)
-    fig.tight_layout()
-    return fig_b64(fig)
+        for _, row in df.iterrows():
+            ax.annotate(row["label"],
+                        (row["roi_dom_med"], row["roi_intl"]),
+                        textcoords="offset points", xytext=(10, 6),
+                        fontsize=round(20 * S), color="#333333")
+
+        # Colorbar vertical à direita — evita colisão com o xlabel
+        cbar = fig.colorbar(scatter, ax=ax, orientation="vertical",
+                            shrink=0.6, pad=0.03, aspect=30)
+        cbar.set_label("Investimento total (R$ deflac.)", fontsize=round(20 * S))
+        cbar.ax.tick_params(labelsize=round(18 * S))
+        cbar.ax.yaxis.set_major_formatter(FuncFormatter(lambda v, _: f"R${v/1e6:.0f}M"))
+        ax.set_xlabel("ROI Doméstico — média pond. (bilheteria / invest. total)")
+        ax.set_ylabel("ROI Internacional médio")
+        ax.set_title("Vocação Comercial vs. Alcance Internacional por Categoria FSA\n(tamanho = nº de obras  |  cor = volume de investimento)")
+        ax.grid(True, alpha=0.3)
+        fig.tight_layout()
+        return fig_b64(fig)
 
 
 # ══════════════════════════════════════════════════════════════════════════════
-# CHART 2 — Perfil de retorno: ROI dom + ROI intl por categoria
+# CHART 2 — ROI Doméstico e Internacional por Categoria FSA (barras horizontais)
+# Canvas máximo: 22×10" — S=2 — legenda centralizada embaixo
 # ══════════════════════════════════════════════════════════════════════════════
 def chart2():
-    cats_cmp = {
-        "FSA Pontuação Bilheteria e Roteiro — Distribuidora": "Seletivo\nDistribuidora",
-        "FSA Pontuação Bilheteria e Roteiro — Produtora":     "Seletivo\nProdutora",
-        "FSA Automático Bilheteria":                          "Automático\nBilheteria",
-        "FSA Pontuação Festivais e Roteiro":                  "Seletivo\nFestivais",
-        "FSA Automático Festivais":                           "Automático\nFestivais",
-        "FSA Coprodução Internacional":                       "Coprodução\nIntl",
-    }
-    sub = (df_cham[df_cham["categoria"].isin(cats_cmp)]
-           .groupby("categoria", as_index=False)
-           .agg(dom=("roi_dom_fsa_agregado", "mean"),
-                intl=("roi_intl_medio", "mean"),
-                n=("n_obras", "sum"))
-           .assign(label=lambda x: x["categoria"].map(cats_cmp))
-           .sort_values("dom", ascending=True))
+    S = 22 / 11  # = 2
+    df = df_cat_painel.copy()
+    df["label"] = df["categoria"].map(CAT_SHORT).fillna(df["categoria"])
 
-    fig, axes = plt.subplots(1, 2, figsize=(13, 5.5))
+    def _cor(label):
+        if "Distrib" in str(label):   return C_GREEN
+        if "Produt" in str(label):    return C_BLUE
+        if "Festivais" in str(label): return C_ORANGE
+        if "Coprod" in str(label):    return C_PURPLE
+        if "Autom" in str(label):     return C_TEAL
+        return C_GREY
 
-    ax = axes[0]
-    colors = [C_GREEN if "Distrib" in l else C_BLUE if "Produt" in l else C_MUTED
-              for l in sub["label"]]
-    bars = ax.barh(sub["label"], sub["dom"], color=colors, alpha=0.88, edgecolor="white")
-    ax.set_title("ROI Doméstico médio (receita / FSA)")
-    ax.set_xlabel("ROI")
-    ax.axvline(1.0, color="#666", linewidth=0.8, linestyle="--", alpha=0.6)
-    ax.grid(axis="x"); ax.grid(axis="y", alpha=0)
-    for b in bars:
-        v = b.get_width()
-        if v > 0.02:
-            ax.text(v + 0.01, b.get_y() + b.get_height() / 2,
-                    f"{v:.2f}x", va="center", fontsize=9, color="#333")
+    df_dom  = df.sort_values("roi_dom_med", ascending=True)
+    df_intl = df.sort_values("intl_total",  ascending=True)
 
-    ax2 = axes[1]
-    bars2 = ax2.barh(sub["label"], sub["intl"], color=C_ORANGE, alpha=0.88, edgecolor="white")
-    ax2.set_title("ROI Internacional médio")
-    ax2.set_xlabel("ROI Internacional")
-    ax2.grid(axis="x"); ax2.grid(axis="y", alpha=0)
-    for b in bars2:
-        v = b.get_width()
-        if v > 0.1:
-            ax2.text(v + 0.05, b.get_y() + b.get_height() / 2,
-                     f"{v:.2f}", va="center", fontsize=9, color="#333")
+    with mpl.rc_context({
+        "font.size":        round(26 * S),
+        "axes.titlesize":   round(28 * S),
+        "axes.labelsize":   round(24 * S),
+        "xtick.labelsize":  round(22 * S),
+        "ytick.labelsize":  round(22 * S),
+        "legend.fontsize":  round(22 * S),
+    }):
+        fig, axes = plt.subplots(1, 2, figsize=(33, 14))
 
-    fig.suptitle("Perfil de retorno por tipo de chamada: doméstico vs. internacional",
-                 fontsize=11, fontweight="bold")
-    fig.tight_layout()
-    return fig_b64(fig)
+        # Left: ROI dom
+        ax = axes[0]
+        colors_dom = [_cor(l) for l in df_dom["label"]]
+        bars = ax.barh(df_dom["label"], df_dom["roi_dom_med"],
+                       color=colors_dom, alpha=0.88, edgecolor="white")
+        ax.set_title("ROI Doméstico\n(bilh. / invest. total)", fontsize=round(22 * S))
+        ax.set_xlabel("ROI doméstico", fontsize=round(20 * S))
+        ax.tick_params(axis="y", labelsize=round(18 * S))
+        ax.axvline(1.0, color="#666", linewidth=1.2, linestyle="--", alpha=0.6)
+        ax.grid(axis="x"); ax.grid(axis="y", alpha=0)
+        for b in bars:
+            v = b.get_width()
+            if v > 0.01:
+                ax.text(v + 0.01, b.get_y() + b.get_height() / 2,
+                        f"{v:.2f}x", va="center", fontsize=round(18 * S), color="#333")
+
+        # Right: ROI intl TOTAL
+        ax2 = axes[1]
+        colors_intl = [_cor(l) for l in df_intl["label"]]
+        bars2 = ax2.barh(df_intl["label"], df_intl["intl_total"],
+                         color=colors_intl, alpha=0.88, edgecolor="white")
+        ax2.set_title("ROI Internacional\n(total acumulado)", fontsize=round(22 * S))
+        ax2.set_xlabel("ROI Internacional total", fontsize=round(20 * S))
+        ax2.tick_params(axis="y", labelsize=round(18 * S))
+        ax2.grid(axis="x"); ax2.grid(axis="y", alpha=0)
+        for b in bars2:
+            v = b.get_width()
+            if v > 1:
+                ax2.text(v + 2, b.get_y() + b.get_height() / 2,
+                         f"{v:.0f}", va="center", fontsize=round(18 * S), color="#333")
+
+        handles = [
+            mpatches.Patch(color=C_GREEN,  label="Seletivo Distribuidora"),
+            mpatches.Patch(color=C_BLUE,   label="Seletivo Produtora"),
+            mpatches.Patch(color=C_ORANGE, label="Seletivo Festivais"),
+            mpatches.Patch(color=C_PURPLE, label="Coprodução Internacional"),
+            mpatches.Patch(color=C_TEAL,   label="Automático"),
+            mpatches.Patch(color=C_GREY,   label="Outros"),
+        ]
+        # Legenda centralizada na base da figura
+        fig.legend(handles=handles, fontsize=round(18 * S),
+                   loc="upper center", bbox_to_anchor=(0.5, 0.02),
+                   ncol=3, frameon=True, facecolor="white", edgecolor="#cccccc")
+        fig.suptitle("Desempenho por categoria FSA — Vocação Comercial vs. Alcance Internacional",
+                     fontsize=round(22 * S), fontweight="bold")
+        fig.tight_layout()
+        fig.subplots_adjust(bottom=0.18)  # espaço para a legenda embaixo
+        return fig_b64(fig)
 
 
 # ══════════════════════════════════════════════════════════════════════════════
-# CHART 3 — Scatter: produtoras por cluster (investimento vs. receita)
+# CHART 3 — Scatter interativo (Plotly) das produtoras por cluster
+# Idêntico ao painel produtoras > aba por cluster > primeira dispersão
+# Retorna HTML string (não base64 PNG)
 # ══════════════════════════════════════════════════════════════════════════════
 def chart3():
     df = df_prod.copy()
-    df["fsa"] = _num(df, "investimento_fsa_deflac")
-    df["rec"] = _num(df, "receita_total_deflac")
-    df["n"]   = _num(df, "n_obras")
+    df["inv_mi"]   = _num(df, "investimento_total_deflac") / 1e6
+    df["fsa_mi"]   = _num(df, "investimento_fsa_deflac")   / 1e6
+    df["rec_mi"]   = _num(df, "receita_total_deflac")      / 1e6
+    df["roi_d"]    = _num(df, "roi_dom_total_deflac")
+    df["roi_intl"] = _num(df, "roi_intl_medio")
+    df["n_obras"]  = _num(df, "n_obras")
+    df["nome"]     = df["razao_social"].fillna("").astype(str).str[:40]
 
-    fig, ax = plt.subplots(figsize=(13, 6.5))
-    for cluster, color in CLUSTER_COLORS.items():
-        sub = df[df["cluster"] == cluster]
-        if len(sub) == 0: continue
-        sz = np.where(sub["n"] > 10, 80, np.where(sub["n"] > 5, 50, 28))
-        ax.scatter(sub["fsa"] / 1e6, sub["rec"] / 1e6, c=color, s=sz,
-                   alpha=0.65, label=f"{cluster} (n={len(sub)})",
-                   zorder=4, linewidths=0)
+    # Filtrar pontos válidos para log scale
+    df = df[(df["inv_mi"] > 0) & (df["roi_d"] > 0)].copy()
 
-    mx = max(df["fsa"].max(), df["rec"].max()) / 1e6 * 1.05
-    ax.plot([0, mx], [0, mx], color="#bbbbbb", linewidth=1, linestyle="--",
-            label="Paridade (receita = investimento)", zorder=2)
+    CLUSTER_PAL = {
+        "Duplo Retorno":         "#f5c842",
+        "Retorno Doméstico":     "#5b8cff",
+        "Retorno Internacional": "#ff80b0",
+        "Fomento Baixo Retorno": "#f87171",
+        "Pequeno Porte":         "#7b849a",
+    }
+    PLOT_ORDER = ["Pequeno Porte", "Fomento Baixo Retorno",
+                  "Retorno Internacional", "Retorno Doméstico", "Duplo Retorno"]
 
-    # Destacar notáveis
-    notaveis = {"Filmes de Plástico": C_AMBER, "Globo": C_RED, "Downtown": C_PURPLE}
-    for _, row in df.iterrows():
-        for nome, cor in notaveis.items():
-            if nome.lower() in str(row.get("razao_social", "")).lower():
-                ax.scatter(row["fsa"] / 1e6, row["rec"] / 1e6, c=cor, s=100,
-                           zorder=6, marker="*", linewidths=0)
-                ax.annotate(str(row["razao_social"])[:22],
-                            (row["fsa"] / 1e6, row["rec"] / 1e6),
-                            textcoords="offset points", xytext=(8, 4),
-                            fontsize=8.5, color=cor, zorder=7)
+    traces = []
+    for cluster in PLOT_ORDER:
+        sub = df[df["cluster"] == cluster].copy()
+        if len(sub) == 0:
+            continue
+        color = CLUSTER_PAL.get(cluster, "#888888")
+        # Tamanho dos marcadores proporcional ao nº de obras (igual ao painel)
+        sz = np.clip(sub["n_obras"] * 3, 6, 30).tolist()
 
-    ax.xaxis.set_major_formatter(FuncFormatter(lambda v, _: f"R${v:.0f}M"))
-    ax.yaxis.set_major_formatter(FuncFormatter(lambda v, _: f"R${v:.0f}M"))
-    ax.set_xlabel("Investimento FSA total (R$ M deflac. 2024)")
-    ax.set_ylabel("Receita total estimada (R$ M deflac. 2024)")
-    ax.set_title("Distribuição das produtoras por retorno e investimento")
-    ax.legend(fontsize=8.5, markerscale=1.5, loc="upper left")
-    ax.grid(True, alpha=0.3)
-    fig.tight_layout()
-    return fig_b64(fig)
+        # Customdata para hover: [invest_total, invest_fsa, receita, roi_intl, n_obras]
+        customdata = sub[["inv_mi", "fsa_mi", "rec_mi", "roi_intl", "n_obras"]].values.tolist()
+
+        traces.append({
+            "type": "scatter",
+            "mode": "markers",
+            "name": f"{cluster} (n={len(sub)})",
+            "x": sub["inv_mi"].tolist(),
+            "y": sub["roi_d"].tolist(),
+            "text": sub["nome"].tolist(),
+            "customdata": customdata,
+            "hovertemplate": (
+                "<b>%{text}</b><br>"
+                "Invest. total: R$ %{customdata[0]:.1f}M<br>"
+                "Invest. FSA: R$ %{customdata[1]:.1f}M<br>"
+                "Renda doméstica: R$ %{customdata[2]:.1f}M<br>"
+                "ROI Internacional: %{customdata[3]:.2f}x<br>"
+                "Nº obras: %{customdata[4]:.0f}"
+                "<extra></extra>"
+            ),
+            "marker": {
+                "color": color,
+                "size": sz,
+                "opacity": 0.55 if cluster == "Pequeno Porte" else 0.78,
+                "line": {"color": "white", "width": 0.5},
+            },
+        })
+
+    # Linha ROI = 1
+    x_range = [df["inv_mi"].min() * 0.8, df["inv_mi"].max() * 1.2]
+    traces.append({
+        "type": "scatter",
+        "mode": "lines+text",
+        "name": "ROI Dom. = 1×",
+        "x": x_range,
+        "y": [1.0, 1.0],
+        "line": {"color": "#888888", "width": 1.5, "dash": "dash"},
+        "text": ["", "ROI Dom. = 1×"],
+        "textposition": "top right",
+        "textfont": {"color": "#666666", "size": 12},
+        "hoverinfo": "skip",
+        "showlegend": True,
+    })
+
+    layout = {
+        "title": {
+            "text": "Dispersão das produtoras por cluster<br><sup>Investimento acumulado vs. retorno doméstico (mesmo recorte do painel produtoras)</sup>",
+            "font": {"size": 16},
+        },
+        "xaxis": {
+            "title": "Investimento total acumulado — R$ mi (escala log)",
+            "type": "log",
+            "showgrid": True,
+            "gridcolor": "#e5e5e5",
+            "zeroline": False,
+        },
+        "yaxis": {
+            "title": "ROI doméstico total deflacionado (escala log)",
+            "type": "log",
+            "showgrid": True,
+            "gridcolor": "#e5e5e5",
+            "zeroline": False,
+        },
+        "legend": {
+            "orientation": "h",
+            "x": 0.5,
+            "xanchor": "center",
+            "y": -0.14,
+            "yanchor": "top",
+            "bgcolor": "rgba(255,255,255,0.85)",
+            "bordercolor": "#dddddd",
+            "borderwidth": 1,
+        },
+        "paper_bgcolor": "white",
+        "plot_bgcolor":  "#f8f9fa",
+        "margin": {"l": 70, "r": 30, "t": 80, "b": 130},
+        "font": {"family": "Arial, Helvetica, sans-serif", "size": 13},
+        "hoverlabel": {
+            "bgcolor": "white",
+            "bordercolor": "#cccccc",
+            "font": {"size": 13},
+        },
+    }
+
+    traces_json = json.dumps(traces)
+    layout_json = json.dumps(layout)
+
+    # Wrapper div com mesmo estilo que article img (bleed + border-radius)
+    # Marcadores <!-- chart3-plotly --> para facilitar substituição em runs subsequentes
+    div_id = "plotly-chart3-prod"
+    html = (
+        '<!-- chart3-plotly -->'
+        '<div style="display:block;width:calc(100% + 160px);max-width:none;'
+        'margin:40px -80px;border-radius:10px;overflow:hidden;background:white">'
+        f'<div id="{div_id}" style="width:100%;height:750px"></div>'
+        '<script src="https://cdn.plot.ly/plotly-2.35.2.min.js" charset="utf-8"></script>'
+        f'<script>Plotly.newPlot("{div_id}",'
+        f'{traces_json},'
+        f'{layout_json},'
+        '{"responsive":true,"displayModeBar":true,"displaylogo":false})'
+        '</script>'
+        '</div>'
+        '<!-- /chart3-plotly -->'
+    )
+    return html
 
 
 # ══════════════════════════════════════════════════════════════════════════════
-# CHART 4 — Produtoras por faixa de investimento FSA
+# CHART 4 — Produtoras ativas por ano e universo acumulado
 # ══════════════════════════════════════════════════════════════════════════════
 def chart4():
-    df = df_prod.copy()
-    df["fsa"] = _num(df, "investimento_fsa_deflac")
-    df = df[df["fsa"] > 0]
+    years         = [2014,2015,2016,2017,2018,2019,2020,2021,2022,2023]
+    active_counts = [144, 149, 231, 238, 304, 327, 257, 188, 230, 338]
+    cum_counts    = [144, 254, 402, 529, 643, 766, 840, 895, 981,1084]
 
-    bins   = [0, 500_000, 1_000_000, 2_500_000, 5_000_000, 10_000_000, 25_000_000]
-    labels = ["< 500K", "500K–1M", "1–2,5M", "2,5–5M", "5–10M", "> 10M"]
-    df["tier"] = pd.cut(df["fsa"], bins=bins, labels=labels, right=True)
+    x = np.arange(len(years))
+    fig, ax1 = plt.subplots(figsize=(11, 7))
+    ax2 = ax1.twinx()
 
-    counts    = df["tier"].value_counts().reindex(labels).fillna(0)
-    total_inv = df.groupby("tier")["fsa"].sum().reindex(labels).fillna(0)
+    bars = ax1.bar(x, active_counts, color=C_BLUE, alpha=0.80, label="Ativas no ano",
+                   edgecolor="white", linewidth=0.5, zorder=3)
+    line, = ax2.plot(x, cum_counts, color=C_RED, linewidth=2.5,
+                     marker="o", markersize=7, label="Universo acumulado", zorder=4)
+    ax2.fill_between(x, cum_counts, alpha=0.07, color=C_RED)
 
-    fig, axes = plt.subplots(1, 2, figsize=(13, 5.5))
+    for b, v in zip(bars, active_counts):
+        ax1.text(b.get_x() + b.get_width() / 2, b.get_height() + max(active_counts) * 0.015,
+                 str(v), ha="center", va="bottom", fontsize=20, color=C_BLUE)
 
-    ax = axes[0]
-    bar_colors = [C_BLUE if l in ("< 500K", "500K–1M", "1–2,5M") else C_ORANGE for l in labels]
-    bars = ax.bar(labels, counts, color=bar_colors, alpha=0.88, edgecolor="white")
-    ax.set_title("Nº de produtoras por faixa de investimento FSA")
-    ax.set_ylabel("Nº de produtoras")
-    ax.tick_params(axis="x", labelsize=9)
-    for b in bars:
-        h = b.get_height()
-        ax.text(b.get_x() + b.get_width() / 2, h + max(counts) * 0.02,
-                f"{int(h)}", ha="center", va="bottom", fontsize=9)
+    ax1.set_xticks(x)
+    ax1.set_xticklabels(years, fontsize=20)
+    ax1.set_ylabel("Produtoras ativas no ano", color=C_BLUE)
+    ax1.tick_params(axis="y", labelcolor=C_BLUE)
+    ax1.set_ylim(0, max(active_counts) * 1.22)
+    ax2.set_ylabel("Universo acumulado (total distinto)", color=C_RED)
+    ax2.tick_params(axis="y", labelcolor=C_RED)
+    ax2.spines["right"].set_visible(True)
+    ax2.spines["right"].set_color("#dddddd")
+    ax2.grid(False)
 
-    ax2 = axes[1]
-    bars2 = ax2.bar(labels, total_inv / 1e6, color=bar_colors, alpha=0.88, edgecolor="white")
-    ax2.set_title("Volume FSA por faixa (R$ M deflac. 2024)")
-    ax2.set_ylabel("R$ milhões (deflac. 2024)")
-    ax2.yaxis.set_major_formatter(FuncFormatter(lambda v, _: f"R${v:.0f}M"))
-    ax2.tick_params(axis="x", labelsize=9)
-    for b, v in zip(bars2, total_inv / 1e6):
-        ax2.text(b.get_x() + b.get_width() / 2, b.get_height() + total_inv.max() / 1e6 * 0.02,
-                 f"R${v:.0f}M", ha="center", va="bottom", fontsize=9)
-
-    handles = [mpatches.Patch(color=C_BLUE, label="Pequeno/médio porte"),
-               mpatches.Patch(color=C_ORANGE, label="Grande porte")]
-    axes[0].legend(handles=handles, fontsize=9)
-    fig.suptitle("Distribuição do investimento FSA por porte de produtora",
-                 fontsize=11, fontweight="bold")
+    handles = [mpatches.Patch(color=C_BLUE, label="Produtoras ativas no ano"),
+               mpatches.Patch(color=C_RED,  label="Universo acumulado")]
+    ax1.legend(handles=handles, fontsize=20, loc="upper left")
+    ax1.set_title("Produtoras ativas por ano e universo acumulado\nMais produtoras, mais obras, menos dinheiro por projeto")
+    ax1.grid(axis="y", alpha=0.3)
     fig.tight_layout()
     return fig_b64(fig)
 
@@ -319,26 +464,25 @@ def chart5():
     cumshare = np.arange(1, len(vals) + 1) / len(vals)
     gini = 1 - 2 * np.trapz(cumvals, cumshare)
 
-    fig, ax = plt.subplots(figsize=(9, 7))
-    ax.plot([0, 1], [0, 1], color="#cccccc", linewidth=1.2, linestyle="--",
+    fig, ax = plt.subplots(figsize=(9, 9))
+    ax.plot([0, 1], [0, 1], color="#cccccc", linewidth=1.5, linestyle="--",
             label="Igualdade perfeita", zorder=2)
     ax.fill_between(cumshare, cumvals, cumshare, alpha=0.10, color=C_BLUE, zorder=2)
     ax.plot(cumshare, cumvals, color=C_BLUE, linewidth=2.5,
-            label=f"Lorenz — FSA por produtora", zorder=3)
+            label="Lorenz — FSA por produtora", zorder=3)
 
     ax.annotate(f"Gini = {gini:.2f}",
-                xy=(0.65, 0.25), fontsize=15, color=C_BLUE, fontweight="bold",
+                xy=(0.65, 0.25), fontsize=24, color=C_BLUE, fontweight="bold",
                 bbox=dict(facecolor="white", edgecolor=C_BLUE, alpha=0.9,
                           boxstyle="round,pad=0.5"))
 
-    # Percentil annotations
     for pct, label_offset in [(0.50, (-0.15, 0.07)), (0.80, (-0.20, 0.06))]:
         idx = int(pct * len(vals))
         x_v, y_v = pct, cumvals[idx]
         ax.annotate(f"Top {100-pct*100:.0f}% = {100*(1-y_v):.0f}% do FSA",
                     xy=(x_v, y_v), xytext=(x_v + label_offset[0], y_v + label_offset[1]),
-                    arrowprops=dict(arrowstyle="->", color="#888888", lw=0.8),
-                    fontsize=9, color="#555555")
+                    arrowprops=dict(arrowstyle="->", color="#888888", lw=1.0),
+                    fontsize=20, color="#555555")
 
     ax.set_xlim(0, 1); ax.set_ylim(0, 1)
     ax.xaxis.set_major_formatter(PercentFormatter(1))
@@ -346,115 +490,110 @@ def chart5():
     ax.set_xlabel("Fração de produtoras (% acumulado)")
     ax.set_ylabel("Fração do investimento FSA (% acumulado)")
     ax.set_title("Curva de Lorenz — distribuição do investimento FSA por produtora")
-    ax.legend(fontsize=9)
+    ax.legend(fontsize=20)
     ax.grid(True, alpha=0.4)
     fig.tight_layout()
     return fig_b64(fig)
 
 
 # ══════════════════════════════════════════════════════════════════════════════
-# CHART 6 — Relação investimento FSA vs bilheteria por obra
+# CHART 6 — Distribuição do ticket anual combinado
 # ══════════════════════════════════════════════════════════════════════════════
 def chart6():
-    df = df_inv.copy()
-    df = df[df["categoria"].str.startswith("FSA", na=False)].copy()
-    df["bil"] = _num(df, "bilheteria_deflac_r2024")
+    labels = ["0–100k","100–200k","200–300k","300–500k",
+              "500–750k","750k–1M","1–1,5M","1,5–2M",
+              "2–3M","3–5M","5–10M","10M+"]
+    counts = [371, 139, 79, 96, 54, 41, 43, 25, 17, 19, 7, 3]
 
-    # Compute ticket (FSA per obra) from aggregates
-    agg = (df_cham.groupby("categoria")
-           .apply(lambda g: pd.to_numeric(g["investimento_fsa_deflac"], errors="coerce").fillna(0).sum()
-                  / max(g["n_obras"].sum(), 1),
-                  include_groups=False)
-           .rename("ticket"))
-    df = df.merge(agg, left_on="categoria", right_index=True, how="left")
-    df["ticket"] = _num(df, "ticket")
+    colors = ([C_RED]    * 4 +
+              [C_AMBER]  * 2 +
+              [C_TEAL]   * 3 +
+              [C_BLUE]   * 3)
 
-    sub = df[(df["ticket"] > 0) & (df["bil"] > 0)].copy()
+    fig, ax = plt.subplots(figsize=(11, 7))
+    bars = ax.bar(labels, counts, color=colors, alpha=0.88, edgecolor="white", zorder=3)
 
-    cat_color = {}
-    for cat in sub["categoria"].unique():
-        if "Distribuidora" in cat:   cat_color[cat] = C_GREEN
-        elif "Festivais" in cat:     cat_color[cat] = C_ORANGE
-        elif "Automático" in cat:    cat_color[cat] = C_MUTED
-        elif "Coprodução" in cat:    cat_color[cat] = C_PURPLE
-        else:                        cat_color[cat] = C_BLUE
+    ax.axvline(3.5, color=C_RED,   linewidth=1.5, linestyle="--", alpha=0.7)
+    ax.axvline(5.5, color=C_AMBER, linewidth=1.5, linestyle="--", alpha=0.7)
+    max_count = max(counts)
+    ax.text(3.6, max_count * 0.97, "R$500k", fontsize=20, color=C_RED,   va="top")
+    ax.text(5.6, max_count * 0.97, "R$1M",   fontsize=20, color=C_AMBER, va="top")
 
-    fig, ax = plt.subplots(figsize=(13, 6.5))
-    for cat in sub["categoria"].unique():
-        s = sub[sub["categoria"] == cat]
-        ax.scatter(s["ticket"] / 1e6, s["bil"] / 1e6, c=cat_color.get(cat, C_BLUE),
-                   s=30, alpha=0.55, zorder=3, linewidths=0)
+    for b, v in zip(bars, counts):
+        if v > 0:
+            ax.text(b.get_x() + b.get_width() / 2, b.get_height() + max_count * 0.01,
+                    str(v), ha="center", va="bottom", fontsize=20)
 
-    mx = max(sub["ticket"].max(), sub["bil"].max()) / 1e6 * 1.1
-    ax.plot([0, mx], [0, mx], color="#bbbbbb", linewidth=1, linestyle="--",
-            label="Paridade (ROI = 1)", zorder=2)
-
-    ax.xaxis.set_major_formatter(FuncFormatter(lambda v, _: f"R${v:.0f}M"))
-    ax.yaxis.set_major_formatter(FuncFormatter(lambda v, _: f"R${v:.0f}M"))
-    ax.set_xlabel("Investimento FSA médio por obra, por categoria (R$ M deflac. 2024)")
-    ax.set_ylabel("Bilheteria (R$ M deflac. 2024)")
-    ax.set_title("Relação entre investimento FSA e bilheteria por obra")
-
-    handles = [
-        mpatches.Patch(color=C_GREEN,  label="Seletivo Distribuidora"),
-        mpatches.Patch(color=C_ORANGE, label="Seletivo Festivais"),
-        mpatches.Patch(color=C_BLUE,   label="Seletivo Produtora"),
-        mpatches.Patch(color=C_MUTED,  label="Automático"),
-        mpatches.Patch(color=C_PURPLE, label="Coprodução Intl"),
-        mpatches.Patch(color="none",   label=""),
-    ]
-    ax.legend(handles=handles[:-1], fontsize=9, loc="upper left")
-    ax.grid(True, alpha=0.3)
+    ax.set_xlabel("Ticket anual combinado por produtora (FSA anualizado + Proxy RLP)")
+    ax.set_ylabel("Nº de produtoras")
+    ax.set_title("Distribuição do ticket anual combinado (fomento + Proxy RLP)\nProdutoras com FSA positivo no período 2014–2023")
+    ax.tick_params(axis="x", labelsize=16, rotation=22)
+    handles = [mpatches.Patch(color=C_RED,   label="Crítico (< R$500k)"),
+               mpatches.Patch(color=C_AMBER, label="Atenção (R$500k–1M)"),
+               mpatches.Patch(color=C_TEAL,  label="Viável (R$1–3M)"),
+               mpatches.Patch(color=C_BLUE,  label="Bom (> R$3M)")]
+    ax.legend(handles=handles, fontsize=20)
+    ax.grid(axis="y", alpha=0.3)
     fig.tight_layout()
     return fig_b64(fig)
 
 
 # ══════════════════════════════════════════════════════════════════════════════
-# CHART 7 — Diversidade: % diretoras e % regional por categoria
+# CHART 7 — Raça: % entre Inscritos vs. Selecionados
 # ══════════════════════════════════════════════════════════════════════════════
 def chart7():
-    df = df_cham[df_cham["categoria"].isin(CAT_SHORT)].copy()
-    df["pct_genero_feminino"]    = _num(df, "pct_genero_feminino")
-    df["pct_diversidade_regional"] = _num(df, "pct_diversidade_regional")
+    stages       = ["Inscritos\nsem PA", "Inscritos\ncom PA", "Selecionados\ncom PA"]
+    pct_neg_vals = [15.2, 22.8, 32.4]
+    pct_bra_vals = [56.0, 48.0, 39.0]
+    pct_out_vals = [100 - n - b for n, b in zip(pct_neg_vals, pct_bra_vals)]
 
-    agg = (df.groupby("categoria", as_index=False)
-             .agg(fem=("pct_genero_feminino", "mean"),
-                  div=("pct_diversidade_regional", "mean"),
-                  n=("n_obras", "sum"))
-             .assign(label=lambda x: x["categoria"].map(CAT_SHORT))
-             .sort_values("fem", ascending=True))
+    x = np.arange(len(stages))
+    w = 0.28
+    fig, ax = plt.subplots(figsize=(11, 7))
 
-    fig, axes = plt.subplots(1, 2, figsize=(13, 5.5))
+    b1 = ax.bar(x - w, pct_neg_vals, w, color=C_AMBER,  alpha=0.88,
+                label="Negro/Pardo/Indígena", edgecolor="white")
+    b2 = ax.bar(x,     pct_bra_vals, w, color=C_BLUE,   alpha=0.70,
+                label="Branco", edgecolor="white")
+    b3 = ax.bar(x + w, pct_out_vals, w, color=C_GREY,   alpha=0.60,
+                label="Outros / Não informado", edgecolor="white")
 
-    for ax, col, title, color in [
-        (axes[0], "fem", "% Obras com diretora mulher", C_PURPLE),
-        (axes[1], "div", "% Obras de regiões fora do eixo SP-RJ", C_AMBER),
-    ]:
-        bars = ax.barh(agg["label"], agg[col] * 100, color=color, alpha=0.88, edgecolor="white")
-        ax.set_title(title)
-        ax.set_xlabel("%")
-        ax.xaxis.set_major_formatter(PercentFormatter())
-        ax.grid(axis="x"); ax.grid(axis="y", alpha=0)
-        for b in bars:
-            v = b.get_width()
-            if v > 0.5:
-                ax.text(v + 0.5, b.get_y() + b.get_height() / 2,
-                        f"{v:.1f}%", va="center", fontsize=9, color="#333")
+    for bars, vals in [(b1, pct_neg_vals), (b2, pct_bra_vals), (b3, pct_out_vals)]:
+        for b, v in zip(bars, vals):
+            ax.text(b.get_x() + b.get_width() / 2, b.get_height() + 0.5,
+                    f"{v:.1f}%", ha="center", va="bottom", fontsize=22, fontweight="bold",
+                    color="#222222")
 
-    fig.suptitle("Diversidade de gênero e regional por tipo de chamada FSA",
-                 fontsize=11, fontweight="bold")
+    ax.annotate("", xy=(x[2] - w + w/2, pct_neg_vals[2] + 3),
+                xytext=(x[0] - w + w/2, pct_neg_vals[0] + 3),
+                arrowprops=dict(arrowstyle="->", color=C_AMBER, lw=2.5))
+    ax.text(x[1] - w/2, max(pct_neg_vals) + 5.5, "+17,2pp",
+            ha="center", fontsize=24, color=C_AMBER, fontweight="bold")
+
+    ax.set_xticks(x)
+    ax.set_xticklabels(stages, fontsize=22)
+    ax.set_ylabel("% do total de diretores declarantes")
+    ax.yaxis.set_major_formatter(PercentFormatter())
+    ax.set_ylim(0, 75)
+    ax.set_title("Raça — % entre Inscritos vs. Selecionados (Política Afirmativa)\n"
+                 "99 editais FSA/BRDE 2015–2025 · dados declaratórios · direção")
+    ax.legend(fontsize=20)
+    ax.grid(axis="y", alpha=0.3)
     fig.tight_layout()
     return fig_b64(fig)
 
 
+# ══════════════════════════════════════════════════════════════════════════════
+# CHARTS list — chart3 retorna HTML (não b64)
+# ══════════════════════════════════════════════════════════════════════════════
 CHARTS = [
-    ("chart1", chart1),
-    ("chart2", chart2),
-    ("chart3", chart3),
-    ("chart4", chart4),
-    ("chart5", chart5),
-    ("chart6", chart6),
-    ("chart7", chart7),
+    ("chart1", chart1, "png"),
+    ("chart2", chart2, "png"),
+    ("chart3", chart3, "html"),  # Plotly interativo
+    ("chart4", chart4, "png"),
+    ("chart5", chart5, "png"),
+    ("chart6", chart6, "png"),
+    ("chart7", chart7, "png"),
 ]
 
 
@@ -465,41 +604,74 @@ def main():
 
     # Gera todos os charts
     print("Gerando graficos...")
-    b64_list = []
-    for name, fn in CHARTS:
+    results = []
+    for name, fn, kind in CHARTS:
         print(f"  {name}...", flush=True)
         try:
-            b64 = fn()
-            b64_list.append(b64)
-            print(f"  {name} OK ({len(b64)//1000}KB)")
+            r = fn()
+            results.append((kind, r))
+            sz = len(r) // 1000
+            print(f"  {name} OK ({sz}KB, {kind})")
         except Exception as e:
             print(f"  {name} ERRO: {e}")
             import traceback; traceback.print_exc()
-            b64_list.append(None)
+            results.append((kind, None))
 
-    # Encontra todas as imgs base64 no HTML (qualquer formato de <img>)
-    # Abordagem: substitui apenas o base64 in-place para preservar atributos
-    B64_PATTERN = re.compile(r'(data:image/png;base64,)([A-Za-z0-9+/=]+)')
+    # Detecta se chart3 já está como Plotly (marcadores <!-- chart3-plotly -->)
+    PLOTLY_MARKER_PAT = re.compile(
+        r'<!-- chart3-plotly -->.*?<!-- /chart3-plotly -->', re.DOTALL
+    )
+    plotly3_match = PLOTLY_MARKER_PAT.search(html)
+    has_plotly3   = plotly3_match is not None
+    print(f"chart3 já é Plotly no HTML: {has_plotly3}")
+
+    # Encontra todas as imgs base64 no HTML (apenas PNG charts)
+    B64_PATTERN = re.compile(r'<img([^>]*?)src="(data:image/png;base64,[A-Za-z0-9+/=]+)"([^>]*?)>')
     b64_matches = list(B64_PATTERN.finditer(html))
-    print(f"\nEncontradas {len(b64_matches)} imagens no HTML")
+    print(f"Imagens base64 encontradas: {len(b64_matches)}")
 
-    n_replace = min(len(b64_matches), len(b64_list))
-    # Aplica do fim para o início (preserva offsets)
-    result = list(html)
-    replaced = 0
-    for i in reversed(range(n_replace)):
-        new_b64 = b64_list[i]
-        if new_b64 is None:
+    # Monta lista de substituições (start, end, new_content)
+    # chart3 (html): substitui o bloco Plotly existente ou o <img> original
+    # demais charts (png): substituem apenas o src base64, em ordem
+    subs  = []
+    b64_i = 0  # ponteiro para b64_matches (pula chart3 se já for Plotly)
+    replaced_png = replaced_html = 0
+
+    for chart_i, (kind, result) in enumerate(results):
+        if result is None:
+            if not (chart_i == 2 and has_plotly3):
+                b64_i += 1
             continue
-        m = b64_matches[i]
-        result[m.start(2):m.end(2)] = list(new_b64)
-        replaced += 1
 
-    html = "".join(result)
-    print(f"{replaced} grafico(s) substituido(s)")
+        if chart_i == 2 and kind == "html":
+            if has_plotly3:
+                # Substitui o bloco Plotly existente
+                subs.append((plotly3_match.start(), plotly3_match.end(), result))
+            else:
+                # Substitui o <img> original (primeira vez)
+                if b64_i < len(b64_matches):
+                    m = b64_matches[b64_i]
+                    subs.append((m.start(), m.end(), result))
+                    b64_i += 1
+            replaced_html += 1
+        else:
+            if b64_i < len(b64_matches):
+                m = b64_matches[b64_i]
+                subs.append((m.start(2), m.end(2), "data:image/png;base64," + result))
+                b64_i += 1
+                replaced_png += 1
+
+    # Aplica do fim para o início para preservar offsets
+    html_chars = list(html)
+    for start, end, new in sorted(subs, key=lambda x: x[0], reverse=True):
+        html_chars[start:end] = list(new)
+
+    html_out = "".join(html_chars)
+    print(f"{replaced_png} gráfico(s) PNG substituído(s)")
+    print(f"{replaced_html} gráfico(s) HTML (Plotly) substituído(s)")
 
     with open(HTML_PATH, "w", encoding="utf-8") as f:
-        f.write(html)
+        f.write(html_out)
     print(f"Salvo: {HTML_PATH}")
 
     # Copia para docs/politica.html
