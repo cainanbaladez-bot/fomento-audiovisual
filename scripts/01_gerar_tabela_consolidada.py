@@ -39,7 +39,7 @@ PMI_SERIES = {      # preço médio ingresso por ano de exibição
     2024: 19.88, 2025: 19.88, 2026: 19.88,
 }
 
-TV_PAGA = {1: 280_000, 2: 120_000, 3: 60_000}   # R$ por tier
+TV_PAGA = {1: 280_000, 2: 120_000, 3: 60_000}   # R$ nominal (referência: ano de emissão do CRT)
 VOD_DOM  = 60_000
 TV_ABERTA = 80_000
 DVD       = 5_000
@@ -664,7 +664,7 @@ for _, row in crt.iterrows():
     }
 
 def estimar_janelas(cpb):
-    """Retorna estimativa de receita das janelas domésticas em R$2024 (ex-bilheteria)."""
+    """Retorna estimativa nominal de receita das janelas domésticas (ex-bilheteria)."""
     s = crt_map.get(cpb, {})
     rev = 0.0
     if s.get("tem_tv"):
@@ -681,20 +681,20 @@ def estimar_janelas(cpb):
 def estimar_janelas_deflac(cpb, ano_obra):
     """
     Retorna (outras_janelas_deflac_r2024, outras_janelas_nominal).
-    Os valores base em crt_receita_estimada já estão em R$2024 → deflac = esses valores.
-    Nominal = deflac / fator_ipca[ano_emissao] (preço na época da emissão do CRT).
+    Os valores base (TV_PAGA, VOD_DOM etc.) são nominais — referência do ano de emissão do CRT.
+    Deflac = nominal * fator_ipca[ano_emissao] (converte para R$2024).
     """
     s = crt_map.get(cpb, {})
     deflac = 0.0
     nominal = 0.0
 
-    def _janela(tem_key, valor_r2024, ano_emissao_key):
+    def _janela(tem_key, valor_nominal, ano_emissao_key):
         if not s.get(tem_key):
             return 0.0, 0.0
-        vd = float(valor_r2024)
+        vn = float(valor_nominal)
         ano = s.get(ano_emissao_key) or ano_obra
         fat = IPCA_FATORES.get(int(ano), 1.0) if (ano and IPCA_FATORES) else 1.0
-        return vd, round(vd / fat, 2)
+        return round(vn * fat, 2), vn
 
     tier = s.get("tier_tv", 3)
     vd, vn = _janela("tem_tv",  TV_PAGA.get(tier, 60_000), "ano_emissao_tv_paga")
@@ -717,7 +717,7 @@ import math as _math
 # ── 6a. Festivais ──────────────────────────────────────────────────────────────
 # Fonte única: resultados/festivais_consolidado.csv
 #   Gerado por scripts/00b_fusao_festivais.py
-#   Prioridade: Ata BRDE/FSA 2024 (primária) +
+#   Prioridade: Atas BRDE/FSA consolidadas (2014-2024, primária) +
 #               Festivais_por_obra_pre_expansao.xlsx (complemento)
 
 FEST_COLS = [
@@ -848,7 +848,7 @@ except Exception as _ep:
 _LUM_MAX = _math.log1p(2_500_000)   # normaliza log(1 + adm) pela maior obra conhecida
 # Cap de pontuação de festivais para o componente de 70 pts do ROI Internacional.
 # festivais_consolidado.csv reúne duas escalas distintas:
-#   - Ata BRDE/FSA 2024 (primária): max ~115 pts (ANCINE)
+#   - Atas BRDE/FSA consolidadas 2014-2024 (primária): max ~115 pts (ANCINE)
 #   - Festivais_por_obra_pre_expansao.xlsx (complemento): max ~351 pts
 # Cap de 350 cobre o máximo observado (Central do Brasil, 351).
 _FEST_MAX = 350

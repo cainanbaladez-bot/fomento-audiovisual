@@ -212,6 +212,12 @@ def chart_fig1():
     w = 0.38
     b1 = ax.bar(x - w/2, grp["inv"]   / 1e6, w, color=C_BLUE,   alpha=0.85, label="Investimento total (FSA + Renúncia)", zorder=3)
     b2 = ax.bar(x + w/2, grp["receita"]/ 1e6, w, color=C_ORANGE, alpha=0.85, label="Receita estimada (bilheteria + janelas)", zorder=3)
+    # Disclaimer: % sintético (janelas estimadas)
+    _jan_total = df["jan"].sum()
+    _rec_total = df["receita"].sum()
+    _pct_sint = round(_jan_total / _rec_total * 100, 1) if _rec_total > 0 else 0
+    ax.annotate(f"* {_pct_sint:.1f}% da receita são estimativas de janelas (TV, VOD, DVD) — dados sintéticos",
+                xy=(0.0, -0.09), xycoords="axes fraction", fontsize=11, color="#999", style="italic")
     ax.set_xticks(x)
     ax.set_xticklabels(grp["ano"].astype(int), fontsize=18)
     ax.yaxis.set_major_formatter(FuncFormatter(lambda v, _: f"R${v:.0f}M"))
@@ -362,6 +368,12 @@ def chart_fig3():
     ax.legend(fontsize=18)
     add_bar_labels(ax, b1, fmt="{:.2f}x", color=C_BLUE)
     add_bar_labels(ax, b2, fmt="{:.2f}x", color=C_TEAL)
+    # Disclaimer: receita total inclui janelas sintéticas
+    _jan_t = df["jan"].sum()
+    _rec_t = df["rec"].sum()
+    _ps = round(_jan_t / _rec_t * 100, 1) if _rec_t > 0 else 0
+    ax.annotate(f"* ROI Receita total inclui {_ps:.1f}% de estimativas de janelas (TV, VOD, DVD) — dados sintéticos",
+                xy=(0.0, -0.08), xycoords="axes fraction", fontsize=11, color="#999", style="italic")
     fig.tight_layout()
     return fig_b64(fig)
 
@@ -648,6 +660,17 @@ def chart_fig9():
     b1 = ax.bar(x - w, agg["tot"] / 1e6, w, color=C_BLUE, alpha=0.85, label="Investimento total")
     b2 = ax.bar(x,     agg["fsa"] / 1e6, w, color=C_PURPLE, alpha=0.85, label="Investimento FSA")
     b3 = ax.bar(x + w, agg["rec"] / 1e6, w, color=C_ORANGE, alpha=0.85, label="Receita estimada")
+    # Disclaimer: % sintético (usa base_nivel_obra para calcular %)
+    _jan_col = "outras_janelas_deflac"
+    if _jan_col in df.columns:
+        _jan_t = _num(df, _jan_col).sum()
+        _rec_t = df["rec"].sum()
+    else:
+        _jan_t = _num(df_obra, _jan_col).sum()
+        _rec_t = (_num(df_obra, "bilheteria_deflac") + _num(df_obra, _jan_col)).sum()
+    _ps = round(_jan_t / _rec_t * 100, 1) if _rec_t > 0 else 0
+    ax.annotate(f"* {_ps:.1f}% da receita são estimativas de janelas (TV, VOD, DVD) — dados sintéticos",
+                xy=(0.0, -0.08), xycoords="axes fraction", fontsize=11, color="#999", style="italic")
     ax.set_xticks(x)
     ax.set_xticklabels([c.replace(" ", "\n") for c in agg["cluster"]], fontsize=18)
     ax.yaxis.set_major_formatter(FuncFormatter(lambda v, _: f"R${v:.0f}M"))

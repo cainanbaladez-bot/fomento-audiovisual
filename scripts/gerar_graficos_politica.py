@@ -20,6 +20,7 @@ import matplotlib as mpl
 import matplotlib.pyplot as plt
 import matplotlib.patches as mpatches
 from matplotlib.ticker import FuncFormatter, PercentFormatter
+from parse_diversidade import compute as _div_compute
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 HTML_PATH = os.path.join(
@@ -540,12 +541,16 @@ def chart6():
 
 # ══════════════════════════════════════════════════════════════════════════════
 # CHART 7 — Raça: % entre Inscritos vs. Selecionados
+# NOTA: Percentuais tabulados manualmente a partir dos resultados dos editais
+# seletivos BRDE/FSA (2015–2024). Não computados pelo pipeline.
 # ══════════════════════════════════════════════════════════════════════════════
 def chart7():
+    _m = _div_compute()
+    _sp, _cp = _m["sem_pa"], _m["com_pa"]
     stages       = ["Inscritos\nsem PA", "Inscritos\ncom PA", "Selecionados\ncom PA"]
-    pct_neg_vals = [15.2, 22.8, 32.4]
-    pct_bra_vals = [56.0, 48.0, 39.0]
-    pct_out_vals = [100 - n - b for n, b in zip(pct_neg_vals, pct_bra_vals)]
+    pct_neg_vals = [_sp["pct_negro_inscritos"], _cp["pct_negro_inscritos"], _cp["pct_negro_selecionados"]]
+    pct_bra_vals = [_sp["pct_branco_inscritos"], _cp["pct_branco_inscritos"], _cp["pct_branco_selecionados"]]
+    pct_out_vals = [round(100 - n - b, 1) for n, b in zip(pct_neg_vals, pct_bra_vals)]
 
     x = np.arange(len(stages))
     w = 0.28
@@ -567,7 +572,8 @@ def chart7():
     ax.annotate("", xy=(x[2] - w + w/2, pct_neg_vals[2] + 3),
                 xytext=(x[0] - w + w/2, pct_neg_vals[0] + 3),
                 arrowprops=dict(arrowstyle="->", color=C_AMBER, lw=2.5))
-    ax.text(x[1] - w/2, max(pct_neg_vals) + 5.5, "+17,2pp",
+    _delta_pp = round(pct_neg_vals[2] - pct_neg_vals[0], 1)
+    ax.text(x[1] - w/2, max(pct_neg_vals) + 5.5, f"+{_delta_pp:.1f}pp",
             ha="center", fontsize=24, color=C_AMBER, fontweight="bold")
 
     ax.set_xticks(x)
@@ -575,8 +581,9 @@ def chart7():
     ax.set_ylabel("% do total de diretores declarantes")
     ax.yaxis.set_major_formatter(PercentFormatter())
     ax.set_ylim(0, 75)
+    _n_ed = _sp["n_editais"] + _cp["n_editais"]
     ax.set_title("Raça — % entre Inscritos vs. Selecionados (Política Afirmativa)\n"
-                 "99 editais FSA/BRDE 2015–2025 · dados declaratórios · direção")
+                 f"{_n_ed} editais FSA/BRDE 2015–2025 · dados declaratórios · direção")
     ax.legend(fontsize=20)
     ax.grid(axis="y", alpha=0.3)
     fig.tight_layout()

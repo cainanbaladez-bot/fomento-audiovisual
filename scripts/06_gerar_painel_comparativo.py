@@ -916,9 +916,18 @@ def make_cluster_kpi():
             showlegend=False,
         ), row=1, col=col)
 
+    # Disclaimer: % sintético na receita
+    _jan_t = df_prod["outras_janelas_deflac"].astype(float).sum()
+    _rec_t = df_prod["receita_total_deflac"].astype(float).sum()
+    _ps = round(_jan_t / _rec_t * 100, 1) if _rec_t > 0 else 0
     fig.update_layout(
         title="Volume por Cluster de Produtora",
         height=440, margin=dict(l=40, r=20, t=80, b=120),
+    )
+    fig.add_annotation(
+        text=f"* {_ps:.1f}% da receita são estimativas de janelas (TV, VOD, DVD) — dados sintéticos",
+        xref="paper", yref="paper", x=0.0, y=-0.18,
+        showarrow=False, font=dict(size=10, color="#888"), align="left",
     )
     fig.update_xaxes(tickangle=-25)
     return fig
@@ -1798,7 +1807,7 @@ def make_intl_festival_map():
     const vod = info.vod || [];
     let html = '<div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:8px">';
     html += '<div><div style="font-size:12px;font-weight:800;color:#222">' + esc(name) + ' (' + esc(info.iso2) + ')</div>';
-    html += '<div style="font-size:9px;color:#666;margin-top:2px">Fontes: festivais na base ATA BRDE/FSA 2024; VOD na base Lumière VOD.</div></div>';
+    html += '<div style="font-size:9px;color:#666;margin-top:2px">Fontes: festivais na base consolidada de atas BRDE/FSA (2014–2024); VOD na base Lumière VOD.</div></div>';
     html += '<div style="font-size:10px;color:#555;white-space:nowrap"><b style="color:#fbbf24">' + fest.length + '</b> obras em festival · <b style="color:#6c7bf7">' + vod.length + '</b> títulos VOD</div></div>';
     html += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;align-items:start">';
     html += '<div><div style="font-size:9px;font-weight:700;color:#fbbf24;margin-bottom:5px;text-transform:uppercase;letter-spacing:.06em">Festivais</div>';

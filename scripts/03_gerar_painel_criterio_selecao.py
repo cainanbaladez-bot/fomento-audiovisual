@@ -988,7 +988,7 @@ tbody td{{padding:9px 12px;font-size:11px;vertical-align:middle}}
 
         <h3 style="margin-top:16px">Métricas de Retorno</h3>
         <div class="meto-row"><span>ROI Total Deflacionado (R$2024) — <strong style="color:var(--text)">métrica primária</strong></span><span>receita deflac. / (FSA deflac. + renúncia deflac.)</span></div>
-        <div class="meto-row"><span style="font-size:10px;color:var(--muted)">Receita = bilheteria deflacionada + outras janelas deflacionadas (R$2024). Denominador = capital público total alocado na obra (FSA direto + renúncia fiscal Art. 3/3-A). Mede o retorno sobre o conjunto do fomento público, tratando FSA e renúncia como co-investimento do Estado.</span></div>
+        <div class="meto-row"><span style="font-size:10px;color:var(--muted)">Receita = bilheteria deflacionada + outras janelas deflacionadas (R$2024). <strong>Nota:</strong> as janelas (TV Paga, VOD, TV Aberta, DVD) são estimativas com valores fixos por tier, deflacionadas pela data de emissão do CRT — não são receita observada (dados sintéticos). Denominador = capital público total alocado na obra (FSA direto + renúncia fiscal Art. 3/3-A). Mede o retorno sobre o conjunto do fomento público, tratando FSA e renúncia como co-investimento do Estado.</span></div>
         <div class="meto-row"><span>ROI FSA Deflacionado (R$2024)</span><span>receita deflac. / FSA deflac.</span></div>
         <div class="meto-row"><span style="font-size:10px;color:var(--muted)">Considera apenas o investimento FSA direto no denominador, excluindo renúncia fiscal. Útil para isolar a eficiência do FSA como instrumento — mas subestima o capital público total mobilizado em obras com forte participação de renúncia.</span></div>
         <div class="meto-row"><span>ROI Doméstico Nominal (compatibilidade)</span><span>receita nominal total da obra / investimento nominal deste mecanismo</span></div>
@@ -1013,7 +1013,7 @@ tbody td{{padding:9px 12px;font-size:11px;vertical-align:middle}}
         <div class="meto-row"><span>Bilheteria</span><span>por_filme_ano.csv · ANCINE (2014+)</span></div>
         <div class="meto-row"><span>Admissões EU</span><span>lumiere_search.xlsx · Lumière/CNC</span></div>
         <div class="meto-row"><span>VOD internacional</span><span>lumiere_vod_search.xlsx · Lumière/CNC</span></div>
-        <div class="meto-row"><span>Festivais</span><span>festivais_consolidado.csv · Ata BRDE/FSA 2024 (primária) + pesquisa bibliográfica (complemento)</span></div>
+        <div class="meto-row"><span>Festivais</span><span>festivais_consolidado.csv · Atas BRDE/FSA consolidadas (2014–2024) + pesquisa bibliográfica (complemento)</span></div>
       </div>
     </div>
 
@@ -1025,6 +1025,7 @@ tbody td{{padding:9px 12px;font-size:11px;vertical-align:middle}}
       (4) Renúncia fiscal exclui obras sem FSA confirmado para evitar superestimação do ROI (denominador seria apenas o captado SALIC, que é parcial).
       (5) Categorias com menos de 5 obras são excluídas do painel por insuficiência amostral.
       (6) Obras com múltiplas chamadas na mesma categoria são deduplicadas para métricas de obra-nível (bilheteria, janelas, festivais, VOD). O ROI usa todas as entradas para refletir o investimento real de cada chamada.
+      (7) <strong>Causalidade vs auto-seleção:</strong> produtores comerciais tendem a buscar chamadas com critério de bilheteria, enquanto cineastas autorais buscam chamadas com critério festival. A correlação entre critério e tipo de retorno pode refletir tanto o efeito do critério quanto a auto-seleção dos candidatos. Os dados não permitem distinguir os dois mecanismos.
     </div>
   </div>
 </div>

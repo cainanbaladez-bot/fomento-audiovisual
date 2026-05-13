@@ -27,6 +27,7 @@ import plotly.io as pio
 # Centralised CSS definitions
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from shared_styles import mega_css, PLOTLY_LAYOUT, PLOTLY_AXIS
+from parse_diversidade import compute as _div_compute
 
 BASE = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
@@ -502,7 +503,7 @@ intl_map_fallback_script = """
     var vod = row.vodList || [];
     var html = '<div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:8px">';
     html += '<div><div style="font-size:12px;font-weight:800;color:#222">' + _esc(row.name) + ' (' + _esc(row.iso2) + ')</div>';
-    html += '<div style="font-size:9px;color:#666;margin-top:2px">Fontes: festivais na base ATA BRDE/FSA 2024; VOD na base Lumière VOD.</div></div>';
+    html += '<div style="font-size:9px;color:#666;margin-top:2px">Fontes: festivais na base consolidada de atas BRDE/FSA (2014–2024); VOD na base Lumière VOD.</div></div>';
     html += '<div style="font-size:10px;color:#555;white-space:nowrap"><b style="color:#ff8040">' + fest.length + '</b> obras em festival · <b style="color:#5B6BB5">' + vod.length + '</b> títulos VOD</div></div>';
     html += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;align-items:start">';
     html += '<div><div style="font-size:9px;font-weight:700;color:#ff8040;margin-bottom:5px;text-transform:uppercase;letter-spacing:.06em">Festivais</div>';
@@ -2144,79 +2145,104 @@ except Exception as e:
 
 # Runtime renderers for sections that were static shells in the source HTML.
 # They only aggregate existing project data and keep the source datasets unchanged.
-_div_render_script = r'''
+# Percentuais computados dinamicamente de raw/Posição_20260324.xlsx via parse_diversidade.
+_div_data = _div_compute()
+_dpa = _div_data["com_pa"]
+_dno = _div_data["sem_pa"]
+
+# Valores para os gráficos Plotly
+_neg_insc_sem = _dno["pct_negro_inscritos"]
+_neg_insc_com = _dpa["pct_negro_inscritos"]
+_neg_sel_com  = _dpa["pct_negro_selecionados"]
+_mul_insc_com = _dpa["pct_mulher_inscritas"]
+_mul_sel_com  = _dpa["pct_mulher_selecionadas"]
+_mul_dir_glob = _dpa["pct_mulher_dir_global"]
+_mul_prod_glob = _dpa["pct_mulher_prod_inscritas"]
+_taxa_neg_sem = _dno["taxa_selecao_negro"]
+_taxa_bra_sem = _dno["taxa_selecao_branco"]
+_taxa_neg_com = _dpa["taxa_selecao_negro"]
+_taxa_bra_com = _dpa["taxa_selecao_branco"]
+_taxa_mul_com = _dpa["taxa_selecao_mulher"]
+_taxa_hom_com = _dpa["taxa_selecao_homem"]
+_taxa_mul_sem = _dno["taxa_selecao_mulher"]
+_taxa_hom_sem = _dno["taxa_selecao_homem"]
+_y_max_raca = max(_neg_insc_sem, _neg_insc_com, _neg_sel_com) + 6
+_y_max_gen  = max(_mul_insc_com, _mul_sel_com, _mul_dir_glob, _mul_prod_glob) + 8
+_y_max_taxa = max(_taxa_neg_sem, _taxa_bra_sem, _taxa_neg_com, _taxa_bra_com, _taxa_mul_com, _taxa_hom_com, _taxa_mul_sem, _taxa_hom_sem) + 4
+
+_div_render_script = f'''
 <script>
-(function(){
-  var baseLayout = {
+(function(){{
+  var baseLayout = {{
     paper_bgcolor:'rgba(0,0,0,0)',
     plot_bgcolor:'rgba(14,16,24,0.6)',
-    font:{color:'#e8eaf2',family:'Inter, system-ui, sans-serif',size:10},
-    margin:{l:48,r:18,t:18,b:44},
-    xaxis:{gridcolor:'#1e2035',zerolinecolor:'#2a2d45'},
-    yaxis:{gridcolor:'#1e2035',zerolinecolor:'#2a2d45',ticksuffix:'%'},
-    legend:{orientation:'h',y:-0.22}
-  };
-  function mergeLayout(extra){
-    return Object.assign({}, baseLayout, extra || {});
-  }
-  function plot(id, data, layout){
+    font:{{color:'#e8eaf2',family:'Inter, system-ui, sans-serif',size:10}},
+    margin:{{l:48,r:18,t:18,b:44}},
+    xaxis:{{gridcolor:'#1e2035',zerolinecolor:'#2a2d45'}},
+    yaxis:{{gridcolor:'#1e2035',zerolinecolor:'#2a2d45',ticksuffix:'%'}},
+    legend:{{orientation:'h',y:-0.22}}
+  }};
+  function mergeLayout(extra){{
+    return Object.assign({{}}, baseLayout, extra || {{}});
+  }}
+  function plot(id, data, layout){{
     var el = document.getElementById(id);
     if(!el || !window.Plotly) return;
-    Plotly.react(el, data, mergeLayout(layout), {responsive:true,displaylogo:false});
-  }
-  window.divRender = function(){
-    plot('div-chart-raca', [{
+    Plotly.react(el, data, mergeLayout(layout), {{responsive:true,displaylogo:false}});
+  }}
+  window.divRender = function(){{
+    plot('div-chart-raca', [{{
       type:'bar',
-      x:['Inscritos sem PA','Inscritos com PA','Selecionados com PA'],
-      y:[15.2,22.8,32.4],
-      marker:{color:['#5a6080','#f5c842','#6c7bf7']},
-      text:['15,2%','22,8%','32,4%'],
+      x:['Inscritos controle','Inscritos com PA','Contratados com PA'],
+      y:[{_neg_insc_sem},{_neg_insc_com},{_neg_sel_com}],
+      marker:{{color:['#5a6080','#f5c842','#6c7bf7']}},
+      text:['{_neg_insc_sem:.1f}%'.replace('.',','),'{_neg_insc_com:.1f}%'.replace('.',','),'{_neg_sel_com:.1f}%'.replace('.',',')],
       textposition:'outside',
-      hovertemplate:'%{x}<br>%{y:.1f}%<extra></extra>'
-    }], {yaxis:{range:[0,38],ticksuffix:'%',gridcolor:'#1e2035'}, showlegend:false});
+      hovertemplate:'%{{x}}<br>%{{y:.1f}}%<extra></extra>'
+    }}], {{yaxis:{{range:[0,{_y_max_raca:.0f}],ticksuffix:'%',gridcolor:'#1e2035'}}, showlegend:false}});
 
-    plot('div-chart-genero', [{
+    plot('div-chart-genero', [{{
       type:'bar',
-      x:['Inscritas com PA','Selecionadas com PA','Direcao global','Producao executiva'],
-      y:[37.0,52.6,30.0,66.0],
-      marker:{color:['#a78bfa','#6c7bf7','#5fd1ff','#f5c842']},
-      text:['37,0%','52,6%','30,0%','66,0%'],
+      x:['Inscritas com PA','Contratadas com PA','Direcao global','Producao executiva'],
+      y:[{_mul_insc_com},{_mul_sel_com},{_mul_dir_glob},{_mul_prod_glob}],
+      marker:{{color:['#a78bfa','#6c7bf7','#5fd1ff','#f5c842']}},
+      text:['{_mul_insc_com:.1f}%'.replace('.',','),'{_mul_sel_com:.1f}%'.replace('.',','),'{_mul_dir_glob:.1f}%'.replace('.',','),'{_mul_prod_glob:.1f}%'.replace('.',',')],
       textposition:'outside',
-      hovertemplate:'%{x}<br>%{y:.1f}%<extra></extra>'
-    }], {yaxis:{range:[0,74],ticksuffix:'%',gridcolor:'#1e2035'}, showlegend:false});
+      hovertemplate:'%{{x}}<br>%{{y:.1f}}%<extra></extra>'
+    }}], {{yaxis:{{range:[0,{_y_max_gen:.0f}],ticksuffix:'%',gridcolor:'#1e2035'}}, showlegend:false}});
 
     plot('div-chart-taxa', [
-      {type:'bar',name:'Negros',x:['Sem PA','Com PA'],y:[26.8,14.8],marker:{color:'#f5c842'},hovertemplate:'Negros - %{x}<br>%{y:.1f}%<extra></extra>'},
-      {type:'bar',name:'Brancos',x:['Sem PA','Com PA'],y:[29.9,9.1],marker:{color:'#5fd1ff'},hovertemplate:'Brancos - %{x}<br>%{y:.1f}%<extra></extra>'},
-      {type:'bar',name:'Mulheres',x:['Com PA'],y:[15.0],marker:{color:'#a78bfa'},hovertemplate:'Mulheres - %{x}<br>%{y:.1f}%<extra></extra>'},
-      {type:'bar',name:'Homens',x:['Com PA'],y:[7.9],marker:{color:'#ff7c6e'},hovertemplate:'Homens - %{x}<br>%{y:.1f}%<extra></extra>'}
-    ], {barmode:'group', yaxis:{range:[0,34],ticksuffix:'%',gridcolor:'#1e2035'}});
+      {{type:'bar',name:'Negros',x:['Controle','Com PA'],y:[{_taxa_neg_sem},{_taxa_neg_com}],text:['{_taxa_neg_sem}%','{_taxa_neg_com}%'],textposition:'outside',marker:{{color:'#f5c842'}},hovertemplate:'Negros - %{{x}}<br>%{{y:.1f}}%<extra></extra>'}},
+      {{type:'bar',name:'Brancos',x:['Controle','Com PA'],y:[{_taxa_bra_sem},{_taxa_bra_com}],text:['{_taxa_bra_sem}%','{_taxa_bra_com}%'],textposition:'outside',marker:{{color:'#5fd1ff'}},hovertemplate:'Brancos - %{{x}}<br>%{{y:.1f}}%<extra></extra>'}},
+      {{type:'bar',name:'Mulheres',x:['Controle','Com PA'],y:[{_taxa_mul_sem},{_taxa_mul_com}],text:['{_taxa_mul_sem}%','{_taxa_mul_com}%'],textposition:'outside',marker:{{color:'#a78bfa'}},hovertemplate:'Mulheres - %{{x}}<br>%{{y:.1f}}%<extra></extra>'}},
+      {{type:'bar',name:'Homens',x:['Controle','Com PA'],y:[{_taxa_hom_sem},{_taxa_hom_com}],text:['{_taxa_hom_sem}%','{_taxa_hom_com}%'],textposition:'outside',marker:{{color:'#ff7c6e'}},hovertemplate:'Homens - %{{x}}<br>%{{y:.1f}}%<extra></extra>'}}
+    ], {{barmode:'group', yaxis:{{range:[0,{_y_max_taxa:.0f}],ticksuffix:'%',gridcolor:'#1e2035'}}}});
 
-    plot('div-chart-raca-global', [{
+    plot('div-chart-raca-global', [{{
       type:'scatter',
       mode:'lines+markers+text',
-      x:['Sem PA: inscritos negros','Com PA: inscritos negros','Com PA: selecionados negros'],
-      y:[15.2,22.8,32.4],
-      line:{color:'#6c7bf7',width:3},
-      marker:{size:11,color:['#5a6080','#f5c842','#6c7bf7']},
-      text:['15,2%','22,8%','32,4%'],
+      x:['Controle: inscritos negros','Com PA: inscritos negros','Com PA: contratados negros'],
+      y:[{_neg_insc_sem},{_neg_insc_com},{_neg_sel_com}],
+      line:{{color:'#6c7bf7',width:3}},
+      marker:{{size:11,color:['#5a6080','#f5c842','#6c7bf7']}},
+      text:['{_neg_insc_sem:.1f}%'.replace('.',','),'{_neg_insc_com:.1f}%'.replace('.',','),'{_neg_sel_com:.1f}%'.replace('.',',')],
       textposition:'top center',
-      hovertemplate:'%{x}<br>%{y:.1f}%<extra></extra>'
-    }], {yaxis:{range:[0,38],ticksuffix:'%',gridcolor:'#1e2035'}, showlegend:false});
+      hovertemplate:'%{{x}}<br>%{{y:.1f}}%<extra></extra>'
+    }}], {{yaxis:{{range:[0,{_y_max_raca:.0f}],ticksuffix:'%',gridcolor:'#1e2035'}}, showlegend:false}});
 
-    plot('div-chart-genero-global', [{
+    plot('div-chart-genero-global', [{{
       type:'bar',
-      x:['Direcao','Producao executiva','Inscritas com PA','Selecionadas com PA'],
-      y:[30.0,66.0,37.0,52.6],
-      marker:{color:['#5fd1ff','#f5c842','#a78bfa','#6c7bf7']},
-      text:['30,0%','66,0%','37,0%','52,6%'],
+      x:['Direcao','Producao executiva','Inscritas com PA','Contratadas com PA'],
+      y:[{_mul_dir_glob},{_mul_prod_glob},{_mul_insc_com},{_mul_sel_com}],
+      marker:{{color:['#5fd1ff','#f5c842','#a78bfa','#6c7bf7']}},
+      text:['{_mul_dir_glob:.1f}%'.replace('.',','),'{_mul_prod_glob:.1f}%'.replace('.',','),'{_mul_insc_com:.1f}%'.replace('.',','),'{_mul_sel_com:.1f}%'.replace('.',',')],
       textposition:'outside',
-      hovertemplate:'%{x}<br>%{y:.1f}%<extra></extra>'
-    }], {yaxis:{range:[0,74],ticksuffix:'%',gridcolor:'#1e2035'}, showlegend:false});
+      hovertemplate:'%{{x}}<br>%{{y:.1f}}%<extra></extra>'
+    }}], {{yaxis:{{range:[0,{_y_max_gen:.0f}],ticksuffix:'%',gridcolor:'#1e2035'}}, showlegend:false}});
 
     _resizeVisibleCharts('mega-section-div');
-  };
-})();
+  }};
+}})()
 </script>
 '''
 

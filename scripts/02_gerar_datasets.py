@@ -620,6 +620,7 @@ for cnpj, grp in df_prod_scope.groupby("CNPJ_produtora"):
     bil_d        = grp["Bilheteria Deflac. (R$)"].astype(float).sum()
     jan_d        = grp["Outras Janelas Deflac. (R$2024)"].astype(float).sum()
     rec_d        = bil_d + jan_d  # Receita = Bilheteria + Outras Janelas
+    pct_sint     = round(jan_d / rec_d * 100, 1) if rec_d > 0 else 0.0
     roi_fsa_d    = round(rec_d / inv_fsa_d,  4) if inv_fsa_d  > 0 else None
     roi_tot_d    = round(rec_d / inv_tot_d,  4) if inv_tot_d  > 0 else None
     roi_intl_med = grp["ROI Internacional (0-100)"].astype(float).mean()
@@ -659,6 +660,7 @@ for cnpj, grp in df_prod_scope.groupby("CNPJ_produtora"):
         "bilheteria_deflac":           round(bil_d, 2),
         "outras_janelas_deflac":       round(jan_d, 2),
         "receita_total_deflac":        round(rec_d, 2),
+        "pct_receita_sintetica":       pct_sint,
         "roi_dom_fsa_deflac":          roi_fsa_d,
         "roi_dom_total_deflac":        roi_tot_d,
         "roi_intl_medio":              round(roi_intl_med, 2) if pd.notna(roi_intl_med) else None,
@@ -736,6 +738,7 @@ for cnpj, grp in df_prod_scope_amplo.groupby("CNPJ_produtora"):
     bil_d        = grp["Bilheteria Deflac. (R$)"].astype(float).sum()
     jan_d        = grp["Outras Janelas Deflac. (R$2024)"].astype(float).sum()
     rec_d        = bil_d + jan_d
+    pct_sint     = round(jan_d / rec_d * 100, 1) if rec_d > 0 else 0.0
     roi_fsa_d    = round(rec_d / inv_fsa_d,  4) if inv_fsa_d  > 0 else None
     roi_tot_d    = round(rec_d / inv_tot_d,  4) if inv_tot_d  > 0 else None
     roi_intl_med = grp["ROI Internacional (0-100)"].astype(float).mean()
@@ -773,6 +776,7 @@ for cnpj, grp in df_prod_scope_amplo.groupby("CNPJ_produtora"):
         "bilheteria_deflac":           round(bil_d, 2),
         "outras_janelas_deflac":       round(jan_d, 2),
         "receita_total_deflac":        round(rec_d, 2),
+        "pct_receita_sintetica":       pct_sint,
         "roi_dom_fsa_deflac":          roi_fsa_d,
         "roi_dom_total_deflac":        roi_tot_d,
         "roi_intl_medio":              round(roi_intl_med, 2) if pd.notna(roi_intl_med) else None,
@@ -842,6 +846,7 @@ for chamada, grp in _cat_rows:
     bil_d      = grp["Bilheteria Deflac. (R$)"].astype(float).sum()
     jan_d      = grp["Outras Janelas Deflac. (R$2024)"].astype(float).sum()
     rec_d      = bil_d + jan_d  # Receita total
+    pct_sint   = round(jan_d / rec_d * 100, 1) if rec_d > 0 else 0.0
     n_bil      = (grp["Bilheteria Deflac. (R$)"].astype(float) > 0).sum()
     n_fest     = (grp["Pontuação Festivais"].astype(float) > 0).sum()
     n_lum      = (grp["Adm. EU — Lumière"].astype(float) > 0).sum()
@@ -880,6 +885,7 @@ for chamada, grp in _cat_rows:
         "bilheteria_total_deflac":   round(bil_d, 0),
         "outras_janelas_deflac":     round(jan_d, 0),
         "receita_total_deflac":      round(rec_d, 0),
+        "pct_receita_sintetica":     pct_sint,
         "roi_dom_fsa_agregado":      roi_fsa_m,
         "roi_dom_total_agregado":    roi_tot_m,
         "roi_dom_fsa_medio_obra":    roi_fsa_med_obra,
@@ -1066,6 +1072,7 @@ try:
         bil_d     = grp["Bilheteria Deflac. (R$)"].astype(float).sum()
         jan_d     = grp["Outras Janelas Deflac. (R$2024)"].astype(float).sum()
         rec_d     = bil_d + jan_d  # Receita total
+        pct_sint  = round(jan_d / rec_d * 100, 1) if rec_d > 0 else 0.0
         roi_fsa   = round(rec_d / inv_fsa_d, 4) if inv_fsa_d > 0 else None
         roi_tot   = round(rec_d / inv_tot_d, 4) if inv_tot_d > 0 else None
         roi_intl  = grp["ROI Internacional (0-100)"].astype(float).mean()
@@ -1115,6 +1122,7 @@ try:
             "bilheteria_deflac":       round(bil_d, 2),
             "outras_janelas_deflac":   round(jan_d, 2),
             "receita_total_deflac":    round(rec_d, 2),
+            "pct_receita_sintetica":   pct_sint,
             "roi_dom_fsa_deflac":      roi_fsa,
             "roi_dom_total_deflac":    roi_tot,
             "roi_intl_medio":          round(roi_intl, 2) if pd.notna(roi_intl) else None,
