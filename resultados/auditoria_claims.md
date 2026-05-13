@@ -5,8 +5,8 @@
 | Métrica | Valor |
 |---------|-------|
 | Claims auditados | 6 |
-| Corretos | 3 |
-| Com ressalvas | 3 |
+| Corretos | 4 |
+| Com ressalvas | 2 |
 | Referências | 13 |
 
 ---
@@ -16,10 +16,10 @@
 | # | Claim | Veredito | Auditoria | Literatura | Fragilidade |
 |---|-------|---------|-----------|------------|-------------|
 | 1 | ROI Doméstico 0,79x | ✅ Correto | 90% | 40% | Numerador inclui janelas além de bilheteria |
-| 2 | Distribuidoras selecionam melhor | ⚠️ Ressalva | 60% | 35% | Distribuidoras superiores em ambas as métricas, mas com mais investimento — risco de endogeneidade |
+| 2 | Distribuidoras selecionam melhor | ⚠️ Ressalva | 60% | 35% | Superioridade confundida com volume de investimento + endogeneidade |
 | 3 | Critério bilheteria / festival | ✅ Correto | 85% | 90% | Causalidade vs auto-seleção não testada |
 | 4 | Gini 0,634 | ⚠️ Ressalva | 70% | 45% | Divergência 0,61 vs 0,634 entre versões |
-| 5 | Política Afirmativa funciona | ⚠️ Ressalva | 35% | 85% | Valores hardcoded nos scripts, não computados |
+| 5 | Política Afirmativa funciona | ✅ Correto | 90% | 85% | Computados automaticamente, com grupo de controle |
 | 6 | Curta → Longa intl (2,2x) | ✅ Correto | 65% | 80% | Match de nomes precisa documentação |
 
 ---
