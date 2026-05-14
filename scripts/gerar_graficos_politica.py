@@ -25,7 +25,7 @@ from parse_diversidade import compute as _div_compute
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 HTML_PATH = os.path.join(
     ROOT, "output_final",
-    "Uma política de fomento baseada em evidências_v6.html"
+    "Uma política de fomento baseada em evidências.html"
 )
 
 # ── Nature-style rcParams ──────────────────────────────────────────────────────
@@ -580,7 +580,7 @@ def chart7():
     ax.set_xticklabels(stages, fontsize=22)
     ax.set_ylabel("% do total de diretores declarantes")
     ax.yaxis.set_major_formatter(PercentFormatter())
-    ax.set_ylim(0, 75)
+    ax.set_ylim(0, 90)
     _n_ed = _sp["n_editais"] + _cp["n_editais"]
     ax.set_title("Raça — % entre Inscritos vs. Selecionados (Política Afirmativa)\n"
                  f"{_n_ed} editais FSA/BRDE 2015–2025 · dados declaratórios · direção")
